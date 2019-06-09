@@ -76,7 +76,7 @@ public class Employee implements Serializable {
         System.out.println("<<< Employee initQueryParameters() END <<<");
     }
     
-    public String getViewId() throws UnsupportedEncodingException
+    private String getViewId() throws UnsupportedEncodingException
     {
         String viewId = String.format("employeeDetail?faces-redirect=true&employee_id=%s&mode=%s"
                                             , URLEncoder.encode(employeeId, "UTF-8")
@@ -163,19 +163,28 @@ public class Employee implements Serializable {
     
     public String beginEdit() throws UnsupportedEncodingException
     {
+        System.out.println(">>> Employee beginEdit() BEGIN >>>");
         this.mode = Mode.Edit;
-        return getViewId();
+        String viewId = getViewId();
+        System.out.println("Return ViewId=" + viewId);
+        System.out.println("<<< Employee beginEdit() END <<<");
+        return viewId;
     }
     
     public String cancelEdit() throws UnsupportedEncodingException
     {
+        System.out.println(">>> Employee cancelEdit() BEGIN >>>");
         this.mode = Mode.Read;
-        return getViewId();
+        String viewId = getViewId();
+        System.out.println("Return ViewId=" + viewId);
+        System.out.println("<<< Employee cancelEdit() END <<<");
+        return viewId;
     }
     
     @Transactional
     public void save()
     {
+        System.out.println(">>> Employee save() BEGIN >>>");
         TEmployee tEmployee = em.find(TEmployee.class, employeeId);
         if(tEmployee==null) {
             tEmployee = new TEmployee();
@@ -199,6 +208,7 @@ public class Employee implements Serializable {
             tEmployee.setZipCode(zipCode);
             em.merge(tEmployee);
         }
+        System.out.println("<<< Employee save() END <<<");
    }
 
     public void showMessage()
