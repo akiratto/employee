@@ -15,8 +15,6 @@
         </f:metadata>
         <h1>社員台帳</h1>
         <h:form id="frm">
-            <h:outputText value="Employeeインスタンスは有効です。" rendered="#{not empty employee}" />
-            <h:outputText value="Employeeインスタンスは無効です。" rendered="#{empty employee}" />
             <h:messages styleClass="preformatted"/>
             <h:panelGrid columns="3" >
                 <h:commandButton value="編集" action="#{employee.beginEdit()}" rendered="#{employee.isRead()}" />
