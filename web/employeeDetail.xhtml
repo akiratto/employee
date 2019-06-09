@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>社員情報</title>
+    </h:head>
+    <h:outputStylesheet library="css" name="format.css" />
+    <h:body>
+        <f:metadata>
+            <f:viewParam name="employee_id" value="#{employee.employeeId}" />
+            <f:viewParam name="mode" value="#{employee.mode}" />
+            <f:viewAction action="#{employee.initQueryParameters()}" />
+        </f:metadata>
+        <h1>社員台帳</h1>
+        <h:form id="frm">
+            <h:outputText value="Employeeインスタンスは有効です。" rendered="#{not empty employee}" />
+            <h:outputText value="Employeeインスタンスは無効です。" rendered="#{empty employee}" />
+            <h:messages styleClass="preformatted"/>
+            <h:panelGrid columns="3" >
+                <h:commandButton value="編集" action="#{employee.beginEdit()}" rendered="#{employee.isRead()}" />
+                <h:commandButton value="保存" action="#{employee.save()}" rendered="#{employee.isEdit()}" />
+                <h:commandButton value="取消" action="#{employee.cancelEdit()}" rendered="#{employee.isEdit()}" />
+            </h:panelGrid>
+            <h:panelGrid columns="2">
+                <h:outputLabel value="社員名：" for="employee_name" />
+                <h:inputText id="employee_name" value="#{employee.name}" disabled="#{employee.isRead()}"/>
+                <h:outputLabel value="性別：" for="employee_gender" />
+                <h:selectOneMenu id="employee_gender" value="#{employee.gender}" disabled="#{employee.isRead()}">
+                    <f:selectItem itemLabel="男" itemValue="M" />
+                    <f:selectItem itemLabel="女" itemValue="F" />
+                    <f:selectItem itemLabel="その他" itemValue="O" />
+                </h:selectOneMenu>
+                <h:outputLabel value="電話番号" for="employee_phone" />
+                <h:inputText id="employee_phone" value="#{employee.phone}" disabled="#{employee.isRead()}" />
+                <h:outputLabel value="携帯電話番号" for="employee_mobile_phone" />
+                <h:inputText id="employee_mobile_phone" value="#{employee.mobilePhone}" disabled="#{employee.isRead()}" />
+                <h:outputLabel value="郵便番号" for="employee_zipcode" />
+                <h:inputText id="employee_zipcode" value="#{employee.zipCode}" disabled="#{employee.isRead()}"/>
+                <h:outputLabel value="住所" for="employee_address" />
+                <h:inputText id="employee_address" value="#{employee.address}" disabled="#{employee.isRead()}"/>
+            </h:panelGrid>
+        </h:form>
+    </h:body>
+</html>
+

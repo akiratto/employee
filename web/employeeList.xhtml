@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>社員一覧</title>
+    </h:head>
+    <h:body>
+        <h:form id="f">
+            <h:dataTable value="#{employeeList.extract()}" var="emp" >
+                <h:column><f:facet name="header"><h:outputText value="社員ID" /></f:facet><h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}">#{emp.employee_id}</h:commandLink></h:column>
+                <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="性別" /></f:facet>#{emp.gender}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
+                <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="住所" /></f:facet>#{emp.address}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="備考" /></f:facet>#{emp.remarks}</h:column>
+            </h:dataTable>
+        </h:form>
+    </h:body>
+</html>
+
