@@ -30,7 +30,12 @@
                 <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
                 <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>
                 <h:column><f:facet name="header"><h:outputText value="住所" /></f:facet>#{emp.address}</h:column>
-                <h:column><f:facet name="header"><h:outputText value="備考" /></f:facet>#{emp.remarks}</h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="備考" />
+                    </f:facet>
+                    <h:outputText class="preformatted" value="#{emp.remarks}"/>
+                </h:column>
             </h:dataTable>
         </h:form>
     </h:body>

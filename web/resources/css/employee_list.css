@@ -11,7 +11,18 @@ table.employee_list, table.employee_list td, table.employee_list th {
     border-collapse: collapse;
     padding: 3px;
 }
-th {
+table.employee_list th {
     background-color: lightyellow;
     text-align: left;
+}
+
+table.employee_list td {
+    vertical-align: top;
+}
+
+/* 1列目を中央ぞろえにする */
+table.employee_list tr th:nth-of-type(1), 
+table.employee_list tr td:nth-of-type(1)
+{
+    text-align: center;
 }
