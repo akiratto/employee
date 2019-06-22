@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -21,7 +23,7 @@ public class Employee implements Serializable {
         Read,
         Edit
     }
-    private String employeeId;
+    private Integer employeeId;
     private TEmployee entity;
     private Mode mode = Mode.Undefined;
     
@@ -46,29 +48,50 @@ public class Employee implements Serializable {
     {
         
         System.out.println(">>> Employee initQueryParameters() BEGIN >>>");
-        if(employeeId != null && !employeeId.equals("")) {
-            entity = em.find(TEmployee.class, employeeId);
-            if(entity != null) {
-                System.out.println("employee found! [employeeId=" + entity.getEmployee_id() + ", mode=" + mode.name() + "]");
-            }
+        switch(this.mode) {
+            case New:
+                entity = new TEmployee();
+                break;
+                
+            case Edit:
+            case Read:
+                if(employeeId != null && !employeeId.equals("")) {
+                    
+                    entity = em.find(TEmployee.class, employeeId);
+                    if(entity != null) {
+                        System.out.println("employee found! [employeeId=" + entity.getEmployee_id() + ", mode=" + mode.name() + "]");
+                    }
+                }
+                break;
+                
+            default:
+                break;
         }
+
         System.out.println("<<< Employee initQueryParameters() END <<<");
     }
 
-    public String getEmployeeId() {
+    public Integer getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(String employeeId) {
+    public void setEmployeeId(Integer employeeId) {
         this.employeeId = employeeId;
     }
     
-    private String getViewId() throws UnsupportedEncodingException
+    private String getViewId() 
     {
-        String viewId = String.format("employeeDetail?faces-redirect=true&employee_id=%s&mode=%s"
-                                            , URLEncoder.encode(employeeId, "UTF-8")
-                                            , URLEncoder.encode(mode.name(), "UTF-8"));
-        System.out.println("viewId=" + viewId);
+        String viewId = "";
+        try {
+            viewId = String.format("employeeDetail?faces-redirect=true&employee_id=%d&mode=%s"
+                                                , employeeId
+                                                , URLEncoder.encode(mode.name(), "UTF-8"));
+            System.out.println("viewId=" + viewId);
+            return viewId;
+        } catch(UnsupportedEncodingException e) {
+            viewId = "employeeDetail?faces-redirect=true";
+            e.printStackTrace();
+        }
         return viewId;
     }
 
@@ -88,7 +111,7 @@ public class Employee implements Serializable {
     public boolean isRead() { return mode == Mode.Read; }
     public boolean isEdit() { return mode == Mode.Edit; }
     
-    public String beginEdit() throws UnsupportedEncodingException
+    public String beginEdit()
     {
         System.out.println(">>> Employee beginEdit() BEGIN >>>");
         this.mode = Mode.Edit;
@@ -98,7 +121,7 @@ public class Employee implements Serializable {
         return viewId;
     }
     
-    public String cancelEdit() throws UnsupportedEncodingException
+    public String cancelEdit()
     {
         System.out.println(">>> Employee cancelEdit() BEGIN >>>");
         this.mode = Mode.Read;
@@ -109,14 +132,17 @@ public class Employee implements Serializable {
     }
     
     @Transactional
-    public void save()
+    public String save()
     {
         System.out.println(">>> Employee save() BEGIN >>>");
-        if(entity==null) {
+        if(isNew()) {
             em.persist(entity);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員情報を新規登録しました。"));
         } else {
             em.merge(entity);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員情報を保存しました。"));
         }
         System.out.println("<<< Employee save() END <<<");
+        return "";
    }
 }

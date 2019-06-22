@@ -5,6 +5,8 @@ package entity;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -14,7 +16,8 @@ import javax.persistence.Id;
 public class TEmployee {
 
     @Id
-    private String employee_id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer employee_id;
 
     @Basic
     private String name;
@@ -37,11 +40,11 @@ public class TEmployee {
     @Basic
     private String remarks;
 
-    public String getEmployee_id() {
+    public Integer getEmployee_id() {
         return this.employee_id;
     }
 
-    public void setEmployee_id(String employee_id) {
+    public void setEmployee_id(Integer employee_id) {
         this.employee_id = employee_id;
     }
 

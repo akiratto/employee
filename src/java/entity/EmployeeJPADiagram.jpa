@@ -31,10 +31,10 @@
                 <jpa:xwm nil="false" req="false"/>
                 <jpa:xm nil="false" req="false"/>
             </jpa:basic>
-            <jpa:id attribute-type="String" v="true" xvt="" name="employee_id" id="_15490577361183">
+            <jpa:id attribute-type="Integer" v="true" xvt="" name="employee_id" id="_15490577361183">
                 <jpa:xwm nil="false" req="false"/>
                 <jpa:xm nil="false" req="false"/>
-                <jpa:generated-value/>
+                <jpa:generated-value strategy="IDENTITY"/>
             </jpa:id>
         </jpa:attributes>
         <jpa:nq e="false" name="TEmployee.findAll">

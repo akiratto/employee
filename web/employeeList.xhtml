@@ -8,8 +8,17 @@
     </h:head>
     <h:body>
         <h:form id="f">
+            <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
             <h:dataTable value="#{employeeList.extract()}" var="emp" >
-                <h:column><f:facet name="header"><h:outputText value="社員ID" /></f:facet><h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}">#{emp.employee_id}</h:commandLink></h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="社員ID" />
+                    </f:facet>
+                    <h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}" 
+                                     value="#{emp.employee_id}">
+                        <f:convertNumber pattern="0000" />
+                    </h:commandLink>
+                </h:column>
                 <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
                 <h:column><f:facet name="header"><h:outputText value="性別" /></f:facet>#{emp.gender}</h:column>
                 <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>

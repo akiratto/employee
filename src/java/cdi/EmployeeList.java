@@ -43,7 +43,12 @@ public class EmployeeList {
                 
     }
     
-    public String gotoDetail(String employeeId, String mode) throws UnsupportedEncodingException
+    public String createEmployee()
+    {
+        return "employeeDetail?faces-redirect=true&mode=New";
+    }
+    
+    public String gotoDetail(Integer employeeId, String mode) throws UnsupportedEncodingException
     {
         System.out.println(String.format(">>> EmployeeList gotoDetail(%s,%s) BEGIN >>>", employeeId, mode));
         
@@ -53,6 +58,6 @@ public class EmployeeList {
         }
         
         System.out.println(String.format("<<< EmployeeList gotoDetail(%s,%s) END <<<", employeeId, mode));
-        return "employeeDetail?faces-redirect=true&employee_id=" + URLEncoder.encode(employeeId, "UTF-8") + "&mode=" + URLEncoder.encode(mode, "UTF-8");
+        return "employeeDetail?faces-redirect=true&employee_id=" + employeeId + "&mode=" + URLEncoder.encode(mode, "UTF-8");
     }
 }
