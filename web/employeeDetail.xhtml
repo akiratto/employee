@@ -87,7 +87,7 @@
                                    disabled="#{employee.isRead()}"/>
                 <h:message for="employee_remarks" />
             </h:panelGrid>
-            <h:commandButton value="戻る" action="employeeList" immediate="true" />
+            <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true" />
         </h:form>
     </h:body>
 </html>
