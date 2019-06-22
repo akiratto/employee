@@ -6,17 +6,22 @@
     <h:head>
         <title>社員一覧</title>
     </h:head>
+    <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
         <h:form id="f">
-            <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
-            <h:dataTable value="#{employeeList.extract()}" var="emp" >
+            <h1>社員一覧</h1>
+            <h:panelGrid columns="1">
+                <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
+            </h:panelGrid>
+            <h:dataTable styleClass="employee_list" value="#{employeeList.extract()}" var="emp" >
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="社員ID" />
                     </f:facet>
-                    <h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}" 
-                                     value="#{emp.employee_id}">
-                        <f:convertNumber pattern="0000" />
+                    <h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}">
+                        <h:outputText value="#{emp.employee_id}">
+                            <f:convertNumber pattern="0000" />
+                        </h:outputText>
                     </h:commandLink>
                 </h:column>
                 <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>

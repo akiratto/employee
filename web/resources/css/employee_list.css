@@ -1,0 +1,17 @@
+/* 
+    Created on : 2019/01/23, 7:55:27
+    Author     : owner
+*/
+.preformatted{
+    white-space: pre;
+}
+
+table.employee_list, table.employee_list td, table.employee_list th {
+    border: solid 1px gray;
+    border-collapse: collapse;
+    padding: 3px;
+}
+th {
+    background-color: lightyellow;
+    text-align: left;
+}
