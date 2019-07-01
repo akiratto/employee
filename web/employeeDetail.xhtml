@@ -15,7 +15,8 @@
         <h1>社員情報</h1>
         <h:form id="frm">
             <h:messages  />
-            <h:panelGrid columns="3" >
+            <h:panelGrid columns="4" >
+                <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true" />
                 <h:commandButton value="編集" action="#{employee.beginEdit()}" rendered="#{employee.isRead()}" />
                 <h:commandButton value="保存" action="#{employee.save()}" rendered="#{employee.isEdit() or employee.isNew()}" />
                 <h:commandButton value="取消" action="#{employee.cancelEdit()}" rendered="#{employee.isEdit()}" immediate="true" />
@@ -76,7 +77,8 @@
                 <h:inputText id="employee_address" 
                                value="#{employee.entity.address}" 
                                disabled="#{employee.isRead()}"
-                               requiredMessage="住所の入力は必須です">
+                               requiredMessage="住所の入力は必須です"
+                               style="width:338px;">
                     <f:validateRequired />
                 </h:inputText>
                 <h:message for="employee_address" />
@@ -84,10 +86,11 @@
                 <h:outputLabel value="備考" for="employee_remarks" />
                 <h:inputTextarea id="employee_remarks"
                                    value="#{employee.entity.remarks}"
-                                   disabled="#{employee.isRead()}"/>
+                                   disabled="#{employee.isRead()}"
+                                   cols="40"
+                                   rows="20"/>
                 <h:message for="employee_remarks" />
             </h:panelGrid>
-            <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true" />
         </h:form>
     </h:body>
 </html>

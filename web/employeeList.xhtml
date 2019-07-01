@@ -10,8 +10,42 @@
     <h:body>
         <h:form id="f">
             <h1>社員一覧</h1>
-            <h:panelGrid columns="1">
+            <h:panelGrid columns="2">
                 <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
+                <h:commandButton action="#{employeeList.search()}" value="検索" />
+            </h:panelGrid>
+            <h:panelGrid columns="3">
+                <h:outputLabel for="search_employee_id" value="社員ID"/>
+                <h:inputText id="search_employee_id" value="#{employeeList.searchCondition.employee_id}" />
+                <h:message for="search_employee_id" />
+
+                <h:outputLabel for="search_employee_name" value="社員名"/>
+                <h:inputText id="search_employee_name" value="#{employeeList.searchCondition.name}" />
+                <h:message for="search_employee_name" />
+
+                <h:outputLabel for="search_employee_gender" value="性別"/>
+                <h:inputText id="search_employee_gender" value="#{employeeList.searchCondition.gender}" />
+                <h:message for="search_employee_gender" />
+
+                <h:outputLabel for="search_employee_phone" value="電話番号"/>
+                <h:inputText id="search_employee_phone" value="#{employeeList.searchCondition.phone}" />
+                <h:message for="search_employee_phone" />
+
+                <h:outputLabel for="search_employee_mobile_phone" value="携帯電話番号"/>
+                <h:inputText id="search_employee_mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" />
+                <h:message for="search_employee_mobile_phone" />
+
+                <h:outputLabel for="search_employee_zip_code" value="郵便番号"/>
+                <h:inputText id="search_employee_zip_code" value="#{employeeList.searchCondition.zipCode}" />
+                <h:message for="search_employee_zip_code" />
+
+                <h:outputLabel for="search_employee_address" value="住所"/>
+                <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" />
+                <h:message for="search_employee_address" />
+
+                <h:outputLabel for="search_employee_reamarks" value="備考"/>
+                <h:inputText id="search_employee_reamarks" value="#{employeeList.searchCondition.remarks}" />
+                <h:message for="search_employee_reamarks" />
             </h:panelGrid>
             <h:dataTable styleClass="employee_list" value="#{employeeList.extract()}" var="emp" >
                 <h:column>

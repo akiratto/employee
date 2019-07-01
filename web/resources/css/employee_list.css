@@ -20,9 +20,11 @@ table.employee_list td {
     vertical-align: top;
 }
 
-/* 1列目を中央ぞろえにする */
+/* 列を中央ぞろえにする */
 table.employee_list tr th:nth-of-type(1), 
-table.employee_list tr td:nth-of-type(1)
+table.employee_list tr td:nth-of-type(1),
+table.employee_list tr th:nth-of-type(3), 
+table.employee_list tr td:nth-of-type(3)
 {
     text-align: center;
 }
