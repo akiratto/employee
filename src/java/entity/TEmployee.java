@@ -3,6 +3,7 @@
  */
 package entity;
 
+import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,7 +14,7 @@ import javax.persistence.Id;
  * @author owner
  */
 @Entity(name = "TEmployee")
-public class TEmployee {
+public class TEmployee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

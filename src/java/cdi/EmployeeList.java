@@ -1,19 +1,21 @@
 package cdi;
 
 import entity.TEmployee;
-import entity.TEmployee_;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 /**
@@ -21,8 +23,8 @@ import javax.persistence.criteria.Root;
  * @author owner
  */
 @Named
-@RequestScoped
-public class EmployeeList {
+@ViewScoped
+public class EmployeeList implements Serializable {
     @PersistenceContext
     private EntityManager em;
     
@@ -57,47 +59,60 @@ public class EmployeeList {
         List<TEmployee> employeeList;
         System.out.println(">>> EmployeeList extract() BEGIN >>>");
         
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<TEmployee> cq = cb.createQuery(TEmployee.class);
+        CriteriaBuilder build = em.getCriteriaBuilder();
+        CriteriaQuery<TEmployee> cq = build.createQuery(TEmployee.class);
         Root<TEmployee> root = cq.from(TEmployee.class);
-        cq = cq.select(root);
-        cq = searchCondition != null && !searchCondition.equals("") ? 
-                cq.where(cb.equal(root.get(TEmployee_.employee_id), searchCondition.getEmployee_id())) : cq ;
-                
-
+        Predicate where = build.conjunction();
         
-//エラー
-//        String sql = "SELECT t FROM TEmployee t "
-//                   + "WHERE (t.employee_id = :searchEmployeeId OR :searchEmployeeId IS NULL) "
-//                   + "  AND (t.name like :searchName OR :searchName IS NULL OR :searchName = '') "
-//                   + "  AND (t.gender like :searchGender OR :searchGender IS NULL OR :searchGender = '') "
-//                   + "  AND (t.phone like :searchPhone OR :searchPhone IS NULL OR :searchPhone = '') "
-//                   + "  AND (t.mobilePhone like :searchMobilePhone OR :searchMobilePhone IS NULL OR :searchMobilePhone = '') "
-//                   + "  AND (t.zipCode like :searchZipCode OR :searchZipCode IS NULL OR :searchZipCode = '') "
-//                   + "  AND (t.address like :searchAddress OR :searchAddress IS NULL OR :searchAddress = '') "
-//                   + "  AND (t.remarks like :searchRemarks OR :searchRemarks IS NULL OR :searchRemarks = '') ";
-
-
-//        String sql = "SELECT t FROM TEmployee t "
-//                   + "WHERE (t.employee_id = :searchEmployeeId) "
-//                   + "  AND (t.name like :searchName) "
-//                   + "  AND (t.gender like :searchGender) "
-//                   + "  AND (t.phone like :searchPhone) "
-//                   + "  AND (t.mobilePhone like :searchMobilePhone) "
-//                   + "  AND (t.zipCode like :searchZipCode) "
-//                   + "  AND (t.address like :searchAddress) "
-//                   + "  AND (t.remarks like :searchRemarks) ";
-//        employeeList = em.createQuery(sql, TEmployee.class)
-//                            .setParameter("searchEmployeeId", searchCondition.getEmployee_id())
-//                            .setParameter("searchName", searchCondition.getName())
-//                            .setParameter("searchGender", searchCondition.getGender())
-//                            .setParameter("searchPhone", searchCondition.getPhone())
-//                            .setParameter("searchMobilePhone", searchCondition.getMobilePhone())
-//                            .setParameter("searchZipCode", searchCondition.getZipCode())
-//                            .setParameter("searchAddress", searchCondition.getAddress())
-//                            .setParameter("searchRemarks", searchCondition.getRemarks())
-//                            .getResultList();       
-        
+        if(searchCondition.getEmployee_id()!=null) {
+            where = build.and(where, build.equal(
+                                        root.get(TEmployee_.employee_id), 
+                                        searchCondition.getEmployee_id()
+            ));
+        }
+        if(searchCondition.getName()!=null && !searchCondition.getName().isEmpty()) {
+            where = build.and(where, build.like(
+                                        root.get(TEmployee_.name), 
+                                        "%" + likeEscape(searchCondition.getName()) + "%"
+            ));
+        }
+        if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
+            where = build.and(where, build.like(
+                                        root.get(TEmployee_.gender), 
+                                        "%" + likeEscape(searchCondition.getGender()) + "%", '\\'
+            ));
+        }
+        if(searchCondition.getPhone()!=null && !searchCondition.getPhone().isEmpty()) {
+            where = build.and(where, build.like(
+                                        root.get(TEmployee_.phone), 
+                                        "%" + likeEscape(searchCondition.getPhone()) + "%"
+            ));
+        }
+        if(searchCondition.getMobilePhone()!=null && !searchCondition.getMobilePhone().isEmpty()) {
+            where = build.and(where, build.like(
+                                        root.get(TEmployee_.mobilePhone), 
+                                        "%" + likeEscape(searchCondition.getMobilePhone()) + "%"
+            ));
+        }
+        if(searchCondition.getZipCode()!=null && !searchCondition.getZipCode().isEmpty()) {
+            where = build.and(where, build.like(
+                                        root.get(TEmployee_.zipCode), 
+                                        "%" + likeEscape(searchCondition.getZipCode()) + "%"
+            ));
+        }
+        if(searchCondition.getAddress()!=null && !searchCondition.getAddress().isEmpty()) {
+            where = build.and(where, build.like(
+                                        root.get(TEmployee_.address), 
+                                        "%" + likeEscape(searchCondition.getAddress()) + "%"
+            ));
+        }
+        if(searchCondition.getRemarks()!=null && !searchCondition.getRemarks().isEmpty()) {
+            where = build.and(where, build.like(
+                                        root.get(TEmployee_.remarks), 
+                                        "%" + likeEscape(searchCondition.getRemarks()) + "%"
+            ));
+        }        
+        cq = cq.select(root).where(where);
         System.out.println("<<< EmployeeList extract() END <<<");
         return em.createQuery(cq).getResultList();
                 
@@ -123,6 +138,14 @@ public class EmployeeList {
     
     public String search()
     {
-        return "";
+        return "employeeList?faces-redirect=true";
+//        return "";
+    }
+
+    private String likeEscape(String likeCondition)
+    {
+        return likeCondition
+                .replaceAll("_", "\\\\_")
+                .replaceAll("%", "\\\\%");
     }
 }
