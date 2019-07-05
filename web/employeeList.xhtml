@@ -12,7 +12,10 @@
             <h1>社員一覧</h1>
             <h:panelGrid columns="2">
                 <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
-                <h:commandButton action="#{employeeList.search()}" value="検索" />
+                <h:commandLink action="#{employeeList.search()}" value="検索">
+                    <f:param name="search_employee_id"
+                </h:commandLink>
+                
             </h:panelGrid>
             <h:panelGrid columns="3">
                 <h:outputLabel for="search_employee_id" value="社員ID"/>
