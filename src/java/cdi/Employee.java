@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -46,28 +47,28 @@ public class Employee implements Serializable {
     
     public void initQueryParameters()
     {
-        
         System.out.println(">>> Employee initQueryParameters() BEGIN >>>");
         switch(this.mode) {
             case New:
                 entity = new TEmployee();
                 break;
-                
             case Edit:
             case Read:
-                if(employeeId != null && !employeeId.equals("")) {
+                if(employeeId == null || employeeId.equals("")) break;
                     
-                    entity = em.find(TEmployee.class, employeeId);
-                    if(entity != null) {
-                        System.out.println("employee found! [employeeId=" + entity.getEmployee_id() + ", mode=" + mode.name() + "]");
-                    }
+                entity = em.find(TEmployee.class, employeeId);
+                if(entity == null) break;
+                System.out.println("employee found! [employeeId=" + entity.getEmployee_id() + ", mode=" + mode.name() + "]");
+
+                Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+                String message = (String)flash.getOrDefault("message","");
+                if(!message.isEmpty()) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(message));
                 }
-                break;
-                
+                break;       
             default:
                 break;
         }
-
         System.out.println("<<< Employee initQueryParameters() END <<<");
     }
 
@@ -132,17 +133,26 @@ public class Employee implements Serializable {
     }
     
     @Transactional
-    public String save()
+    public String save() throws UnsupportedEncodingException
     {
         System.out.println(">>> Employee save() BEGIN >>>");
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         if(isNew()) {
             em.persist(entity);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員情報を新規登録しました。"));
+            flash.put("message", "社員情報を新規登録しました。");
         } else {
             em.merge(entity);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員情報を保存しました。"));
+            flash.put("message","社員情報を保存しました。");
         }
+        
+        StringBuilder builder = new StringBuilder();
+        builder.append("employeeDetail.xhtml?faces-redirect=true");
+        builder.append("&employee_id=");
+        builder.append(employeeId.toString());
+        builder.append("&mode=");
+        builder.append(URLEncoder.encode(mode.name(),"UTF-8"));
+        
         System.out.println("<<< Employee save() END <<<");
-        return "";
+        return builder.toString();
    }
 }

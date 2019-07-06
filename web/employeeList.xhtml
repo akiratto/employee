@@ -8,14 +8,23 @@
     </h:head>
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
+        <f:metadata>
+            <f:viewParam name="employee_id" value="#{employeeList.searchCondition.employee_id}" />
+            <f:viewParam name="name" value="#{employeeList.searchCondition.name}" />
+            <f:viewParam name="gender" value="#{employeeList.searchCondition.gender}" />
+            <f:viewParam name="phone" value="#{employeeList.searchCondition.phone}" />
+            <f:viewParam name="mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" />
+            <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
+            <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
+            <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
+            <f:viewAction action="#{employeeList.extract()}" />
+        </f:metadata>
         <h:form id="f">
             <h1>社員一覧</h1>
-            <h:panelGrid columns="2">
+            <h:panelGrid columns="3">
                 <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
-                <h:commandLink action="#{employeeList.search()}" value="検索">
-                    <f:param name="search_employee_id"
-                </h:commandLink>
-                
+                <h:commandButton action="#{employeeList.search()}" value="検索" />
+                <h:commandButton action="#{employeeList.clear()}" value="クリア" />
             </h:panelGrid>
             <h:panelGrid columns="3">
                 <h:outputLabel for="search_employee_id" value="社員ID"/>
@@ -50,7 +59,7 @@
                 <h:inputText id="search_employee_reamarks" value="#{employeeList.searchCondition.remarks}" />
                 <h:message for="search_employee_reamarks" />
             </h:panelGrid>
-            <h:dataTable styleClass="employee_list" value="#{employeeList.extract()}" var="emp" >
+            <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp" >
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="社員ID" />

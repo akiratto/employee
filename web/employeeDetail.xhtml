@@ -14,7 +14,7 @@
         </f:metadata>
         <h1>社員情報</h1>
         <h:form id="frm">
-            <h:messages  />
+            <h:messages globalOnly="true"  />
             <h:panelGrid columns="4" >
                 <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true" />
                 <h:commandButton value="編集" action="#{employee.beginEdit()}" rendered="#{employee.isRead()}" />
@@ -49,16 +49,19 @@
                 <h:inputText id="employee_phone" 
                                value="#{employee.entity.phone}" 
                                disabled="#{employee.isRead()}"
+                               required="true"
                                requiredMessage="電話番号の入力は必須です。"
                                validatorMessage="電話番号が正しい形式ではありません。">
-                    <f:validateRegex pattern="0\d{1,4}-\d{1,4}-\d{4}" disabled="#{empty employee.entity.phone}"/>
+                    <f:validateRegex pattern="0\d{1,4}-\d{1,4}-\d{4}" />
                 </h:inputText>
                 <h:message for="employee_phone" />
                 
                 <h:outputLabel value="携帯電話番号" for="employee_mobile_phone" />
                 <h:inputText id="employee_mobile_phone" 
                                value="#{employee.entity.mobilePhone}" 
-                               disabled="#{employee.isRead()}" 
+                               disabled="#{employee.isRead()}"
+                               required="true"
+                               requiredMessage="携帯電話番号の入力は必須です。"
                                validatorMessage="携帯電話番号が正しい形式ではありません。">
                     <f:validateRegex pattern="0\d{1,4}-\d{1,4}-\d{4}" />
                 </h:inputText>
@@ -68,6 +71,8 @@
                 <h:inputText id="employee_zipcode" 
                                value="#{employee.entity.zipCode}" 
                                disabled="#{employee.isRead()}"
+                               required="true"
+                               requiredMessage="郵便番号の入力は必須です。"
                                validatorMessage="郵便番号が正しい形式ではありません。">
                     <f:validateRegex pattern="\d{3}-\d{4}" />
                 </h:inputText>
@@ -77,10 +82,9 @@
                 <h:inputText id="employee_address" 
                                value="#{employee.entity.address}" 
                                disabled="#{employee.isRead()}"
+                               required="true"
                                requiredMessage="住所の入力は必須です"
-                               style="width:338px;">
-                    <f:validateRequired />
-                </h:inputText>
+                               style="width:338px;" />
                 <h:message for="employee_address" />
                 
                 <h:outputLabel value="備考" for="employee_remarks" />

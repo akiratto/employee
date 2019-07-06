@@ -5,7 +5,12 @@ import entity.TEmployee_;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
@@ -30,7 +35,7 @@ public class EmployeeList implements Serializable {
     private EntityManager em;
     
     private TEmployee searchCondition = new TEmployee();
-    private List<TEmployee> employeeList;
+    private List<TEmployee> employeeList = new ArrayList<>();
     
     @PostConstruct
     public void init()
@@ -45,19 +50,17 @@ public class EmployeeList implements Serializable {
         System.out.println(">>> EmployeeList terminate() BEGIN >>>");
         System.out.println("<<< EmployeeList terminate() END <<<");
     }
-    
-    public void initQueryParameters()
-    {
-        
-    }
 
     public TEmployee getSearchCondition() {
         return searchCondition;
     }
 
-    public List<TEmployee> extract()
+    public List<TEmployee> getEmployeeList() {
+        return employeeList;
+    }
+
+    public void extract()
     {
-        List<TEmployee> employeeList;
         System.out.println(">>> EmployeeList extract() BEGIN >>>");
         
         CriteriaBuilder build = em.getCriteriaBuilder();
@@ -114,9 +117,8 @@ public class EmployeeList implements Serializable {
             ));
         }        
         cq = cq.select(root).where(where);
-        System.out.println("<<< EmployeeList extract() END <<<");
-        return em.createQuery(cq).getResultList();
-                
+        this.employeeList = em.createQuery(cq).getResultList();
+        System.out.println("<<< EmployeeList extract() END <<<");                
     }
     
     public String createEmployee()
@@ -136,11 +138,44 @@ public class EmployeeList implements Serializable {
         System.out.println(String.format("<<< EmployeeList gotoDetail(%s,%s) END <<<", employeeId, mode));
         return "employeeDetail?faces-redirect=true&employee_id=" + employeeId + "&mode=" + URLEncoder.encode(mode, "UTF-8");
     }
+       
+    public String search() throws UnsupportedEncodingException
+    {
+        List<String> queryStrings = new ArrayList<>();
+        if(searchCondition.getEmployee_id()!=null) {
+            queryStrings.add("employee_id=" + searchCondition.getEmployee_id());
+        }
+        if(searchCondition.getName()!=null && !searchCondition.getName().isEmpty()) {
+            queryStrings.add("name=" + URLEncoder.encode(searchCondition.getName(), "UTF-8"));
+        }
+        if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
+            queryStrings.add("gender=" + URLEncoder.encode(searchCondition.getGender(), "UTF-8"));
+        }
+        if(searchCondition.getPhone()!=null && !searchCondition.getPhone().isEmpty()) {
+            queryStrings.add("phone=" + URLEncoder.encode(searchCondition.getPhone(), "UTF-8"));
+        }
+        if(searchCondition.getMobilePhone()!=null && !searchCondition.getMobilePhone().isEmpty()) {
+            queryStrings.add("mobile_phone=" + URLEncoder.encode(searchCondition.getMobilePhone(), "UTF-8"));
+        }
+        if(searchCondition.getZipCode()!=null && !searchCondition.getZipCode().isEmpty()) {
+            queryStrings.add("zip_code=" + URLEncoder.encode(searchCondition.getZipCode(), "UTF-8"));
+        }
+        if(searchCondition.getAddress()!=null && !searchCondition.getAddress().isEmpty()) {
+            queryStrings.add("address=" + URLEncoder.encode(searchCondition.getAddress(), "UTF-8"));
+        }
+        if(searchCondition.getRemarks()!=null && !searchCondition.getRemarks().isEmpty()) {
+            queryStrings.add("remarks=" + URLEncoder.encode(searchCondition.getRemarks(), "UTF-8"));
+        } 
+        
+        String queryString = queryStrings.size() > 0 ? 
+                "&" + String.join("&", queryStrings) : "";
+        
+        return "employeeList?faces-redirect=true" + queryString;
+    }
     
-    public String search()
+    public String clear()
     {
         return "employeeList?faces-redirect=true";
-//        return "";
     }
 
     private String likeEscape(String likeCondition)
