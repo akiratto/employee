@@ -58,6 +58,10 @@ public class EmployeeList implements Serializable {
     public List<TEmployee> getEmployeeList() {
         return employeeList;
     }
+    
+    public int getEmployeeCount() {
+        return employeeList.size();
+    }
 
     public void extract()
     {

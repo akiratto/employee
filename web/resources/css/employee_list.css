@@ -6,6 +6,16 @@
     white-space: pre;
 }
 
+.aggreagate_info {
+    width:700px;
+    text-align: right;
+    margin-bottom: 4px;
+}
+
+table.employee_list {
+    width:700px;
+}
+
 table.employee_list, table.employee_list td, table.employee_list th {
     border: solid 1px gray;
     border-collapse: collapse;
