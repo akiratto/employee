@@ -14,6 +14,9 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -23,6 +26,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.transaction.Transactional;
 
 /**
  *
@@ -50,28 +54,16 @@ public class EmployeeList implements Serializable {
         System.out.println(">>> EmployeeList terminate() BEGIN >>>");
         System.out.println("<<< EmployeeList terminate() END <<<");
     }
-
-    public TEmployee getSearchCondition() {
-        return searchCondition;
-    }
-
-    public List<TEmployee> getEmployeeList() {
-        return employeeList;
-    }
     
-    public int getEmployeeCount() {
-        return employeeList.size();
-    }
-
-    public void extract()
+    public void viewAction()
     {
-        System.out.println(">>> EmployeeList extract() BEGIN >>>");
+        System.out.println(">>> EmployeeList viewAction() BEGIN >>>");
         
+        //検索条件を基に抽出処理を実行する -------------------------------------
         CriteriaBuilder build = em.getCriteriaBuilder();
         CriteriaQuery<TEmployee> cq = build.createQuery(TEmployee.class);
         Root<TEmployee> root = cq.from(TEmployee.class);
         Predicate where = build.conjunction();
-        
         if(searchCondition.getEmployee_id()!=null) {
             where = build.and(where, build.equal(
                                         root.get(TEmployee_.employee_id), 
@@ -120,14 +112,51 @@ public class EmployeeList implements Serializable {
                                         "%" + likeEscape(searchCondition.getRemarks()) + "%"
             ));
         }        
-        cq = cq.select(root).where(where);
+        cq = cq.select(root)
+                .where(where)
+                .orderBy(build.asc(root.get(TEmployee_.employee_id)));
         this.employeeList = em.createQuery(cq).getResultList();
-        System.out.println("<<< EmployeeList extract() END <<<");                
+        
+        //メッセージ表示 -------------------------------------------------------
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        String message = (String)flash.getOrDefault("message", "");
+        if(!message.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(message));
+        }
+        
+        System.out.println("<<< EmployeeList viewAction() END <<<");                
+    }
+
+    public TEmployee getSearchCondition() {
+        return searchCondition;
+    }
+
+    public List<TEmployee> getEmployeeList() {
+        return employeeList;
     }
     
+    public int getEmployeeCount() {
+        return employeeList.size();
+    }
+
     public String createEmployee()
     {
         return "employeeDetail?faces-redirect=true&mode=New";
+    }
+    
+    @Transactional
+    public String deleteEmployee(Integer employeeId) throws UnsupportedEncodingException
+    {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        
+        TEmployee employee = em.find(TEmployee.class, employeeId);
+        if(employee == null) {
+            flash.put("message", "社員ID:" + employeeId + "が見つかりません。");
+            return search();
+        }
+        em.remove(employee);
+        flash.put("message", "社員ID:" + employeeId + "を削除しました。");
+        return search();
     }
     
     public String gotoDetail(Integer employeeId, String mode) throws UnsupportedEncodingException

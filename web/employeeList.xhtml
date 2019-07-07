@@ -17,10 +17,11 @@
             <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
             <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
             <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
-            <f:viewAction action="#{employeeList.extract()}" />
+            <f:viewAction action="#{employeeList.viewAction()}" />
         </f:metadata>
         <h:form id="f">
             <h1>社員一覧</h1>
+            <h:messages globalOnly="true" />
             <h:panelGrid columns="3">
                 <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
                 <h:commandButton action="#{employeeList.search()}" value="検索" />
@@ -61,6 +62,14 @@
             </h:panelGrid>
             <p class="aggreagate_info"><h:outputText value="[社員情報を #{employeeList.employeeCount}件 表示]" /></p>
             <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp" >
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="ボタン" />
+                    </f:facet>
+                    <h:commandButton value="削除" 
+                                      onclick="return confirm('社員ID:#{emp.employee_id}を削除してもよろしいですか？')"
+                                      action="#{employeeList.deleteEmployee(emp.employee_id)}" />
+                </h:column>
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="社員ID" />
