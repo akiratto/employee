@@ -155,4 +155,19 @@ public class Employee implements Serializable {
         System.out.println("<<< Employee save() END <<<");
         return builder.toString();
    }
+    
+   @Transactional
+   public String delete()
+   {
+       Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+       
+       TEmployee employee = em.find(TEmployee.class, this.employeeId);
+       if(employee == null) {
+           flash.put("message", "社員ID:" + this.employeeId + " が見つかりません。既に削除された可能性があります。");
+           return "employeeList.xhtml?faces-redirect=true";
+       }
+       em.remove(employee);
+       flash.put("message", "社員ID:" + this.employeeId + " を削除しました。");
+       return "employeeList.xhtml?faces-redirect=true";
+   }
 }

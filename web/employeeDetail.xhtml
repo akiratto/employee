@@ -19,6 +19,10 @@
                 <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true" />
                 <h:commandButton value="編集" action="#{employee.beginEdit()}" rendered="#{employee.isRead()}" />
                 <h:commandButton value="保存" action="#{employee.save()}" rendered="#{employee.isEdit() or employee.isNew()}" />
+                <h:commandButton value="削除" action="#{employee.delete()}" 
+                                               rendered="#{employee.isEdit() or employee.isNew()}" 
+                                               immediate="true" 
+                                               onclick="return confirm('社員ID:#{employee.entity.employee_id}を削除してもよろしいですか？')"/>
                 <h:commandButton value="取消" action="#{employee.cancelEdit()}" rendered="#{employee.isEdit()}" immediate="true" />
             </h:panelGrid>
             <h:panelGrid columns="3">
