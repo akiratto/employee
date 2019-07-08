@@ -32,7 +32,8 @@
                 <h:inputText id="employee_name" 
                                value="#{employee.entity.name}" 
                                disabled="#{employee.isRead()}" 
-                               requiredMessage="社員名の入力は必須です。">
+                               requiredMessage="社員名の入力は必須です。"
+                               onkeypress="if(event.keyCode == 13) return false;">
                     <f:validateRequired />
                 </h:inputText>
                 <h:message for="employee_name" />
@@ -51,7 +52,8 @@
                                disabled="#{employee.isRead()}"
                                required="true"
                                requiredMessage="電話番号の入力は必須です。"
-                               validatorMessage="電話番号が正しい形式ではありません。">
+                               validatorMessage="電話番号が正しい形式ではありません。"
+                               onkeypress="if(event.keyCode == 13) return false;">
                     <f:validateRegex pattern="0\d{1,4}-\d{1,4}-\d{4}" />
                 </h:inputText>
                 <h:message for="employee_phone" />
@@ -62,7 +64,8 @@
                                disabled="#{employee.isRead()}"
                                required="true"
                                requiredMessage="携帯電話番号の入力は必須です。"
-                               validatorMessage="携帯電話番号が正しい形式ではありません。">
+                               validatorMessage="携帯電話番号が正しい形式ではありません。"
+                               onkeypress="if(event.keyCode == 13) return false;">
                     <f:validateRegex pattern="0\d{1,4}-\d{1,4}-\d{4}" />
                 </h:inputText>
                 <h:message for="employee_mobile_phone" />
@@ -73,7 +76,8 @@
                                disabled="#{employee.isRead()}"
                                required="true"
                                requiredMessage="郵便番号の入力は必須です。"
-                               validatorMessage="郵便番号が正しい形式ではありません。">
+                               validatorMessage="郵便番号が正しい形式ではありません。"
+                               onkeypress="if(event.keyCode == 13) return false;">
                     <f:validateRegex pattern="\d{3}-\d{4}" />
                 </h:inputText>
                 <h:message for="employee_zipcode" />
@@ -84,7 +88,8 @@
                                disabled="#{employee.isRead()}"
                                required="true"
                                requiredMessage="住所の入力は必須です"
-                               style="width:338px;" />
+                               style="width:338px;" 
+                               onkeypress="if(event.keyCode == 13) return false;"/>
                 <h:message for="employee_address" />
                 
                 <h:outputLabel value="備考" for="employee_remarks" />
