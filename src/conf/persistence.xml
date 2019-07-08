@@ -5,6 +5,7 @@
     <jta-data-source>jdbc/employee</jta-data-source>
     <class>entity.TEmployee</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.logging.level.sql" value="FINE"/>
       <property name="eclipselink.logging.parameters" value="true"/>

@@ -139,6 +139,7 @@ public class Employee implements Serializable {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         if(isNew()) {
             em.persist(entity);
+            em.flush(); //SQLを発行してIDを自動附番させ、entityに反映させる
             flash.put("message", "社員情報を新規登録しました。");
         } else {
             em.merge(entity);
@@ -148,9 +149,9 @@ public class Employee implements Serializable {
         StringBuilder builder = new StringBuilder();
         builder.append("employeeDetail.xhtml?faces-redirect=true");
         builder.append("&employee_id=");
-        builder.append(employeeId.toString());
+        builder.append(entity.getEmployee_id().toString());
         builder.append("&mode=");
-        builder.append(URLEncoder.encode(mode.name(),"UTF-8"));
+        builder.append(URLEncoder.encode(mode.Read.name(),"UTF-8"));
         
         System.out.println("<<< Employee save() END <<<");
         return builder.toString();
