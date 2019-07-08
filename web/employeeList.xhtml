@@ -60,7 +60,7 @@
                 <h:inputText id="search_employee_reamarks" value="#{employeeList.searchCondition.remarks}" onkeypress="if(event.keyCode == 13) return false;"/>
                 <h:message for="search_employee_reamarks" />
             </h:panelGrid>
-            <p class="aggreagate_info"><h:outputText value="[社員情報を #{employeeList.employeeCount}件 表示]" /></p>
+            <p class="aggreagate_info"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{employeeList.employeeCount}件 表示]" /></p>
             <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp" >
                 <h:column>
                     <f:facet name="header">

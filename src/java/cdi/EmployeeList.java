@@ -40,6 +40,7 @@ public class EmployeeList implements Serializable {
     
     private TEmployee searchCondition = new TEmployee();
     private List<TEmployee> employeeList = new ArrayList<>();
+    private Long employeeAllCount = 0L;
     
     @PostConstruct
     public void init()
@@ -58,6 +59,10 @@ public class EmployeeList implements Serializable {
     public void viewAction()
     {
         System.out.println(">>> EmployeeList viewAction() BEGIN >>>");
+        
+        //全社員数を取得する --------------------------------------------------
+        this.employeeAllCount = em.createQuery("SELECT count(t) FROM TEmployee t",Long.class).getSingleResult();
+        
         
         //検索条件を基に抽出処理を実行する -------------------------------------
         CriteriaBuilder build = em.getCriteriaBuilder();
@@ -137,6 +142,10 @@ public class EmployeeList implements Serializable {
     
     public int getEmployeeCount() {
         return employeeList.size();
+    }
+
+    public Long getEmployeeAllCount() {
+        return employeeAllCount;
     }
 
     public String createEmployee()
