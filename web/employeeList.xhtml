@@ -18,15 +18,23 @@
             <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
             <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
             <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
+            <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
             <f:viewAction action="#{employeeList.viewAction()}" />
+            <f:viewAction action="#{pageNavigator.viewAction()}" />
         </f:metadata>
-        <h:form id="f">
+        <h:form id="f" enctype="multipart/form-data">
             <h1>社員一覧</h1>
             <h:messages globalOnly="true" />
             <h:panelGrid columns="3">
                 <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
                 <h:commandButton action="#{employeeList.search()}" value="検索" />
                 <h:commandButton action="#{employeeList.clear()}" value="クリア" />
+            </h:panelGrid>
+            <h:panelGrid columns="4">
+                <h:outputLabel for="csv_fileupload" />
+                <h:inputFile id="csv_fileupload" value="#{csvUploader.csvFile}" />
+                <h:commandButton value="一括登録" action="#{csvUploader.uploadFile()}" />
+                <h:outputText value="[#{empty csvUploader.csvFile ? 'ファイル未指定' : csvUploader.csvFile.submittedFileName}]" />
             </h:panelGrid>
             <h:panelGrid columns="3">
                 <h:outputLabel for="search_employee_id" value="社員ID"/>
@@ -61,7 +69,7 @@
                 <h:inputText id="search_employee_reamarks" value="#{employeeList.searchCondition.remarks}" onkeypress="if(event.keyCode == 13) return false;"/>
                 <h:message for="search_employee_reamarks" />
             </h:panelGrid>
-            <p class="aggreagate_info"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{employeeList.employeeCount}件 表示]" /></p>
+            <p class="aggreagate_info"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.getEndRowIndex(employeeList.employeeAllCount)}件 表示]" /></p>
             <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp" >
                 <h:column>
                     <f:facet name="header">

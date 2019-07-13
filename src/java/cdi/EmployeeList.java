@@ -18,6 +18,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -37,6 +38,9 @@ import javax.transaction.Transactional;
 public class EmployeeList implements Serializable {
     @PersistenceContext
     private EntityManager em;
+    
+    @Inject
+    private PageNavigator pageNavigator;
     
     private TEmployee searchCondition = new TEmployee();
     private List<TEmployee> employeeList = new ArrayList<>();
@@ -120,7 +124,10 @@ public class EmployeeList implements Serializable {
         cq = cq.select(root)
                 .where(where)
                 .orderBy(build.asc(root.get(TEmployee_.employee_id)));
-        this.employeeList = em.createQuery(cq).getResultList();
+        this.employeeList = em.createQuery(cq)
+                                .setFirstResult(this.pageNavigator.getBeginRowIndex().intValue())
+                                .setMaxResults(this.pageNavigator.getRowCountPerPage())
+                                .getResultList();
         
         //メッセージ表示 -------------------------------------------------------
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
