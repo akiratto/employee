@@ -33,8 +33,7 @@ public class PageNavigator implements Serializable {
         public String moveToPage()
         {
             System.out.println(">>> PageLink moveToPage BEGIN >>>");
-            String pageURL = baseURL + "?pageNo=" + pageNo;
-//            String pageURL = baseURL + "?faces-redirect=true&pageNo=" + pageNo;
+            String pageURL = baseURL + "?faces-redirect=true&pageNo=" + pageNo;
             System.out.println(" pageURL=" + pageURL);
             System.out.println("<<< PageLink moveToPage END >>>");
             return pageURL;                   
