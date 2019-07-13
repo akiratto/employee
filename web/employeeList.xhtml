@@ -94,10 +94,10 @@
                     <h:outputText class="preformatted" value="#{emp.remarks}"/>
                 </h:column>
             </h:dataTable>
-            <p>
-                <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" />
+            <p style="width:700px; text-align:center;">
+                <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" style="margin-right:0.6em;"/>
                 <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
-                    <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" />
+                    <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" style="margin-right:0.6em;" />
                 </ui:repeat>
                 <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" />
             </p>
