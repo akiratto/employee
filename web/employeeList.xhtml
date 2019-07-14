@@ -19,8 +19,8 @@
             <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
             <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
             <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
-            <f:viewAction action="#{employeeList.viewAction()}" />
             <f:viewAction action="#{pageNavigator.viewAction()}" />
+            <f:viewAction action="#{employeeList.viewAction()}" />
         </f:metadata>
         <h:form id="f" enctype="multipart/form-data">
             <h1>社員一覧</h1>

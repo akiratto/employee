@@ -9,6 +9,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
@@ -19,14 +21,14 @@ import javax.inject.Named;
 public class PageNavigator implements Serializable {
     public static class PageLink {
         public String baseURL;
-        public int pageNo;
+        public long pageNo;
         
-        public PageLink(String baseURL, int pageNo)
+        public PageLink(String baseURL, long pageNo)
         {
             this.baseURL = baseURL;
             this.pageNo = pageNo;
         }
-        public int getPageNo() {
+        public long getPageNo() {
             return pageNo;
         }
         
@@ -40,11 +42,22 @@ public class PageNavigator implements Serializable {
         }
     }
     
+    @PersistenceContext
+    private EntityManager em;
+    
     private String baseURL;
     private int rowCountPerPage = 20;
     private int showPageCount = 10;
     private Long currentPageNo = 1L;
     private int maxPageCount = 100;
+    
+    private Long beginRowIndex;
+    private Long endRowIndex;
+    private Long dataPageCount = 0L;
+    private Long beginShowPageNo = 0L;
+    private Long endShowPageNo = 0L;
+    
+    private List<PageLink> pageLinks = new ArrayList<>();
 
     @PostConstruct
     public void initialize()
@@ -58,14 +71,20 @@ public class PageNavigator implements Serializable {
     public void viewAction()
     {
         System.out.println(">>> PageNavigator viewAction BEGIN >>>");
+        
+        Long allRowCount = em.createQuery("SELECT count(t) FROM TEmployee t",Long.class).getSingleResult();
+        calculate(allRowCount);
+        
         List<PageLink> pageLinks = new ArrayList<>();
-        for(int i = 1; i <= 10; i++) {
+        for(long i = this.beginShowPageNo; i <= this.endShowPageNo; i++) {
             pageLinks.add(new PageLink(this.baseURL,i));
         }
-        return pageLinks;
+        this.pageLinks = pageLinks;
         
         System.out.println("<<< PageNavigator viewAction END <<<");
     }
+    
+
 
     public Long getCurrentPageNo() {
         return currentPageNo;
@@ -74,19 +93,23 @@ public class PageNavigator implements Serializable {
     public void setCurrentPageNo(Long currentPageNo) {
         this.currentPageNo = currentPageNo;
     }
-    
+
     public Long getBeginShowPageNo() {
-        this.showPageCount
+       return this.beginShowPageNo;
+    }
+    
+    public Long getEndShowPageNo() {
+        return this.endShowPageNo;
     }
     
     public Long getBeginRowIndex()
     {
-        return (currentPageNo-1) * rowCountPerPage + 1;
+        return this.beginRowIndex;
     }
     
     public Long getEndRowIndex(Long allRowCount)
     {
-        return Long.min(allRowCount, getBeginRowIndex() + rowCountPerPage - 1);
+        return this.endRowIndex;
     }
 
     public int getRowCountPerPage() {
@@ -103,10 +126,6 @@ public class PageNavigator implements Serializable {
     
     public List<PageLink> getPageLinks()
     {
-        List<PageLink> pageLinks = new ArrayList<>();
-        for(int i = 1; i <= 10; i++) {
-            pageLinks.add(new PageLink(this.baseURL,i));
-        }
         return pageLinks;
     }
     
@@ -138,5 +157,58 @@ public class PageNavigator implements Serializable {
     public void updateMaxPageCount()
     {
         
+    }
+    
+    
+    
+
+    private void calculate(Long allRowCount)
+    {
+        this.beginRowIndex = calculateBeginRowIndex(this.currentPageNo, this.rowCountPerPage);
+        this.endRowIndex = calculateEndRowIndex(this.currentPageNo, this.rowCountPerPage, allRowCount);
+        this.dataPageCount = calculateDataPageCount(this.rowCountPerPage, this.maxPageCount, allRowCount);
+        this.beginShowPageNo = calculateBeginShowPageNo(this.currentPageNo, this.showPageCount, this.dataPageCount);
+        this.endShowPageNo = calculateEndShowPageNo(this.currentPageNo, this.showPageCount, this.dataPageCount);
+    }
+    
+    public static Long calculateBeginRowIndex(Long currentPageNo, int rowCountPerPage)
+    {
+        return (currentPageNo-1) * rowCountPerPage + 1;
+    }
+    
+    public static Long calculateEndRowIndex(Long currentPageNo, int rowCountPerPage, Long allRowCount)
+    {
+        return Long.min(allRowCount, calculateBeginRowIndex(currentPageNo, rowCountPerPage) + rowCountPerPage - 1);
+    }
+    
+    private static Long calculateDataPageCount(int rowCountPerPage, int maxPageCount, Long allRowCount)
+    {
+        return Math.min(allRowCount / rowCountPerPage + (allRowCount % rowCountPerPage > 0 ? 1 : 0), maxPageCount);
+    }
+    
+    private static Long calculateBeginShowPageNo(Long currentPageNo, int showPageCount, Long dataPageCount)
+    {
+        Long beginShowPageNo;
+        Long endShowPageNo;
+        Long overPageCount;
+        
+        endShowPageNo = currentPageNo + showPageCount / 2;
+        overPageCount = endShowPageNo - dataPageCount;
+        beginShowPageNo  = currentPageNo - showPageCount / 2 + 1;
+        beginShowPageNo  = beginShowPageNo - (overPageCount > 0 ? overPageCount : 0);
+        beginShowPageNo  = Math.max(1, beginShowPageNo);
+        return beginShowPageNo;
+    }
+    
+    private static Long calculateEndShowPageNo(Long currentPageNo, int showPageCount, Long dataPageCount)
+    {
+        Long beginShowPageNo;
+        Long endShowPageNo;
+        
+        beginShowPageNo  = currentPageNo - showPageCount / 2 + 1;
+        endShowPageNo = currentPageNo + showPageCount / 2;
+        endShowPageNo = endShowPageNo + (beginShowPageNo <= 0 ? Math.abs(beginShowPageNo) + 1 : 0);
+        endShowPageNo = Math.min(dataPageCount, endShowPageNo);
+        return endShowPageNo;
     }
 }
