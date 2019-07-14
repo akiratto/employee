@@ -25,16 +25,11 @@
         <h:form id="f" enctype="multipart/form-data">
             <h1>社員一覧</h1>
             <h:messages globalOnly="true" />
-            <h:panelGrid columns="3">
+            <h:panelGrid columns="4">
                 <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
                 <h:commandButton action="#{employeeList.search()}" value="検索" />
                 <h:commandButton action="#{employeeList.clear()}" value="クリア" />
-            </h:panelGrid>
-            <h:panelGrid columns="4">
-                <h:outputLabel for="csv_fileupload" />
-                <h:inputFile id="csv_fileupload" value="#{csvUploader.csvFile}" />
-                <h:commandButton value="一括登録" action="#{csvUploader.uploadFile()}" />
-                <h:outputText value="[#{empty csvUploader.csvFile ? 'ファイル未指定' : csvUploader.csvFile.submittedFileName}]" />
+                <h:commandButton action="#{employeeList.batchEmployee()}" value="一括登録" />
             </h:panelGrid>
             <h:panelGrid columns="3">
                 <h:outputLabel for="search_employee_id" value="社員ID"/>

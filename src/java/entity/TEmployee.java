@@ -9,6 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * @author owner
@@ -21,9 +24,15 @@ public class TEmployee implements Serializable {
     private Integer employee_id;
 
     @Basic
+    //--Bean バリデーション
+    @NotNull(message="社員名の入力は必須です。")
+    @Size(min=1, max=60, message="${validatedValue == '' ? '社員名の入力は必須です。' : '社員名は' += min +='～'+=max+='文字以内で入力してください。'}")
     private String name;
 
     @Basic
+    //--Bean バリデーション
+    @NotNull(message="性別の入力は必須です。")
+    @Pattern(regexp = "[MFO]", message="性別は男性(M),女性(F),その他(O)のいずれかを入力してください:${validatedValue}")
     private String gender;
 
     @Basic

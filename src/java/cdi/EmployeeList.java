@@ -160,6 +160,11 @@ public class EmployeeList implements Serializable {
         return "employeeDetail?faces-redirect=true&mode=New";
     }
     
+    public String batchEmployee()
+    {
+        return "employeeBatch?faces-redirect=true";
+    }
+    
     @Transactional
     public String deleteEmployee(Integer employeeId) throws UnsupportedEncodingException
     {

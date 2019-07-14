@@ -29,6 +29,7 @@ public class CsvUploader {
     EntityManager em;
     
     private Part csvFile;
+    private String uploadLog;
     private String folder = "c:\\Temp";
 
     public Part getCsvFile() {
