@@ -69,7 +69,17 @@
                 <h:inputText id="search_employee_reamarks" value="#{employeeList.searchCondition.remarks}" onkeypress="if(event.keyCode == 13) return false;"/>
                 <h:message for="search_employee_reamarks" />
             </h:panelGrid>
-            <p class="aggreagate_info"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.getEndRowIndex(employeeList.employeeAllCount)}件 表示]" /></p>
+            <div style="position: relative;width:1000px;height:30px;">
+                <div id="topPageNavigator">
+                    <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
+                    <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                        <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
+                        <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
+                    </ui:repeat>
+                    <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
+                </div>
+                <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.getEndRowIndex(employeeList.employeeAllCount)}件 表示]" /></div>
+            </div>
             <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp" >
                 <h:column>
                     <f:facet name="header">
@@ -102,12 +112,13 @@
                     <h:outputText class="preformatted" value="#{emp.remarks}"/>
                 </h:column>
             </h:dataTable>
-            <p style="width:700px; text-align:center;">
-                <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" style="margin-right:0.6em;"/>
+            <p style="width:1000px; text-align:center;">
+                <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
                 <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
-                    <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" style="margin-right:0.6em;" />
+                    <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
+                    <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
                 </ui:repeat>
-                <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" />
+                <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
             </p>
         </h:form>
     </h:body>

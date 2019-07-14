@@ -21,15 +21,22 @@ import javax.persistence.PersistenceContext;
 public class PageNavigator implements Serializable {
     public static class PageLink {
         public String baseURL;
-        public long pageNo;
+        private long pageNo;
+        private long currentPageNo;
         
-        public PageLink(String baseURL, long pageNo)
+        public PageLink(String baseURL, long pageNo, long currentPageNo)
         {
             this.baseURL = baseURL;
             this.pageNo = pageNo;
+            this.currentPageNo = currentPageNo;
         }
         public long getPageNo() {
             return pageNo;
+        }
+        
+        public boolean isCurrentPage()
+        {
+            return this.currentPageNo == this.pageNo;
         }
         
         public String moveToPage()
@@ -77,7 +84,7 @@ public class PageNavigator implements Serializable {
         
         List<PageLink> pageLinks = new ArrayList<>();
         for(long i = this.beginShowPageNo; i <= this.endShowPageNo; i++) {
-            pageLinks.add(new PageLink(this.baseURL,i));
+            pageLinks.add(new PageLink(this.baseURL,i, this.currentPageNo));
         }
         this.pageLinks = pageLinks;
         
@@ -146,7 +153,7 @@ public class PageNavigator implements Serializable {
     
     public boolean nextPageEnabled()
     {
-        return (currentPageNo + 1)  <= maxPageCount;
+        return (currentPageNo + 1)  <= dataPageCount;
     }
     
     public String nextPage()

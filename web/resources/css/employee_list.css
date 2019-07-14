@@ -7,13 +7,12 @@
 }
 
 .aggreagate_info {
-    width:700px;
     text-align: right;
-    margin-bottom: 4px;
+    margin-bottom: 0px;
 }
 
 table.employee_list {
-    width:700px;
+    width:1000px;
 }
 
 table.employee_list, table.employee_list td, table.employee_list th {
@@ -38,4 +37,20 @@ table.employee_list tr th:nth-of-type(4),
 table.employee_list tr td:nth-of-type(4)
 {
     text-align: center;
+}
+
+#topPageNavigator {
+    position: absolute;
+    z-index: 3;
+    top:0px;
+    width:100%;
+    text-align: center;
+}
+
+#countInfo {
+    position: absolute;
+    z-index: 2;
+    top:0px;
+    width:100%;
+    text-align:right;
 }
