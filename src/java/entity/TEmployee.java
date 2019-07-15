@@ -36,15 +36,30 @@ public class TEmployee implements Serializable {
     private String gender;
 
     @Basic
+    //--Bean バリデーション
+    @NotNull(message="電話番号の入力は必須です。")
+    @Size(min=1, message="電話番号の入力は必須です。")
+    @Pattern(regexp = "0\\d{1,4}-\\d{1,4}-\\d{4}", message="電話番号が正しい形式ではありません。")
     private String phone;
 
     @Basic
+    //--Bean バリデーション
+    @NotNull(message="携帯電話番号の入力は必須です。")
+    @Size(min=1, message="携帯電話番号の入力は必須です。")
+    @Pattern(regexp = "0\\d{1,4}-\\d{1,4}-\\d{4}", message="携帯電話番号が正しい形式ではありません。")
     private String mobilePhone;
 
     @Basic
+    //--Bean バリデーション
+    @NotNull(message="郵便番号の入力は必須です。")
+    @Size(min=1, message="郵便番号の入力は必須です。")
+    @Pattern(regexp = "\\d{3}-\\d{4}", message="郵便番号が正しい形式ではありません。")
     private String zipCode;
 
     @Basic
+    //--Bean バリデーション
+    @NotNull(message="住所の入力は必須です")
+    @Size(min=1, message="住所の入力は必須です")
     private String address;
 
     @Basic
