@@ -75,6 +75,21 @@ public class PageNavigator implements Serializable {
         System.out.println("<<< PageNavigator initialize END <<<");
     }
     
+    public void build(Long allRowCount)
+    {
+        System.out.println(">>> PageNavigator build BEGIN >>>");
+        
+        calculate(allRowCount);
+        
+        List<PageLink> pageLinks = new ArrayList<>();
+        for(long i = this.beginShowPageNo; i <= this.endShowPageNo; i++) {
+            pageLinks.add(new PageLink(this.baseURL,i, this.currentPageNo));
+        }
+        this.pageLinks = pageLinks;
+        
+        System.out.println("<<< PageNavigator build END <<<");
+    }
+    
     public void viewAction()
     {
         System.out.println(">>> PageNavigator viewAction BEGIN >>>");
@@ -114,9 +129,14 @@ public class PageNavigator implements Serializable {
         return this.beginRowIndex;
     }
     
-    public Long getEndRowIndex(Long allRowCount)
+    public Long getEndRowIndex()
     {
         return this.endRowIndex;
+    }
+    
+    public int getOffset()
+    {
+        return getBeginRowIndex().intValue() - 1;
     }
 
     public int getRowCountPerPage() {

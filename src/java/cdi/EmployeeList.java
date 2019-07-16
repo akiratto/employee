@@ -25,6 +25,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
@@ -64,68 +65,104 @@ public class EmployeeList implements Serializable {
     {
         System.out.println(">>> EmployeeList viewAction() BEGIN >>>");
         
-        //全社員数を取得する --------------------------------------------------
-        this.employeeAllCount = em.createQuery("SELECT count(t) FROM TEmployee t",Long.class).getSingleResult();
-        
-        
         //検索条件を基に抽出処理を実行する -------------------------------------
         CriteriaBuilder build = em.getCriteriaBuilder();
+        CriteriaQuery<Long> cqCount = build.createQuery(Long.class);
         CriteriaQuery<TEmployee> cq = build.createQuery(TEmployee.class);
         Root<TEmployee> root = cq.from(TEmployee.class);
-        Predicate where = build.conjunction();
+        Root<TEmployee> rootCount = cqCount.from(TEmployee.class);
+        Predicate where2 = build.conjunction();
+        Predicate where1 = build.conjunction();
         if(searchCondition.getEmployee_id()!=null) {
-            where = build.and(where, build.equal(
+            where1 = build.and(where1, build.equal(
+                                        rootCount.get(TEmployee_.employee_id), 
+                                        searchCondition.getEmployee_id()
+            ));
+            where2 = build.and(where2, build.equal(
                                         root.get(TEmployee_.employee_id), 
                                         searchCondition.getEmployee_id()
             ));
         }
         if(searchCondition.getName()!=null && !searchCondition.getName().isEmpty()) {
-            where = build.and(where, build.like(
+            where1 = build.and(where1, build.like(
+                                        rootCount.get(TEmployee_.name), 
+                                        "%" + likeEscape(searchCondition.getName()) + "%", '\\'
+            ));
+            where2 = build.and(where2, build.like(
                                         root.get(TEmployee_.name), 
-                                        "%" + likeEscape(searchCondition.getName()) + "%"
+                                        "%" + likeEscape(searchCondition.getName()) + "%", '\\'
             ));
         }
         if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
-            where = build.and(where, build.like(
+            where1 = build.and(where1, build.like(
+                                        rootCount.get(TEmployee_.gender), 
+                                        "%" + likeEscape(searchCondition.getGender()) + "%", '\\'
+            ));
+            where2 = build.and(where2, build.like(
                                         root.get(TEmployee_.gender), 
                                         "%" + likeEscape(searchCondition.getGender()) + "%", '\\'
             ));
         }
         if(searchCondition.getPhone()!=null && !searchCondition.getPhone().isEmpty()) {
-            where = build.and(where, build.like(
+            where1 = build.and(where1, build.like(
+                                        rootCount.get(TEmployee_.phone), 
+                                        "%" + likeEscape(searchCondition.getPhone()) + "%", '\\'
+            ));
+            where2 = build.and(where2, build.like(
                                         root.get(TEmployee_.phone), 
-                                        "%" + likeEscape(searchCondition.getPhone()) + "%"
+                                        "%" + likeEscape(searchCondition.getPhone()) + "%", '\\'
             ));
         }
         if(searchCondition.getMobilePhone()!=null && !searchCondition.getMobilePhone().isEmpty()) {
-            where = build.and(where, build.like(
+            where1 = build.and(where1, build.like(
+                                        rootCount.get(TEmployee_.mobilePhone), 
+                                        "%" + likeEscape(searchCondition.getMobilePhone()) + "%", '\\'
+            ));
+            where2 = build.and(where2, build.like(
                                         root.get(TEmployee_.mobilePhone), 
-                                        "%" + likeEscape(searchCondition.getMobilePhone()) + "%"
+                                        "%" + likeEscape(searchCondition.getMobilePhone()) + "%", '\\'
             ));
         }
         if(searchCondition.getZipCode()!=null && !searchCondition.getZipCode().isEmpty()) {
-            where = build.and(where, build.like(
+            where1 = build.and(where1, build.like(
+                                        rootCount.get(TEmployee_.zipCode), 
+                                        "%" + likeEscape(searchCondition.getZipCode()) + "%", '\\'
+            ));
+            where2 = build.and(where2, build.like(
                                         root.get(TEmployee_.zipCode), 
-                                        "%" + likeEscape(searchCondition.getZipCode()) + "%"
+                                        "%" + likeEscape(searchCondition.getZipCode()) + "%", '\\'
             ));
         }
         if(searchCondition.getAddress()!=null && !searchCondition.getAddress().isEmpty()) {
-            where = build.and(where, build.like(
+            where1 = build.and(where1, build.like(
+                                        rootCount.get(TEmployee_.address), 
+                                        "%" + likeEscape(searchCondition.getAddress()) + "%", '\\'
+            ));
+            where2 = build.and(where2, build.like(
                                         root.get(TEmployee_.address), 
-                                        "%" + likeEscape(searchCondition.getAddress()) + "%"
+                                        "%" + likeEscape(searchCondition.getAddress()) + "%", '\\'
             ));
         }
         if(searchCondition.getRemarks()!=null && !searchCondition.getRemarks().isEmpty()) {
-            where = build.and(where, build.like(
+            where1 = build.and(where1, build.like(
+                                        rootCount.get(TEmployee_.remarks), 
+                                        "%" + likeEscape(searchCondition.getRemarks()) + "%", '\\'
+            ));
+            where2 = build.and(where2, build.like(
                                         root.get(TEmployee_.remarks), 
-                                        "%" + likeEscape(searchCondition.getRemarks()) + "%"
+                                        "%" + likeEscape(searchCondition.getRemarks()) + "%", '\\'
             ));
         }        
+        cqCount = cqCount.select(build.count(rootCount)).where(where1);
+        this.employeeAllCount = em.createQuery(cqCount).getSingleResult();
+        
+        this.pageNavigator.build(this.employeeAllCount);
+        
         cq = cq.select(root)
-                .where(where)
+                .where(where2)
                 .orderBy(build.asc(root.get(TEmployee_.employee_id)));
         this.employeeList = em.createQuery(cq)
-                                .setFirstResult(this.pageNavigator.getBeginRowIndex().intValue())
+                                .setFirstResult(this.pageNavigator.getOffset())
                                 .setMaxResults(this.pageNavigator.getRowCountPerPage())
                                 .getResultList();
         

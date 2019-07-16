@@ -20,7 +20,7 @@
                 <h:commandButton value="編集" action="#{employee.beginEdit()}" rendered="#{employee.isRead()}" />
                 <h:commandButton value="保存" action="#{employee.save()}" rendered="#{employee.isEdit() or employee.isNew()}" />
                 <h:commandButton value="削除" action="#{employee.delete()}" 
-                                               rendered="#{employee.isEdit() or employee.isNew()}" 
+                                               rendered="#{employee.isEdit()}" 
                                                immediate="true" 
                                                onclick="return confirm('社員ID:#{employee.entity.employee_id}を削除してもよろしいですか？')"/>
                 <h:commandButton value="取消" action="#{employee.cancelEdit()}" rendered="#{employee.isEdit()}" immediate="true" />
@@ -36,9 +36,8 @@
                 <h:inputText id="employee_name" 
                                value="#{employee.entity.name}" 
                                disabled="#{employee.isRead()}" 
-                               requiredMessage="社員名の入力は必須です。"
                                onkeypress="if(event.keyCode == 13) return false;">
-                    <f:validateRequired />
+                    <f:validateBean />
                 </h:inputText>
                 <h:message for="employee_name" />
                 
@@ -54,44 +53,27 @@
                 <h:inputText id="employee_phone" 
                                value="#{employee.entity.phone}" 
                                disabled="#{employee.isRead()}"
-                               required="true"
-                               requiredMessage="電話番号の入力は必須です。"
-                               validatorMessage="電話番号が正しい形式ではありません。"
-                               onkeypress="if(event.keyCode == 13) return false;">
-                    <f:validateRegex pattern="0\d{1,4}-\d{1,4}-\d{4}" />
-                </h:inputText>
+                               onkeypress="if(event.keyCode == 13) return false;" />
                 <h:message for="employee_phone" />
                 
                 <h:outputLabel value="携帯電話番号" for="employee_mobile_phone" />
                 <h:inputText id="employee_mobile_phone" 
                                value="#{employee.entity.mobilePhone}" 
                                disabled="#{employee.isRead()}"
-                               required="true"
-                               requiredMessage="携帯電話番号の入力は必須です。"
-                               validatorMessage="携帯電話番号が正しい形式ではありません。"
-                               onkeypress="if(event.keyCode == 13) return false;">
-                    <f:validateRegex pattern="0\d{1,4}-\d{1,4}-\d{4}" />
-                </h:inputText>
+                               onkeypress="if(event.keyCode == 13) return false;" />
                 <h:message for="employee_mobile_phone" />
                 
                 <h:outputLabel value="郵便番号" for="employee_zipcode" />
                 <h:inputText id="employee_zipcode" 
                                value="#{employee.entity.zipCode}" 
                                disabled="#{employee.isRead()}"
-                               required="true"
-                               requiredMessage="郵便番号の入力は必須です。"
-                               validatorMessage="郵便番号が正しい形式ではありません。"
-                               onkeypress="if(event.keyCode == 13) return false;">
-                    <f:validateRegex pattern="\d{3}-\d{4}" />
-                </h:inputText>
+                               onkeypress="if(event.keyCode == 13) return false;" />
                 <h:message for="employee_zipcode" />
                 
                 <h:outputLabel value="住所" for="employee_address" />
                 <h:inputText id="employee_address" 
                                value="#{employee.entity.address}" 
                                disabled="#{employee.isRead()}"
-                               required="true"
-                               requiredMessage="住所の入力は必須です"
                                style="width:338px;" 
                                onkeypress="if(event.keyCode == 13) return false;"/>
                 <h:message for="employee_address" />
