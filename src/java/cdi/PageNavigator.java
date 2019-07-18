@@ -1,13 +1,19 @@
 package cdi;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,12 +26,15 @@ import javax.persistence.PersistenceContext;
 @ViewScoped
 public class PageNavigator implements Serializable {
     public static class PageLink {
+        PageNavigator pageNavigator;
+        
         public String baseURL;
         private long pageNo;
         private long currentPageNo;
         
-        public PageLink(String baseURL, long pageNo, long currentPageNo)
+        public PageLink(PageNavigator pageNavigator, String baseURL, long pageNo, long currentPageNo)
         {
+            this.pageNavigator = pageNavigator;
             this.baseURL = baseURL;
             this.pageNo = pageNo;
             this.currentPageNo = currentPageNo;
@@ -42,7 +51,7 @@ public class PageNavigator implements Serializable {
         public String moveToPage()
         {
             System.out.println(">>> PageLink moveToPage BEGIN >>>");
-            String pageURL = baseURL + "?faces-redirect=true&page_no=" + pageNo;
+            String pageURL = baseURL + "?faces-redirect=true&page_no=" + pageNo + generateQueryString(pageNavigator.queryStrings);
             System.out.println(" pageURL=" + pageURL);
             System.out.println("<<< PageLink moveToPage END <<<");
             return pageURL;                   
@@ -65,6 +74,7 @@ public class PageNavigator implements Serializable {
     private Long endShowPageNo = 0L;
     
     private List<PageLink> pageLinks = new ArrayList<>();
+    private Map<String,String> queryStrings = new HashMap<>();
 
     @PostConstruct
     public void initialize()
@@ -75,7 +85,7 @@ public class PageNavigator implements Serializable {
         System.out.println("<<< PageNavigator initialize END <<<");
     }
     
-    public void build(Long allRowCount)
+    public void build(Long allRowCount, Map<String,String> queryStrings)
     {
         System.out.println(">>> PageNavigator build BEGIN >>>");
         
@@ -83,30 +93,13 @@ public class PageNavigator implements Serializable {
         
         List<PageLink> pageLinks = new ArrayList<>();
         for(long i = this.beginShowPageNo; i <= this.endShowPageNo; i++) {
-            pageLinks.add(new PageLink(this.baseURL,i, this.currentPageNo));
+            pageLinks.add(new PageLink(this, this.baseURL,i, this.currentPageNo));
         }
         this.pageLinks = pageLinks;
+        this.queryStrings = queryStrings;
         
         System.out.println("<<< PageNavigator build END <<<");
     }
-    
-    public void viewAction()
-    {
-        System.out.println(">>> PageNavigator viewAction BEGIN >>>");
-        
-        Long allRowCount = em.createQuery("SELECT count(t) FROM TEmployee t",Long.class).getSingleResult();
-        calculate(allRowCount);
-        
-        List<PageLink> pageLinks = new ArrayList<>();
-        for(long i = this.beginShowPageNo; i <= this.endShowPageNo; i++) {
-            pageLinks.add(new PageLink(this.baseURL,i, this.currentPageNo));
-        }
-        this.pageLinks = pageLinks;
-        
-        System.out.println("<<< PageNavigator viewAction END <<<");
-    }
-    
-
 
     public Long getCurrentPageNo() {
         return currentPageNo;
@@ -156,11 +149,6 @@ public class PageNavigator implements Serializable {
         return pageLinks;
     }
     
-    public String moveToPage(int pageNo)
-    {
-        return baseURL + "?faces-redirect=true&page_no=" + pageNo;
-    }
-    
     public boolean prevPageEnabled()
     {
         return (currentPageNo - 1) >= 1;
@@ -168,7 +156,7 @@ public class PageNavigator implements Serializable {
     
     public String prevPage()
     {
-        return baseURL + "?faces-redirect=true&page_no=" + (currentPageNo - 1);
+        return baseURL + "?faces-redirect=true&page_no=" + (currentPageNo - 1) + generateQueryString(this.queryStrings);
     }
     
     public boolean nextPageEnabled()
@@ -178,7 +166,7 @@ public class PageNavigator implements Serializable {
     
     public String nextPage()
     {
-        return baseURL + "?faces-redirect=true&page_no=" + (currentPageNo + 1);
+        return baseURL + "?faces-redirect=true&page_no=" + (currentPageNo + 1) + generateQueryString(this.queryStrings);
     }
     
     public void updateMaxPageCount()
@@ -237,5 +225,18 @@ public class PageNavigator implements Serializable {
         endShowPageNo = endShowPageNo + (beginShowPageNo <= 0 ? Math.abs(beginShowPageNo) + 1 : 0);
         endShowPageNo = Math.min(dataPageCount, endShowPageNo);
         return endShowPageNo;
+    }
+    
+    private static String generateQueryString(Map<String, String> queryStrings)
+    {
+        try {
+        List<String> temp = new ArrayList<>();
+            for(Entry<String,String> entry : queryStrings.entrySet()) {
+                temp.add(URLEncoder.encode(entry.getKey(),"UTF-8") + "=" + URLEncoder.encode(entry.getValue(), "UTF-8"));
+            }
+            return (temp.size() > 0 ? "&" + String.join("&", temp) : "");
+        } catch(UnsupportedEncodingException ex) {
+            return "";
+        }
     }
 }

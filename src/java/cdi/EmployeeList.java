@@ -7,10 +7,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static java.util.stream.Collectors.joining;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.RequestScoped;
@@ -156,7 +160,7 @@ public class EmployeeList implements Serializable {
         cqCount = cqCount.select(build.count(rootCount)).where(where1);
         this.employeeAllCount = em.createQuery(cqCount).getSingleResult();
         
-        this.pageNavigator.build(this.employeeAllCount);
+        this.pageNavigator.build(this.employeeAllCount, this.generateQueryStrings(this.searchCondition));
         
         cq = cq.select(root)
                 .where(where2)
@@ -232,41 +236,49 @@ public class EmployeeList implements Serializable {
        
     public String search() throws UnsupportedEncodingException
     {
-        List<String> queryStrings = new ArrayList<>();
-        if(searchCondition.getEmployee_id()!=null) {
-            queryStrings.add("employee_id=" + searchCondition.getEmployee_id());
-        }
-        if(searchCondition.getName()!=null && !searchCondition.getName().isEmpty()) {
-            queryStrings.add("name=" + URLEncoder.encode(searchCondition.getName(), "UTF-8"));
-        }
-        if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
-            queryStrings.add("gender=" + URLEncoder.encode(searchCondition.getGender(), "UTF-8"));
-        }
-        if(searchCondition.getPhone()!=null && !searchCondition.getPhone().isEmpty()) {
-            queryStrings.add("phone=" + URLEncoder.encode(searchCondition.getPhone(), "UTF-8"));
-        }
-        if(searchCondition.getMobilePhone()!=null && !searchCondition.getMobilePhone().isEmpty()) {
-            queryStrings.add("mobile_phone=" + URLEncoder.encode(searchCondition.getMobilePhone(), "UTF-8"));
-        }
-        if(searchCondition.getZipCode()!=null && !searchCondition.getZipCode().isEmpty()) {
-            queryStrings.add("zip_code=" + URLEncoder.encode(searchCondition.getZipCode(), "UTF-8"));
-        }
-        if(searchCondition.getAddress()!=null && !searchCondition.getAddress().isEmpty()) {
-            queryStrings.add("address=" + URLEncoder.encode(searchCondition.getAddress(), "UTF-8"));
-        }
-        if(searchCondition.getRemarks()!=null && !searchCondition.getRemarks().isEmpty()) {
-            queryStrings.add("remarks=" + URLEncoder.encode(searchCondition.getRemarks(), "UTF-8"));
-        } 
+        String queryString = generateQueryStrings(searchCondition)
+                                .entrySet()
+                                .stream()
+                                .map(e -> e.getKey() + "=" + urlEncode(e.getValue()))
+                                .collect(joining("&"));
+
         
-        String queryString = queryStrings.size() > 0 ? 
-                "&" + String.join("&", queryStrings) : "";
-        
-        return "employeeList?faces-redirect=true" + queryString;
+        return "employeeList?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
     }
     
     public String clear()
     {
         return "employeeList?faces-redirect=true";
+    }
+    
+    private Map<String,String> generateQueryStrings(TEmployee searchCondition)
+    {
+        Map<String, String> queryStrings = new HashMap<>();
+        if(searchCondition.getEmployee_id()!=null) {
+            queryStrings.put("employee_id",searchCondition.getEmployee_id().toString());
+        }
+        if(searchCondition.getName()!=null && !searchCondition.getName().isEmpty()) {
+            queryStrings.put("name",searchCondition.getName());
+        }
+        if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
+            queryStrings.put("gender",searchCondition.getGender());
+        }
+        if(searchCondition.getPhone()!=null && !searchCondition.getPhone().isEmpty()) {
+            queryStrings.put("phone",searchCondition.getPhone());
+        }
+        if(searchCondition.getMobilePhone()!=null && !searchCondition.getMobilePhone().isEmpty()) {
+            queryStrings.put("mobile_phone",searchCondition.getMobilePhone());
+        }
+        if(searchCondition.getZipCode()!=null && !searchCondition.getZipCode().isEmpty()) {
+            queryStrings.put("zip_code",searchCondition.getZipCode());
+        }
+        if(searchCondition.getAddress()!=null && !searchCondition.getAddress().isEmpty()) {
+            queryStrings.put("address",searchCondition.getAddress());
+        }
+        if(searchCondition.getRemarks()!=null && !searchCondition.getRemarks().isEmpty()) {
+            queryStrings.put("remarks",searchCondition.getRemarks());
+        }
+        return queryStrings;
     }
 
     private String likeEscape(String likeCondition)
@@ -274,5 +286,14 @@ public class EmployeeList implements Serializable {
         return likeCondition
                 .replaceAll("_", "\\\\_")
                 .replaceAll("%", "\\\\%");
+    }
+    
+    private String urlEncode(String target)
+    {
+        try {
+            return URLEncoder.encode(target, "UTF-8");
+        } catch(UnsupportedEncodingException ex) {
+            return "";
+        }
     }
 }
