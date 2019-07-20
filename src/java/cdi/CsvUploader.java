@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Set;
+import static java.util.stream.Collectors.joining;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
@@ -17,6 +19,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.Part;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -31,6 +37,7 @@ public class CsvUploader {
     private Part csvFile;
     private String uploadLog;
     private String folder = "c:\\Temp";
+    private String logMessage = "";
 
     public Part getCsvFile() {
         return csvFile;
@@ -39,10 +46,22 @@ public class CsvUploader {
     public void setCsvFile(Part csvFile) {
         this.csvFile = csvFile;
     }
+
+    public String getLogMessage() {
+        return logMessage;
+    }
+
+    public void setLogMessage(String logMessage) {
+        this.logMessage = logMessage;
+    }
+    
+    
     
     @Transactional
     public String uploadFile()
     {
+        ValidatorFactory vf = Validation.buildDefaultValidatorFactory();
+        Validator validator = vf.getValidator();
         try(InputStream input = csvFile.getInputStream()) {
             String fileName = new File(csvFile.getSubmittedFileName()).getName();
             Files.copy(input, new File(folder, fileName).toPath(),StandardCopyOption.REPLACE_EXISTING);
@@ -51,6 +70,7 @@ public class CsvUploader {
             try(BufferedReader br = Files.newBufferedReader(csvFilePath, Charset.forName("UTF-8"))) {
                 String[] headers = null;
                 int lineCount = 1;
+                int errorCount = 0;
                 String line;
                 while((line = br.readLine())!=null) {
                     if(lineCount==1) {
@@ -92,6 +112,16 @@ public class CsvUploader {
                                     emp.setAddress(emp.getAddress() + rowData[col]);
                                     break;                                  
                             }
+                        }
+                        Set<ConstraintViolation<TEmployee>> vRet = validator.validate(emp);
+                        if(!vRet.isEmpty()) {
+                            this.logMessage += lineCount + "行目に以下のエラーが発生しました。\n";
+                            this.logMessage += vRet.stream().map(e -> "・" + e.getMessage()).collect(joining("\n"));
+                            errorCount++;
+                            if(errorCount>10) {
+                                
+                            }
+                              
                         }
                         em.persist(emp);
                     }
