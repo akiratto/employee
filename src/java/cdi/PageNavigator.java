@@ -168,14 +168,7 @@ public class PageNavigator implements Serializable {
     {
         return baseURL + "?faces-redirect=true&page_no=" + (currentPageNo + 1) + generateQueryString(this.queryStrings);
     }
-    
-    public void updateMaxPageCount()
-    {
-        
-    }
-    
-    
-    
+
 
     private void calculate(Long allRowCount)
     {

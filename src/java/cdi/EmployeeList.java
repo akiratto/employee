@@ -5,6 +5,7 @@ import entity.TEmployee_;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -106,6 +107,10 @@ public class EmployeeList implements Serializable {
                                         root.get(TEmployee_.gender), 
                                         "%" + likeEscape(searchCondition.getGender()) + "%", '\\'
             ));
+        }
+        if(searchCondition.getBirthday()!=null) {
+            where1 = build.and(where1, build.equal(rootCount.get(TEmployee_.birthday), searchCondition.getBirthday()));
+            where2 = build.and(where2, build.equal(root.get(TEmployee_.birthday), searchCondition.getBirthday()));
         }
         if(searchCondition.getPhone()!=null && !searchCondition.getPhone().isEmpty()) {
             where1 = build.and(where1, build.like(
@@ -221,6 +226,18 @@ public class EmployeeList implements Serializable {
         return search();
     }
     
+    @Transactional
+    public String deleteAllEmployee()
+    {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        int deleteCount = em.createQuery("DELETE FROM TEmployee").executeUpdate();
+        
+        flash.put("message", deleteCount + "件の社員情報を削除しました。");
+        String queryString = generateString(searchCondition);
+        return "employeeList?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
+    }
+            
+    
     public String gotoDetail(Integer employeeId, String mode) throws UnsupportedEncodingException
     {
         System.out.println(String.format(">>> EmployeeList gotoDetail(%s,%s) BEGIN >>>", employeeId, mode));
@@ -236,13 +253,7 @@ public class EmployeeList implements Serializable {
        
     public String search() throws UnsupportedEncodingException
     {
-        String queryString = generateQueryStrings(searchCondition)
-                                .entrySet()
-                                .stream()
-                                .map(e -> e.getKey() + "=" + urlEncode(e.getValue()))
-                                .collect(joining("&"));
-
-        
+        String queryString = generateString(searchCondition);        
         return "employeeList?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
     }
     
@@ -263,6 +274,10 @@ public class EmployeeList implements Serializable {
         if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
             queryStrings.put("gender",searchCondition.getGender());
         }
+        if(searchCondition.getBirthday()!=null) {
+            SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyy/MM/dd");
+            queryStrings.put("birthday", birthdayFormat.format(searchCondition.getBirthday()));
+        }
         if(searchCondition.getPhone()!=null && !searchCondition.getPhone().isEmpty()) {
             queryStrings.put("phone",searchCondition.getPhone());
         }
@@ -279,6 +294,15 @@ public class EmployeeList implements Serializable {
             queryStrings.put("remarks",searchCondition.getRemarks());
         }
         return queryStrings;
+    }
+    
+    private String generateString(TEmployee searchCondition)
+    {
+        return generateQueryStrings(searchCondition)
+                .entrySet()
+                .stream()
+                .map(e -> e.getKey() + "=" + urlEncode(e.getValue()))
+                .collect(joining("&"));
     }
 
     private String likeEscape(String likeCondition)

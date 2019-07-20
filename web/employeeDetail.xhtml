@@ -15,7 +15,7 @@
         <h1>社員情報</h1>
         <h:form id="frm">
             <h:messages globalOnly="true"  />
-            <h:panelGrid columns="4" >
+            <h:panelGrid columns="4">
                 <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true" />
                 <h:commandButton value="編集" action="#{employee.beginEdit()}" rendered="#{employee.isRead()}" />
                 <h:commandButton value="保存" action="#{employee.save()}" rendered="#{employee.isEdit() or employee.isNew()}" />
@@ -48,6 +48,12 @@
                     <f:selectItem itemLabel="その他" itemValue="O" />
                 </h:selectOneMenu>
                 <h:message for="employee_gender" />
+                
+                <h:outputLabel value="生年月日" for="employee_birthday" />
+                <h:inputText value="#{employee.entity.birthday}" disabled="#{employee.isRead()}">
+                    <f:convertDateTime type="date" dateStyle="medium" />
+                </h:inputText>
+                <h:message for="employee_birthday" />
                 
                 <h:outputLabel value="電話番号" for="employee_phone" />
                 <h:inputText id="employee_phone" 

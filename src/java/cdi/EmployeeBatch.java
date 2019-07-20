@@ -5,15 +5,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
-import javax.enterprise.context.RequestScoped;
+import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -29,8 +37,8 @@ import javax.validation.ValidatorFactory;
  * @author Owner
  */
 @Named
-@RequestScoped
-public class CsvUploader {
+@ViewScoped
+public class EmployeeBatch implements Serializable {
     @PersistenceContext
     EntityManager em;
     
@@ -38,6 +46,13 @@ public class CsvUploader {
     private String uploadLog;
     private String folder = "c:\\Temp";
     private String logMessage = "";
+    
+    @PostConstruct
+    public void init()
+    {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        this.logMessage = (String)flash.getOrDefault("log_message", "");
+    }
 
     public Part getCsvFile() {
         return csvFile;
@@ -55,8 +70,6 @@ public class CsvUploader {
         this.logMessage = logMessage;
     }
     
-    
-    
     @Transactional
     public String uploadFile()
     {
@@ -71,6 +84,7 @@ public class CsvUploader {
                 String[] headers = null;
                 int lineCount = 1;
                 int errorCount = 0;
+                List<String> errorMessages = new ArrayList<>();
                 String line;
                 while((line = br.readLine())!=null) {
                     if(lineCount==1) {
@@ -92,6 +106,16 @@ public class CsvUploader {
                                                   : rowData[col].equals("女") ? "F"
                                                   : "O";
                                     emp.setGender(gender);
+                                    break;
+                                case "生年月日":
+                                    SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyy/MM/dd");
+                                    Date birthday = null;
+                                    try {
+                                        birthday = birthdayFormat.parse(rowData[col]);
+                                    } catch(ParseException ex) {
+                                        errorMessages.add("生年月日が正しい形式ではありません。(例.2019/01/01)");
+                                    }
+                                    emp.setBirthday(birthday);
                                     break;
                                 case "電話番号":
                                     emp.setPhone(rowData[col]);
@@ -115,19 +139,32 @@ public class CsvUploader {
                         }
                         Set<ConstraintViolation<TEmployee>> vRet = validator.validate(emp);
                         if(!vRet.isEmpty()) {
+                            errorMessages.addAll(
+                                vRet.stream().map(e -> e.getMessage()).collect(Collectors.toList())
+                            );
                             this.logMessage += lineCount + "行目に以下のエラーが発生しました。\n";
                             this.logMessage += vRet.stream().map(e -> "・" + e.getMessage()).collect(joining("\n"));
+                            this.logMessage += "\n";
                             errorCount++;
                             if(errorCount>10) {
-                                
+                                this.logMessage += "エラーが10件を超えました。処理を中止します。\n";
+                                break;
                             }
                               
+                        } else {
+                            em.persist(emp);
+                            em.clear();
                         }
-                        em.persist(emp);
                     }
                     lineCount++;
                 }
+                if(errorCount == 0) {
+                    this.logMessage += "一括登録処理が完了しました。";
+                }
             }
+            
+            Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+            flash.put("log_message", this.logMessage);
                      
         } catch(IOException e) {
             e.printStackTrace();

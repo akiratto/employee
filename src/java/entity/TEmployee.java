@@ -4,11 +4,14 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -34,6 +37,11 @@ public class TEmployee implements Serializable {
     @NotNull(message="性別の入力は必須です。")
     @Pattern(regexp = "[MFO]", message="性別は男性(M),女性(F),その他(O)のいずれかを入力してください:${validatedValue}")
     private String gender;
+    
+    @Temporal(TemporalType.DATE)
+    //--Bean バリデーション
+    @NotNull(message="生年月日の入力は必須です。")
+    private Date birthday;
 
     @Basic
     //--Bean バリデーション
@@ -87,6 +95,14 @@ public class TEmployee implements Serializable {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
     public String getPhone() {
