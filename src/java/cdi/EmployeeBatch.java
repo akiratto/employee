@@ -1,5 +1,6 @@
 package cdi;
 
+import csv.CsvFile;
 import entity.TEmployee;
 import java.io.BufferedReader;
 import java.io.File;
@@ -80,88 +81,100 @@ public class EmployeeBatch implements Serializable {
             Files.copy(input, new File(folder, fileName).toPath(),StandardCopyOption.REPLACE_EXISTING);
             
             Path csvFilePath = new File(folder, fileName).toPath();
-            try(BufferedReader br = Files.newBufferedReader(csvFilePath, Charset.forName("UTF-8"))) {
-                String[] headers = null;
-                int lineCount = 1;
-                int errorCount = 0;
-                List<String> errorMessages = new ArrayList<>();
-                String line;
-                while((line = br.readLine())!=null) {
-                    if(lineCount==1) {
-                        headers = line.split(",");
-                    } else {
-                        String[] rowData = line.split(",");
-                        TEmployee emp = new TEmployee();
-                        for(int col=0; col < headers.length; col++) {
-                            String headerName = headers[col];
-                            switch(headerName) {
-                                case "連番":
-                                    emp.setEmployee_id(Integer.parseInt(rowData[col]));
-                                    break;
-                                case "氏名":
-                                    emp.setName(rowData[col]);
-                                    break;
-                                case "性別":
-                                    String gender = rowData[col].equals("男") ? "M"
-                                                  : rowData[col].equals("女") ? "F"
-                                                  : "O";
-                                    emp.setGender(gender);
-                                    break;
-                                case "生年月日":
-                                    SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyy/MM/dd");
-                                    Date birthday = null;
-                                    try {
-                                        birthday = birthdayFormat.parse(rowData[col]);
-                                    } catch(ParseException ex) {
-                                        errorMessages.add("生年月日が正しい形式ではありません。(例.2019/01/01)");
-                                    }
-                                    emp.setBirthday(birthday);
-                                    break;
-                                case "電話番号":
-                                    emp.setPhone(rowData[col]);
-                                    break;
-                                    
-                                case "郵便番号":
-                                    emp.setZipCode(rowData[col]);
-                                    break;
-                                    
-                                case "住所1":
-                                    emp.setAddress(rowData[col]);
-                                    break;
-                                    
-                                case "住所2":
-                                case "住所3":
-                                case "住所4":
-                                case "住所5":
-                                    emp.setAddress(emp.getAddress() + rowData[col]);
-                                    break;                                  
-                            }
-                        }
-                        Set<ConstraintViolation<TEmployee>> vRet = validator.validate(emp);
-                        if(!vRet.isEmpty()) {
-                            errorMessages.addAll(
-                                vRet.stream().map(e -> e.getMessage()).collect(Collectors.toList())
-                            );
-                            this.logMessage += lineCount + "行目に以下のエラーが発生しました。\n";
-                            this.logMessage += vRet.stream().map(e -> "・" + e.getMessage()).collect(joining("\n"));
-                            this.logMessage += "\n";
-                            errorCount++;
-                            if(errorCount>10) {
-                                this.logMessage += "エラーが10件を超えました。処理を中止します。\n";
-                                break;
-                            }
-                              
-                        } else {
-                            em.persist(emp);
-                            em.clear();
-                        }
-                    }
-                    lineCount++;
+            try(CsvFile csvFile = new CsvFile(csvFilePath, Charset.forName("UTF-8"))) {
+                TEmployee employee;
+                while((employee = csvFile.readLine(TEmployee.class))!=null) {
+                    em.persist(employee);
+//                    em.clear();                
                 }
-                if(errorCount == 0) {
-                    this.logMessage += "一括登録処理が完了しました。";
-                }
+                
+            } catch(Exception e) {
+                e.printStackTrace();
             }
+                
+            
+//            try(BufferedReader br = Files.newBufferedReader(csvFilePath, Charset.forName("UTF-8"))) {
+//                String[] headers = null;
+//                int lineCount = 1;
+//                int errorCount = 0;
+//                List<String> errorMessages = new ArrayList<>();
+//                String line;
+//                while((line = br.readLine())!=null) {
+//                    if(lineCount==1) {
+//                        headers = line.split(",");
+//                    } else {
+//                        String[] rowData = line.split(",");
+//                        TEmployee emp = new TEmployee();
+//                        for(int col=0; col < headers.length; col++) {
+//                            String headerName = headers[col];
+//                            switch(headerName) {
+//                                case "連番":
+//                                    emp.setEmployee_id(Integer.parseInt(rowData[col]));
+//                                    break;
+//                                case "氏名":
+//                                    emp.setName(rowData[col]);
+//                                    break;
+//                                case "性別":
+//                                    String gender = rowData[col].equals("男") ? "M"
+//                                                  : rowData[col].equals("女") ? "F"
+//                                                  : "O";
+//                                    emp.setGender(gender);
+//                                    break;
+//                                case "生年月日":
+//                                    SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyy/MM/dd");
+//                                    Date birthday = null;
+//                                    try {
+//                                        birthday = birthdayFormat.parse(rowData[col]);
+//                                    } catch(ParseException ex) {
+//                                        errorMessages.add("生年月日が正しい形式ではありません。(例.2019/01/01)");
+//                                    }
+//                                    emp.setBirthday(birthday);
+//                                    break;
+//                                case "電話番号":
+//                                    emp.setPhone(rowData[col]);
+//                                    break;
+//                                    
+//                                case "郵便番号":
+//                                    emp.setZipCode(rowData[col]);
+//                                    break;
+//                                    
+//                                case "住所1":
+//                                    emp.setAddress(rowData[col]);
+//                                    break;
+//                                    
+//                                case "住所2":
+//                                case "住所3":
+//                                case "住所4":
+//                                case "住所5":
+//                                    emp.setAddress(emp.getAddress() + rowData[col]);
+//                                    break;                                  
+//                            }
+//                        }
+//                        Set<ConstraintViolation<TEmployee>> vRet = validator.validate(emp);
+//                        if(!vRet.isEmpty()) {
+//                            errorMessages.addAll(
+//                                vRet.stream().map(e -> e.getMessage()).collect(Collectors.toList())
+//                            );
+//                            this.logMessage += lineCount + "行目に以下のエラーが発生しました。\n";
+//                            this.logMessage += vRet.stream().map(e -> "・" + e.getMessage()).collect(joining("\n"));
+//                            this.logMessage += "\n";
+//                            errorCount++;
+//                            if(errorCount>10) {
+//                                this.logMessage += "エラーが10件を超えました。処理を中止します。\n";
+//                                break;
+//                            }
+//                              
+//                        } else {
+//                            em.persist(emp);
+//                            em.clear();
+//                        }
+//                    }
+//                    lineCount++;
+//                }
+//                if(errorCount == 0) {
+//                    this.logMessage += "一括登録処理が完了しました。";
+//                }
+//            }
             
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
             flash.put("log_message", this.logMessage);

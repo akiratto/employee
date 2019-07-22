@@ -52,7 +52,7 @@
                     <h:inputText id="search_employee_birthday" 
                                   value="#{employeeList.searchCondition.birthday}" 
                                   onkeypress="if(event.keyCode == 13) return false;">
-                        <f:convertDateTime type="date" dateStyle="medium" />
+                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
                     </h:inputText>
                     <h:message for="search_employee_birthday" />
 
@@ -110,7 +110,12 @@
                 </h:column>
                 <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
                 <h:column><f:facet name="header"><h:outputText value="性別" /></f:facet>#{emp.gender}</h:column>
-                <h:column><f:facet name="header"><h:outputText value="生年月日" /></f:facet>#{emp.birthday}</h:column>
+                <h:column>
+                    <f:facet name="header"><h:outputText value="生年月日" /></f:facet>
+                    <h:outputText value="#{emp.birthday}">
+                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
+                    </h:outputText>
+                </h:column>
                 <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>
                 <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
                 <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>

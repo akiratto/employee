@@ -3,6 +3,9 @@
  */
 package entity;
 
+import csv.annotation.CsvColumn;
+import csv.annotation.CsvConverter;
+import csv.converter.builtin.CsvColumnDateConverter;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -24,23 +27,32 @@ public class TEmployee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //--CSV パーサ
+    @CsvColumn(field="連番")
     private Integer employee_id;
 
     @Basic
     //--Bean バリデーション
     @NotNull(message="社員名の入力は必須です。")
     @Size(min=1, max=60, message="${validatedValue == '' ? '社員名の入力は必須です。' : '社員名は' += min +='～'+=max+='文字以内で入力してください。'}")
+    //--CSV パーサ
+    @CsvColumn(field="氏名")
     private String name;
 
     @Basic
     //--Bean バリデーション
     @NotNull(message="性別の入力は必須です。")
     @Pattern(regexp = "[MFO]", message="性別は男性(M),女性(F),その他(O)のいずれかを入力してください:${validatedValue}")
+    //--CSV パーサ
+    @CsvColumn(field="性別")
     private String gender;
     
     @Temporal(TemporalType.DATE)
     //--Bean バリデーション
     @NotNull(message="生年月日の入力は必須です。")
+    //--CSV パーサ
+    @CsvColumn(field="生年月日")
+    @CsvConverter(converter = CsvColumnDateConverter.class)
     private Date birthday;
 
     @Basic
@@ -48,6 +60,8 @@ public class TEmployee implements Serializable {
     @NotNull(message="電話番号の入力は必須です。")
     @Size(min=1, message="電話番号の入力は必須です。")
     @Pattern(regexp = "0\\d{1,4}-\\d{1,4}-\\d{4}", message="電話番号が正しい形式ではありません。")
+    //--CSV パーサ
+    @CsvColumn(field="電話番号")
     private String phone;
 
     @Basic
@@ -55,6 +69,8 @@ public class TEmployee implements Serializable {
     @NotNull(message="携帯電話番号の入力は必須です。")
     @Size(min=1, message="携帯電話番号の入力は必須です。")
     @Pattern(regexp = "0\\d{1,4}-\\d{1,4}-\\d{4}", message="携帯電話番号が正しい形式ではありません。")
+    //--CSV パーサ
+    @CsvColumn(field="携帯電話")
     private String mobilePhone;
 
     @Basic
@@ -62,12 +78,16 @@ public class TEmployee implements Serializable {
     @NotNull(message="郵便番号の入力は必須です。")
     @Size(min=1, message="郵便番号の入力は必須です。")
     @Pattern(regexp = "\\d{3}-\\d{4}", message="郵便番号が正しい形式ではありません。")
+    //--CSV パーサ
+    @CsvColumn(field="郵便番号")
     private String zipCode;
 
     @Basic
     //--Bean バリデーション
     @NotNull(message="住所の入力は必須です")
     @Size(min=1, message="住所の入力は必須です")
+    //--CSV パーサ
+    @CsvColumn(field="住所")
     private String address;
 
     @Basic
