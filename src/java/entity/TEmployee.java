@@ -27,10 +27,8 @@ public class TEmployee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //--CSV パーサ
-    @CsvColumn(field="連番")
     private Integer employee_id;
-
+    
     @Basic
     //--Bean バリデーション
     @NotNull(message="社員名の入力は必須です。")
