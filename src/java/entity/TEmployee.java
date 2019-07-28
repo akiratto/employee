@@ -4,6 +4,7 @@
 package entity;
 
 import csv.annotation.CsvColumn;
+import csv.annotation.CsvColumnFormula;
 import csv.annotation.CsvConverter;
 import csv.converter.builtin.CsvColumnDateConverter;
 import java.io.Serializable;
@@ -85,7 +86,7 @@ public class TEmployee implements Serializable {
     @NotNull(message="住所の入力は必須です")
     @Size(min=1, message="住所の入力は必須です")
     //--CSV パーサ
-    @CsvColumn(field="住所")
+    @CsvColumnFormula(formula="住所1 += 住所2 += 住所3 += 住所4 += 住所5")
     private String address;
 
     @Basic

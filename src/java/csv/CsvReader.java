@@ -1,6 +1,7 @@
 package csv;
 
 import csv.annotation.CsvColumn;
+import csv.annotation.CsvColumnFormula;
 import csv.annotation.CsvConverter;
 import csv.converter.CsvColumnConverter;
 import csv.exception.CsvReadLineException;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.el.ELProcessor;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -80,91 +82,193 @@ public class CsvReader implements AutoCloseable {
 
         Map<String, List<String>> fieldErrorMessages = new HashMap<>();
         String[] rowData = line.split(",");
+        
+        ELProcessor elProcessor = new ELProcessor();
+        Map<String, String> headerAndValues = new HashMap<>();
         for(int col=0; col < headers.length; col++) {
-            String headerName = headers[col];
-
-            for(Field field : clazz.getDeclaredFields()) {
-                CsvColumn csvColumn = field.getAnnotation(CsvColumn.class);
-                CsvConverter csvConverter = field.getAnnotation(CsvConverter.class);
-
-                if(csvColumn == null) continue;
-                if(csvColumn.field().equals(headerName) == false) continue;
-
-                if(csvConverter != null) {
-                    Class<? extends CsvColumnConverter> csvColumnConverterClass = csvConverter.converter();
-                    CsvColumnConverter csvColumnConverter;
-                    try {
-                        csvColumnConverter = csvColumnConverterClass.newInstance();
-                    } catch(IllegalAccessException | InstantiationException e) {
-                        throw new IllegalArgumentException(e);
-                    }
-                    Object value = csvColumnConverter.convertToFieldObject(rowData[col]);
-                    Class<?> fieldType = field.getType();
-                    if(value != null) {
-                        if(fieldType.isInstance(value)) {
-                            boolean tmpAccessible = field.isAccessible();
-                            field.setAccessible(true);
-                            try {
-                                field.set(instance, value);
-                            } catch(IllegalAccessException e) {
-                                throw new IllegalArgumentException(e);
-                            }
-                            field.setAccessible(tmpAccessible);
-                            Set<ConstraintViolation<T>> messages = validator.validateProperty(instance, field.getName());
-                            
-                            if(messages.size() > 0) {
-                                List<String> errorMessages = messages.stream().map(m -> m.getMessage()).collect(Collectors.toList());
-                                fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
-                            }
-                        } else {
-                            //変換不可のエラー出力
-                            String errorMessage = clazz.getName() 
-                                                + "." + field.getName() 
-                                                + " can not convert to " + fieldType.getName() + "!";
-                            
-                            List<String> errorMessages = Arrays.asList(errorMessage);
-                            fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
-                        }
-                    } else {
-                        //コンバータ内で変換不可の場合、エラー出力
-                        String errorMessage = clazz.getName() 
-                                                + "." + field.getName() 
-                                                + " can not convert to " + fieldType.getName() 
-                                                + "in " + csvConverter.getClass().getName() + "!";
-                        
-                        List<String> errorMessages = Arrays.asList(errorMessage);
-                        fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
-                   }
-                } else {
-                    Class<?> fieldType = field.getType();
-                    if(fieldType == String.class) {
-                        boolean tmpAccessible = field.isAccessible();
-                        field.setAccessible(true);
-                        try {
-                            field.set(instance, rowData[col]);
-                        } catch(IllegalAccessException e) {
-                            throw new IllegalArgumentException(e);
-                        }
-                        field.setAccessible(tmpAccessible);
-                        Set<ConstraintViolation<T>> messages = validator.validateProperty(instance, field.getName());
-                        if(messages.size() > 0) {
-                            messages.stream().forEach(m -> System.out.println(clazz.getName() + "." + field.getName() + ":" + m.getMessage()));
-                        }
-                    } else {
-                        //変換不可のエラー出力
-                        String errorMessage = clazz.getName() 
-                                            + "." + field.getName() 
-                                            + " can not convert to " + fieldType.getName() + "!";
-
-                        List<String> errorMessages = Arrays.asList(errorMessage);
-                        fieldErrorMessages.put(clazz.getName() + "." + field.getName(), errorMessages);
-                    }
-                }
+            headerAndValues.put(headers[col], rowData[col]);
+            
+            for(Entry<String,String> entry : headerAndValues.entrySet()) {
+                elProcessor.defineBean(entry.getKey(), entry.getValue());
             }
         }
+        
+        for(Field field : clazz.getDeclaredFields()) {
+            CsvColumn csvColumn = field.getAnnotation(CsvColumn.class);
+            CsvConverter csvConverter = field.getAnnotation(CsvConverter.class);
+            CsvColumnFormula csvColumnFormula = field.getAnnotation(CsvColumnFormula.class);
+            
+            if(csvColumn != null) {
+                if(headerAndValues.containsKey(csvColumn.field())) {
+                    String csvColumnValue = headerAndValues.get(csvColumn.field());
+                    processCsvColumn(csvColumnValue, validator, clazz, instance, field, csvColumn, csvConverter, fieldErrorMessages);
+                }
+            } else if(csvColumnFormula != null) {
+                String csvColumnValue = (String)elProcessor.eval(csvColumnFormula.formula());
+                processCsvColumn(csvColumnValue, validator, clazz, instance, field, csvColumn, csvConverter, fieldErrorMessages);
+            }
+        }
+//        
+//        
+//        for(int col=0; col < headers.length; col++) {
+//            String headerName = headers[col];
+//
+//            for(Field field : clazz.getDeclaredFields()) {
+//                CsvColumn csvColumn = field.getAnnotation(CsvColumn.class);
+//                CsvConverter csvConverter = field.getAnnotation(CsvConverter.class);
+//
+//                if(csvColumn == null) continue;
+//                if(csvColumn.field().equals(headerName) == false) continue;
+//
+//                if(csvConverter != null) {
+//                    Class<? extends CsvColumnConverter> csvColumnConverterClass = csvConverter.converter();
+//                    CsvColumnConverter csvColumnConverter;
+//                    try {
+//                        csvColumnConverter = csvColumnConverterClass.newInstance();
+//                    } catch(IllegalAccessException | InstantiationException e) {
+//                        throw new IllegalArgumentException(e);
+//                    }
+//                    Object value = csvColumnConverter.convertToFieldObject(rowData[col]);
+//                    Class<?> fieldType = field.getType();
+//                    if(value != null) {
+//                        if(fieldType.isInstance(value)) {
+//                            boolean tmpAccessible = field.isAccessible();
+//                            field.setAccessible(true);
+//                            try {
+//                                field.set(instance, value);
+//                            } catch(IllegalAccessException e) {
+//                                throw new IllegalArgumentException(e);
+//                            }
+//                            field.setAccessible(tmpAccessible);
+//                            Set<ConstraintViolation<T>> messages = validator.validateProperty(instance, field.getName());
+//                            
+//                            if(messages.size() > 0) {
+//                                List<String> errorMessages = messages.stream().map(m -> m.getMessage()).collect(Collectors.toList());
+//                                fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
+//                            }
+//                        } else {
+//                            //変換不可のエラー出力
+//                            String errorMessage = clazz.getName() 
+//                                                + "." + field.getName() 
+//                                                + " can not convert to " + fieldType.getName() + "!";
+//                            
+//                            List<String> errorMessages = Arrays.asList(errorMessage);
+//                            fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
+//                        }
+//                    } else {
+//                        //コンバータ内で変換不可の場合、エラー出力
+//                        String errorMessage = clazz.getName() 
+//                                                + "." + field.getName() 
+//                                                + " can not convert to " + fieldType.getName() 
+//                                                + "in " + csvConverter.getClass().getName() + "!";
+//                        
+//                        List<String> errorMessages = Arrays.asList(errorMessage);
+//                        fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
+//                   }
+//                } else {
+//                    Class<?> fieldType = field.getType();
+//                    if(fieldType == String.class) {
+//                        boolean tmpAccessible = field.isAccessible();
+//                        field.setAccessible(true);
+//                        try {
+//                            field.set(instance, rowData[col]);
+//                        } catch(IllegalAccessException e) {
+//                            throw new IllegalArgumentException(e);
+//                        }
+//                        field.setAccessible(tmpAccessible);
+//                        Set<ConstraintViolation<T>> messages = validator.validateProperty(instance, field.getName());
+//                        if(messages.size() > 0) {
+//                            messages.stream().forEach(m -> System.out.println(clazz.getName() + "." + field.getName() + ":" + m.getMessage()));
+//                        }
+//                    } else {
+//                        //変換不可のエラー出力
+//                        String errorMessage = clazz.getName() 
+//                                            + "." + field.getName() 
+//                                            + " can not convert to " + fieldType.getName() + "!";
+//
+//                        List<String> errorMessages = Arrays.asList(errorMessage);
+//                        fieldErrorMessages.put(clazz.getName() + "." + field.getName(), errorMessages);
+//                    }
+//                }
+//            }
+//        }
         if(fieldErrorMessages.size() > 0) {
             throw new CsvReadLineException(csvFilePath, lineCount, clazz, fieldErrorMessages);
         }
         return instance;
-    }       
+    }    
+    
+    private <T> void processCsvColumn(String csvColumnValue, Validator validator, Class clazz, T instance, Field field, CsvColumn csvColumn, CsvConverter csvConverter, Map<String, List<String>> fieldErrorMessages)
+    {
+        if(csvConverter != null) {
+            Class<? extends CsvColumnConverter> csvColumnConverterClass = csvConverter.converter();
+            CsvColumnConverter csvColumnConverter;
+            try {
+                csvColumnConverter = csvColumnConverterClass.newInstance();
+            } catch(IllegalAccessException | InstantiationException e) {
+                throw new IllegalArgumentException(e);
+            }
+            Object value = csvColumnConverter.convertToFieldObject(csvColumnValue);
+            Class<?> fieldType = field.getType();
+            if(value != null) {
+                if(fieldType.isInstance(value)) {
+                    boolean tmpAccessible = field.isAccessible();
+                    field.setAccessible(true);
+                    try {
+                        field.set(instance, value);
+                    } catch(IllegalAccessException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                    field.setAccessible(tmpAccessible);
+                    Set<ConstraintViolation<T>> messages = validator.validateProperty(instance, field.getName());
+
+                    if(messages.size() > 0) {
+                        List<String> errorMessages = messages.stream().map(m -> m.getMessage()).collect(Collectors.toList());
+                        fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
+                    }
+                } else {
+                    //変換不可のエラー出力
+                    String errorMessage = clazz.getName() 
+                                        + "." + field.getName() 
+                                        + " can not convert to " + fieldType.getName() + "!";
+
+                    List<String> errorMessages = Arrays.asList(errorMessage);
+                    fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
+                }
+            } else {
+                //コンバータ内で変換不可の場合、エラー出力
+                String errorMessage = clazz.getName() 
+                                        + "." + field.getName() 
+                                        + " can not convert to " + fieldType.getName() 
+                                        + "in " + csvConverter.getClass().getName() + "!";
+
+                List<String> errorMessages = Arrays.asList(errorMessage);
+                fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
+           }
+        } else {
+            Class<?> fieldType = field.getType();
+            if(fieldType == String.class) {
+                boolean tmpAccessible = field.isAccessible();
+                field.setAccessible(true);
+                try {
+                    field.set(instance, csvColumnValue);
+                } catch(IllegalAccessException e) {
+                    throw new IllegalArgumentException(e);
+                }
+                field.setAccessible(tmpAccessible);
+                Set<ConstraintViolation<T>> messages = validator.validateProperty(instance, field.getName());
+                if(messages.size() > 0) {
+                    messages.stream().forEach(m -> System.out.println(clazz.getName() + "." + field.getName() + ":" + m.getMessage()));
+                }
+            } else {
+                //変換不可のエラー出力
+                String errorMessage = clazz.getName() 
+                                    + "." + field.getName() 
+                                    + " can not convert to " + fieldType.getName() + "!";
+
+                List<String> errorMessages = Arrays.asList(errorMessage);
+                fieldErrorMessages.put(clazz.getName() + "." + field.getName(), errorMessages);
+            }
+        }
+    }
 }
