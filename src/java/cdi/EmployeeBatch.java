@@ -1,5 +1,6 @@
 package cdi;
 
+import cdi.interseptor.TransactionDebugger;
 import csv.CsvReader;
 import csv.exception.CsvReadLineException;
 import entity.TEmployee;
@@ -22,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.Part;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import util.Tuple;
 
 /**
@@ -34,7 +36,9 @@ public class EmployeeBatch implements Serializable {
     @PersistenceContext
     EntityManager em;
     
+    @NotNull(message = "一括登録するCSVファイルを指定してください。")
     private Part csvFile;
+    
     private String uploadLog;
     private String folder = "c:\\Temp";
     private String logMessage = "";
@@ -68,30 +72,36 @@ public class EmployeeBatch implements Serializable {
     }
     
     @Transactional
+    @TransactionDebugger
     public String uploadFile()
     {
         try(InputStream input = csvFile.getInputStream()) {
             String fileName = new File(csvFile.getSubmittedFileName()).getName();
-            Files.copy(input, new File(folder, fileName).toPath(),StandardCopyOption.REPLACE_EXISTING);
+            File csvFile = new File(folder, fileName);
+            Files.copy(input, csvFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
             
             Integer errorCount = 0;
-            Path csvFilePath = new File(folder, fileName).toPath();
+            Path csvFilePath = csvFile.toPath();
             TEmployee employee = null;
-            try(CsvReader csvFile = new CsvReader(csvFilePath, Charset.forName("UTF-8"))) {
+            try(CsvReader csvFileReader = new CsvReader(csvFilePath, Charset.forName("UTF-8"))) {
                 Tuple<TEmployee,Integer> employeeAndErrorCount = null;
                 do {
-                        employeeAndErrorCount = this.readLine100AndCommit(csvFile, errorCount);
+                        employeeAndErrorCount = this.readLine100AndCommit(csvFileReader, errorCount);
                         System.out.println("--- 100 comitted ---");
                         employee = employeeAndErrorCount._1;
                 } while(employee != null);
                 
-            }            
+            } finally {
+                Files.deleteIfExists(csvFilePath);
+            }    
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
             flash.put("message", "一括登録が完了しました。");
             flash.put("log_message", this.logMessage);
                      
         } catch(IOException e) {
             throw new IllegalStateException(e);
+        } finally {
+            
         }
         String currentPage = FacesContext.getCurrentInstance().getViewRoot().getViewId();
         return currentPage + "?faces-redirect=true";
