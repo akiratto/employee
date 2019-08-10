@@ -1,5 +1,6 @@
 package cdi.interseptor;
 
+import java.io.Serializable;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
@@ -10,7 +11,7 @@ import javax.interceptor.InvocationContext;
  */
 @Interceptor
 @TransactionDebugger
-public class TransactionInterceptor {
+public class TransactionInterceptor implements Serializable {
     @AroundInvoke
     public Object runInTransaction(InvocationContext invocationContext) throws Exception
     {
@@ -18,6 +19,7 @@ public class TransactionInterceptor {
         try {
             result = invocationContext.proceed();
         } catch(Exception e) {
+            System.out.println("@Transaction Debugger catch. -------------------------------------------------------");
             e.printStackTrace();
             throw e;
         }
