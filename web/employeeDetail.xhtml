@@ -22,14 +22,12 @@
                 <h:commandButton value="削除" action="#{employee.delete()}" 
                                                rendered="#{employee.isEdit()}" 
                                                immediate="true" 
-                                               onclick="return confirm('社員ID:#{employee.entity.employee_id}を削除してもよろしいですか？')"/>
+                                               onclick="return confirm('社員コード:#{employee.entity.employeeCode}を削除してもよろしいですか？')"/>
                 <h:commandButton value="取消" action="#{employee.cancelEdit()}" rendered="#{employee.isEdit()}" immediate="true" />
             </h:panelGrid>
             <h:panelGrid columns="3">
-                <h:outputLabel value="社員ID：" />
-                <h:outputText value="#{employee.entity.employee_id}">
-                    <f:convertNumber pattern="0000"/>
-                </h:outputText>
+                <h:outputLabel value="社員コード：" />
+                <h:outputText value="#{employee.entity.employeeCode}" />
                 <h:outputText value="" />
                 
                 <h:outputLabel value="社員名：" for="employee_name" />

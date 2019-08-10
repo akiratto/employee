@@ -11,9 +11,11 @@
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
         <f:metadata>
-            <f:viewParam name="employee_id" value="#{employeeList.searchCondition.employee_id}" />
+            <f:viewParam name="employee_code" value="#{employeeList.searchCondition.employeeCode}" />
             <f:viewParam name="name" value="#{employeeList.searchCondition.name}" />
-            <f:viewParam name="gender" value="#{employeeList.searchCondition.gender}" />
+            <f:viewParam name="gender" value="#{employeeList.searchCondition.gender}">
+                <f:converter converterId="genderConverter" />
+            </f:viewParam>
             <f:viewParam name="phone" value="#{employeeList.searchCondition.phone}" />
             <f:viewParam name="mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" />
             <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
@@ -36,16 +38,21 @@
             </h:panelGrid>
             <f:validateBean disabled="true">
                 <h:panelGrid columns="3">
-                    <h:outputLabel for="search_employee_id" value="社員ID"/>
-                    <h:inputText id="search_employee_id" value="#{employeeList.searchCondition.employee_id}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_id" />
+                    <h:outputLabel for="search_employee_code" value="社員コード"/>
+                    <h:inputText id="search_employee_code" value="#{employeeList.searchCondition.employeeCode}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:message for="search_employee_code" />
 
                     <h:outputLabel for="search_employee_name" value="社員名"/>
                     <h:inputText id="search_employee_name" value="#{employeeList.searchCondition.name}" onkeypress="if(event.keyCode == 13) return false;"/>
                     <h:message for="search_employee_name" />
 
                     <h:outputLabel for="search_employee_gender" value="性別"/>
-                    <h:inputText id="search_employee_gender" value="#{employeeList.searchCondition.gender}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:selectOneMenu id="search_employee_gender"
+                                     value="#{employeeList.searchCondition.gender}"
+                                     converter="genderConverter">
+                        <f:selectItem itemValue="" itemLabel="" />
+                        <f:selectItems value="#{employeeList.genders}"/>
+                    </h:selectOneMenu>
                     <h:message for="search_employee_gender" />
                     
                     <h:outputLabel for="search_employee_birthday" value="誕生日" />
@@ -95,21 +102,22 @@
                         <h:outputText value="ボタン" />
                     </f:facet>
                     <h:commandButton value="削除" 
-                                      onclick="return confirm('社員ID:#{emp.employee_id}を削除してもよろしいですか？')"
+                                     onclick="return confirm('社員コード:#{emp.employeeCode}を削除してもよろしいですか？')"
                                       action="#{employeeList.deleteEmployee(emp.employee_id)}" />
                 </h:column>
                 <h:column>
                     <f:facet name="header">
-                        <h:outputText value="社員ID" />
+                        <h:outputText value="社員コード" />
                     </f:facet>
                     <h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}">
-                        <h:outputText value="#{emp.employee_id}">
-                            <f:convertNumber pattern="0000" />
-                        </h:outputText>
+                        <h:outputText value="#{emp.employeeCode}" />
                     </h:commandLink>
                 </h:column>
                 <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
-                <h:column><f:facet name="header"><h:outputText value="性別" /></f:facet>#{emp.gender}</h:column>
+                <h:column>
+                    <f:facet name="header"><h:outputText value="性別" /></f:facet>
+                    <h:outputText value="#{emp.gender.jpName()}" />
+                </h:column>
                 <h:column>
                     <f:facet name="header"><h:outputText value="生年月日" /></f:facet>
                     <h:outputText value="#{emp.birthday}">

@@ -2,6 +2,7 @@ package cdi;
 
 import entity.TEmployee;
 import entity.TEmployee_;
+import entity.type.Gender;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -15,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,6 +24,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -78,14 +81,14 @@ public class EmployeeList implements Serializable {
         Root<TEmployee> rootCount = cqCount.from(TEmployee.class);
         Predicate where2 = build.conjunction();
         Predicate where1 = build.conjunction();
-        if(searchCondition.getEmployee_id()!=null) {
+        if(searchCondition.getEmployeeCode()!=null) {
             where1 = build.and(where1, build.equal(
-                                        rootCount.get(TEmployee_.employee_id), 
-                                        searchCondition.getEmployee_id()
+                                        rootCount.get(TEmployee_.employeeCode), 
+                                        searchCondition.getEmployeeCode()
             ));
             where2 = build.and(where2, build.equal(
-                                        root.get(TEmployee_.employee_id), 
-                                        searchCondition.getEmployee_id()
+                                        root.get(TEmployee_.employeeCode), 
+                                        searchCondition.getEmployeeCode()
             ));
         }
         if(searchCondition.getName()!=null && !searchCondition.getName().isEmpty()) {
@@ -98,14 +101,15 @@ public class EmployeeList implements Serializable {
                                         "%" + likeEscape(searchCondition.getName()) + "%", '\\'
             ));
         }
-        if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
-            where1 = build.and(where1, build.like(
+        if(searchCondition.getGender()!=null) {
+            where1 = build.and(where1, build.equal(
                                         rootCount.get(TEmployee_.gender), 
-                                        "%" + likeEscape(searchCondition.getGender()) + "%", '\\'
+                                        searchCondition.getGender()
             ));
-            where2 = build.and(where2, build.like(
+                    
+            where2 = build.and(where2, build.equal(
                                         root.get(TEmployee_.gender), 
-                                        "%" + likeEscape(searchCondition.getGender()) + "%", '\\'
+                                        searchCondition.getGender()
             ));
         }
         if(searchCondition.getBirthday()!=null) {
@@ -169,7 +173,7 @@ public class EmployeeList implements Serializable {
         
         cq = cq.select(root)
                 .where(where2)
-                .orderBy(build.asc(root.get(TEmployee_.employee_id)));
+                .orderBy(build.asc(root.get(TEmployee_.employeeCode)));
         this.employeeList = em.createQuery(cq)
                                 .setFirstResult(this.pageNavigator.getOffset())
                                 .setMaxResults(this.pageNavigator.getRowCountPerPage())
@@ -218,11 +222,11 @@ public class EmployeeList implements Serializable {
         
         TEmployee employee = em.find(TEmployee.class, employeeId);
         if(employee == null) {
-            flash.put("message", "社員ID:" + employeeId + "が見つかりません。");
+            flash.put("message", "削除する社員情報が見つかりません。");
             return search();
         }
         em.remove(employee);
-        flash.put("message", "社員ID:" + employeeId + "を削除しました。");
+        flash.put("message", "社員コード:" + employee.getEmployeeCode() + "を削除しました。");
         return search();
     }
     
@@ -262,17 +266,25 @@ public class EmployeeList implements Serializable {
         return "employeeList?faces-redirect=true";
     }
     
+    public List<SelectItem> getGenders()
+    {
+        return Arrays.asList(Gender.values())
+                    .stream()
+                    .map(g -> new SelectItem(g.name(), g.jpName()))
+                    .collect(Collectors.toList());
+    }
+    
     private Map<String,String> generateQueryStrings(TEmployee searchCondition)
     {
         Map<String, String> queryStrings = new HashMap<>();
-        if(searchCondition.getEmployee_id()!=null) {
-            queryStrings.put("employee_id",searchCondition.getEmployee_id().toString());
+        if(searchCondition.getEmployeeCode()!=null) {
+            queryStrings.put("employee_code",searchCondition.getEmployeeCode().toString());
         }
         if(searchCondition.getName()!=null && !searchCondition.getName().isEmpty()) {
             queryStrings.put("name",searchCondition.getName());
         }
-        if(searchCondition.getGender()!=null && !searchCondition.getGender().isEmpty()) {
-            queryStrings.put("gender",searchCondition.getGender());
+        if(searchCondition.getGender()!=null) {
+            queryStrings.put("gender",searchCondition.getGender().name());
         }
         if(searchCondition.getBirthday()!=null) {
             SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyy/MM/dd");

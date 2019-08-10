@@ -3,7 +3,6 @@ package cdi;
 import csv.CsvReader;
 import csv.exception.CsvReadLineException;
 import entity.TEmployee;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,15 +11,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
@@ -29,10 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.Part;
 import javax.transaction.Transactional;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import util.Tuple;
 
 /**
  *
@@ -54,6 +44,11 @@ public class EmployeeBatch implements Serializable {
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         this.logMessage = (String)flash.getOrDefault("log_message", "");
+        
+        String message = (String)flash.getOrDefault("message", "");
+        if(!message.equals("")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(message));
+        }
     }
 
     public Part getCsvFile() {
@@ -79,33 +74,20 @@ public class EmployeeBatch implements Serializable {
             String fileName = new File(csvFile.getSubmittedFileName()).getName();
             Files.copy(input, new File(folder, fileName).toPath(),StandardCopyOption.REPLACE_EXISTING);
             
-            int errorCount = 0;
+            Integer errorCount = 0;
             Path csvFilePath = new File(folder, fileName).toPath();
+            TEmployee employee = null;
             try(CsvReader csvFile = new CsvReader(csvFilePath, Charset.forName("UTF-8"))) {
-                TEmployee employee;
+                Tuple<TEmployee,Integer> employeeAndErrorCount = null;
                 do {
-                    try {
-                        employee = csvFile.readLine(TEmployee.class);
-                        if(employee==null) break;
-                        em.persist(employee);
-                    } catch(CsvReadLineException e) {
-                        this.logMessage += e.getErrorOccurrenceLine() + "行目に以下のエラーが発生しました。\n";
-                        this.logMessage += e.getFieldErrorMessages()
-                                                .entrySet()
-                                                .stream()
-                                                .map(msg -> "・" + msg.getValue())
-                                                .collect(joining("\n"));
-                        this.logMessage += "\n";
-                        errorCount++;
-                        if(errorCount>10) {
-                            this.logMessage += "エラーが10件を超えました。処理を中止します。\n";
-                            break;
-                        }
-                    }
-                } while(true);
+                        employeeAndErrorCount = this.readLine100AndCommit(csvFile, errorCount);
+                        System.out.println("--- 100 comitted ---");
+                        employee = employeeAndErrorCount._1;
+                } while(employee != null);
                 
             }            
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+            flash.put("message", "一括登録が完了しました。");
             flash.put("log_message", this.logMessage);
                      
         } catch(IOException e) {
@@ -113,5 +95,32 @@ public class EmployeeBatch implements Serializable {
         }
         String currentPage = FacesContext.getCurrentInstance().getViewRoot().getViewId();
         return currentPage + "?faces-redirect=true";
+    }
+    
+    @Transactional
+    private Tuple<TEmployee,Integer> readLine100AndCommit(CsvReader csvFile, Integer errorCount) throws IOException
+    {
+        TEmployee employee = null;
+        for(int i = 1; i <= 100; i++) {
+            try {
+                employee = csvFile.readLine(TEmployee.class);
+                if(employee==null) break;
+                em.persist(employee);
+            } catch(CsvReadLineException e) {
+                this.logMessage += e.getErrorOccurrenceLine() + "行目に以下のエラーが発生しました。\n";
+                this.logMessage += e.getFieldErrorMessages()
+                                        .entrySet()
+                                        .stream()
+                                        .map(msg -> "・" + msg.getValue())
+                                        .collect(joining("\n"));
+                this.logMessage += "\n";
+                errorCount++;
+                if(errorCount>10) {
+                    this.logMessage += "エラーが10件を超えました。処理を中止します。\n";
+                    break;
+                }
+            }
+        }
+        return new Tuple<>(employee, errorCount);
     }
 }

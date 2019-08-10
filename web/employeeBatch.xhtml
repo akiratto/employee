@@ -8,7 +8,9 @@
     <h:body>
         <h1>社員一括登録</h1>
         <h:form id="f" enctype="multipart/form-data">
-            <h:panelGrid columns="1">
+            <h:messages />
+            <h:panelGrid columns="2">
+                <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true"/>
                 <h:commandButton value="一括登録" action="#{employeeBatch.uploadFile()}"/>
             </h:panelGrid>
             <h:panelGrid columns="2">

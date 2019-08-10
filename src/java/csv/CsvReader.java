@@ -258,7 +258,9 @@ public class CsvReader implements AutoCloseable {
                 field.setAccessible(tmpAccessible);
                 Set<ConstraintViolation<T>> messages = validator.validateProperty(instance, field.getName());
                 if(messages.size() > 0) {
-                    messages.stream().forEach(m -> System.out.println(clazz.getName() + "." + field.getName() + ":" + m.getMessage()));
+//                    messages.stream().forEach(m -> System.out.println(clazz.getName() + "." + field.getName() + ":" + m.getMessage()));
+                    List<String> errorMessages = messages.stream().map(m -> m.getMessage()).collect(Collectors.toList());
+                    fieldErrorMessages.put(clazz.getName()+"." + field.getName(), errorMessages);
                 }
             } else {
                 //変換不可のエラー出力

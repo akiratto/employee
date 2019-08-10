@@ -7,15 +7,25 @@ import csv.annotation.CsvColumn;
 import csv.annotation.CsvColumnFormula;
 import csv.annotation.CsvConverter;
 import csv.converter.builtin.CsvColumnDateConverter;
+import employee.converter.GenderConverter;
+import entity.type.Gender;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Converter;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -24,11 +34,19 @@ import javax.validation.constraints.Size;
  * @author owner
  */
 @Entity(name = "TEmployee")
+@Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
 public class TEmployee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer employee_id;
+    
+    @Basic
+    //--Bean バリデーション
+    @NotNull(message="社員コードの入力は必須です。")
+    @Pattern(regexp="\\d{10}", message="社員コードは10桁の数字を入力してください。例)0000000001")
+    @CsvColumn(field="社員コード")
+    private String employeeCode;
     
     @Basic
     //--Bean バリデーション
@@ -39,12 +57,14 @@ public class TEmployee implements Serializable {
     private String name;
 
     @Basic
+//    @Enumerated(EnumType.STRING)
+    @Convert(converter = GenderConverter.class)
     //--Bean バリデーション
     @NotNull(message="性別の入力は必須です。")
-    @Pattern(regexp = "[MFO]", message="性別は男性(M),女性(F),その他(O)のいずれかを入力してください:${validatedValue}")
     //--CSV パーサ
     @CsvColumn(field="性別")
-    private String gender;
+    @CsvConverter(converter = GenderConverter.class)
+    private Gender gender;
     
     @Temporal(TemporalType.DATE)
     //--Bean バリデーション
@@ -100,6 +120,14 @@ public class TEmployee implements Serializable {
         this.employee_id = employee_id;
     }
 
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
+    }
+
     public String getName() {
         return this.name;
     }
@@ -108,11 +136,11 @@ public class TEmployee implements Serializable {
         this.name = name;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return this.gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
