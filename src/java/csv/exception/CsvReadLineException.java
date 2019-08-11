@@ -40,17 +40,20 @@ public class CsvReadLineException extends Exception {
         this.fieldErrorMessages = null;
     }
     
+    public CsvReadLineException(Path csvFilePath, int errorOccureLineCount, Map<String,List<String>> fieldErrorMessages)
+    {
+        this.csvFilePath = csvFilePath;
+        this.errorOccurrenceLine = errorOccureLineCount;
+        this.errorClazz = null;
+        this.fieldErrorMessages = fieldErrorMessages;
+    }
+    
     public CsvReadLineException(Path csvFilePath, int errorOccureLineCount, Class errorClazz, Map<String,List<String>> fieldErrorMessages)
     {
         this.csvFilePath = csvFilePath;
         this.errorOccurrenceLine = errorOccureLineCount;
         this.errorClazz = errorClazz;
-        this.fieldErrorMessages = fieldErrorMessages;
-        
-//        String msg = "CSV行読み込みエラー : [" + csvFilePath.toString() + "] エラー発生行:" + errorOccureLineCount + "\n"
-//                   + fieldErrorMessages.entrySet().stream()
-//                        .map(m -> "・" + m.getValue())
-//                        .collect(Collectors.joining("\n"));        
+        this.fieldErrorMessages = fieldErrorMessages;       
     }
 
     public Class getErrorClazz() {

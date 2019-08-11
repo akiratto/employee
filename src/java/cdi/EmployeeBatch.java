@@ -1,6 +1,7 @@
 package cdi;
 
 import cdi.interseptor.TransactionDebugger;
+import csv.CsvReadLineCustomValidationHandler;
 import csv.CsvReader;
 import csv.exception.CsvReadLineException;
 import entity.TEmployee;
@@ -12,6 +13,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import static java.util.stream.Collectors.joining;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -21,6 +27,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.servlet.http.Part;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
@@ -77,13 +84,37 @@ public class EmployeeBatch implements Serializable {
     {
         try(InputStream input = csvFile.getInputStream()) {
             String fileName = new File(csvFile.getSubmittedFileName()).getName();
+            
+            //CSVから読み込んだ社員コードが既にデータベース上に存在する場合に
+            //エラーメッセージを設定するカスタムハンドラーを作成
+            CsvReadLineCustomValidationHandler customValidationHandler
+                    = (clazz, headerAndValues) -> {
+                        if(headerAndValues.containsKey("社員コード") == false) return null;
+                        
+                        Map<String,List<String>> customFieldErrorMessages = new HashMap<>();
+                        String employeeCode = headerAndValues.getOrDefault("社員コード", "");
+                        if(employeeCode.isEmpty()) return null;
+                        
+                        Long employeeCount 
+                                = em.createQuery("SELECT COUNT(t) FROM TEmployee t WHERE t.employeeCode = :employeeCode", Long.class)
+                                        .setParameter("employeeCode", employeeCode)
+                                        .getSingleResult();
+                        if(employeeCount == 0L) return null;
+                        
+                        List<String> errorMessages = Arrays.asList(clazz.getName() + ".employeeCode[" + employeeCode + "] is already exists.");
+                        customFieldErrorMessages.put(clazz.getName() + ".employeeCode", errorMessages);
+                        
+                        return customFieldErrorMessages;
+                    };
+            
+            //アップロードされたCSVファイルを一時フォルダへコピーする
             File csvFile = new File(folder, fileName);
             Files.copy(input, csvFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
             
             Integer errorCount = 0;
             Path csvFilePath = csvFile.toPath();
             TEmployee employee = null;
-            try(CsvReader csvFileReader = new CsvReader(csvFilePath, Charset.forName("UTF-8"))) {
+            try(CsvReader csvFileReader = new CsvReader(csvFilePath, Charset.forName("UTF-8"), customValidationHandler)) {
                 Tuple<TEmployee,Integer> employeeAndErrorCount = null;
                 do {
                         employeeAndErrorCount = this.readLine100AndCommit(csvFileReader, errorCount);
@@ -100,8 +131,6 @@ public class EmployeeBatch implements Serializable {
                      
         } catch(IOException e) {
             throw new IllegalStateException(e);
-        } finally {
-            
         }
         String currentPage = FacesContext.getCurrentInstance().getViewRoot().getViewId();
         return currentPage + "?faces-redirect=true";
@@ -114,7 +143,7 @@ public class EmployeeBatch implements Serializable {
         for(int i = 1; i <= 100; i++) {
             try {
                 employee = csvFile.readLine(TEmployee.class);
-                if(employee==null) break;
+                if(employee==null) break; 
                 em.persist(employee);
             } catch(CsvReadLineException e) {
                 this.logMessage += e.getErrorOccurrenceLine() + "行目に以下のエラーが発生しました。\n";
