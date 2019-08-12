@@ -55,11 +55,6 @@ public class EmployeeBatch implements Serializable {
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         this.logMessage = (String)flash.getOrDefault("log_message", "");
-        
-        String message = (String)flash.getOrDefault("message", "");
-        if(!message.equals("")) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(message));
-        }
     }
 
     public Part getCsvFile() {
@@ -126,7 +121,8 @@ public class EmployeeBatch implements Serializable {
                 Files.deleteIfExists(csvFilePath);
             }    
             Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-            flash.put("message", "一括登録が完了しました。");
+            flash.setKeepMessages(true);        //リダイレクト後もFacesMessageが保持されるよう設定する
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("一括登録が完了しました。"));
             flash.put("log_message", this.logMessage);
                      
         } catch(IOException e) {

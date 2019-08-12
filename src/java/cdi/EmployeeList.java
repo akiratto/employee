@@ -179,13 +179,6 @@ public class EmployeeList implements Serializable {
                                 .setMaxResults(this.pageNavigator.getRowCountPerPage())
                                 .getResultList();
         
-        //メッセージ表示 -------------------------------------------------------
-        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-        String message = (String)flash.getOrDefault("message", "");
-        if(!message.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(message));
-        }
-        
         System.out.println("<<< EmployeeList viewAction() END <<<");                
     }
 
@@ -219,14 +212,15 @@ public class EmployeeList implements Serializable {
     public String deleteEmployee(Integer employeeId) throws UnsupportedEncodingException
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
         TEmployee employee = em.find(TEmployee.class, employeeId);
         if(employee == null) {
-            flash.put("message", "削除する社員情報が見つかりません。");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("削除する社員情報が見つかりません。"));
             return search();
         }
         em.remove(employee);
-        flash.put("message", "社員コード:" + employee.getEmployeeCode() + "を削除しました。");
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員コード:" + employee.getEmployeeCode() + "を削除しました。"));
         return search();
     }
     
@@ -234,9 +228,10 @@ public class EmployeeList implements Serializable {
     public String deleteAllEmployee()
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         int deleteCount = em.createQuery("DELETE FROM TEmployee").executeUpdate();
         
-        flash.put("message", deleteCount + "件の社員情報を削除しました。");
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(deleteCount + "件の社員情報を削除しました。"));
         String queryString = generateString(searchCondition);
         return "employeeList?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
     }
