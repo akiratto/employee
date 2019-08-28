@@ -27,24 +27,9 @@ public class Parser {
         return new Parser(provider, ctx -> parserContext);
     }
     
-//    public Parser(String target)
-//    {
-////        this.target = target;
-//        this.provider = () -> null;
-//        this.intermediateOperations = initParserContext -> initParserContext;
-//    }
-//    
-//    public Parser(String target, Supplier<String> provider)
-//    {
-////        this.target = target;
-//        this.provider = provider;
-//        this.intermediateOperations = initParserContext -> initParserContext;
-//    }
-    
     protected Parser(Supplier<String> provider, 
                       Function<ParserContext, ParserContext> intermediateOperations)
     {
-//        this.target = target;
         this.provider = provider;
         this.intermediateOperations = intermediateOperations;
     }
@@ -56,6 +41,8 @@ public class Parser {
          Function<ParserContext, ParserContext> nextIntermediateOperations 
             = initParserContext -> {
                ParserContext currentParserContext = intermediateOperations.apply(initParserContext);
+               List<MatchResult> matchResults = currentParserContext.getMatchResults();
+               
                ParserContext nextParserContext = intermediateOperation.apply(currentParserContext);
                return nextParserContext;
            };
@@ -68,7 +55,11 @@ public class Parser {
             String target = ctx.getTarget();
             List<MatchResult> matchResults = ctx.getMatchResults();
             
-            MatchResult matchResult = matcher.match(target);
+            MatchResult matchResult = 
+                    matchResults.stream().allMatch(r -> r.getConsumeCharCount()>0) 
+                        ? matcher.match(target)
+                        : MatchResult.failure();
+                    
             while(matchResult.getType()==MatchResult.Type.SUPPLY) {
                 String addInput = provider.get();
                 if(addInput == null) {
@@ -81,7 +72,6 @@ public class Parser {
             }
             target = target.substring(matchResult.getConsumeCharCount());
             matchResults.add(matchResult);
-
             return new ParserContext(target, matchResults);
         };
         return nextParser(provider, intermediateOperation);
@@ -90,10 +80,7 @@ public class Parser {
     public boolean allMatch()
     {
         ParserContext parserContext = intermediateOperations.apply(null);
-        List<MatchResult> matchResults = parserContext.getMatchResults();
-        return matchResults
-                .stream()
-                .allMatch(r -> Boolean.valueOf(r.getConsumeCharCount() > 0)); 
+        return parserContext.allMatch();
     }
     
     public String[] matches()
@@ -111,5 +98,11 @@ public class Parser {
     {
         ParserContext parserContext = intermediateOperations.apply(null);
         return function.apply(parserContext);
+    }
+    
+    public ParserContext parse(ParserContext context, Matcher matcher)
+    {
+        match(matcher);
+        return intermediateOperations.apply(context); 
     }
 }

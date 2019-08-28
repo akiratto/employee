@@ -24,4 +24,22 @@ public class ParserContext {
     public List<MatchResult> getMatchResults() {
         return matchResults;
     }
+    
+    public boolean allMatch()
+    {
+        List<MatchResult> matchResults = getMatchResults();
+        return matchResults
+                .stream()
+                .allMatch(r -> Boolean.valueOf(r.getConsumeCharCount() > 0)); 
+    }
+    
+    public boolean lastMatch()
+    {
+        MatchResult.Type lastMatchResultType
+                = getMatchResults().size() > 0
+                    ? getMatchResults().get(getMatchResults().size() - 1).getType() 
+                    : MatchResult.Type.FAILURE;
+        
+        return lastMatchResultType == MatchResult.Type.SUCCESS;
+    }
 }

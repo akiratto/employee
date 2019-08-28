@@ -62,7 +62,44 @@ public class ParserTest {
         assertEquals("10:sasisuseso:SUCCESS", parseResults.get(4));
     }
     
-    public void testParser() {
+    @Test
+    public void testParserFailure() {
+        System.out.println("testParserFailure");
         
+        List<String> parseResults = 
+            Parser.build("aiueo kakikukeko sasisuseso")
+                .match(Matchers.string("aiueo"))
+                .match(Matchers.space())
+                .match(Matchers.string("KAKIKUKEKO"))
+                .match(Matchers.space())
+                .match(Matchers.string("sasisuseso"))
+                .parse(ctx -> ctx.getMatchResults()
+                                    .stream()
+                                    .map(r -> r.getConsumeCharCount() + ":" + r.getMatchString() + ":" + r.getType().name())
+                                    .collect(Collectors.toList()));
+        System.out.println(String.join("\n", parseResults));
+        assertEquals(5, parseResults.size());
+        assertEquals("5:aiueo:SUCCESS", parseResults.get(0));
+        assertEquals("1: :SUCCESS", parseResults.get(1));
+        assertEquals("0::FAILURE", parseResults.get(2));    //★あるマッチングに失敗すると以降のマッチングもすべて失敗として扱う
+        assertEquals("0::FAILURE", parseResults.get(3));
+        assertEquals("0::FAILURE", parseResults.get(4));
+    }
+    
+    @Test
+    public void testParserDoubleQuoteString()
+    {
+        System.out.println("testParserFailure");
+        
+        Parser p;
+        ParserContext ctx;
+        p = Parser.build("\"aiueo\"");
+        ctx = p.parse(null,Matchers.string("\""));
+        ctx = p.parse(ctx, Matchers.stringNot("\""));
+        while(ctx.lastMatch()) {
+            ctx = p.parse(ctx, Matchers.stringNot("\""));
+        }
+        ctx = p.parse(ctx, Matchers.string("\""));
+        assertTrue(ctx.allMatch());
     }
 }
