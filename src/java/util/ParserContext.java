@@ -7,39 +7,51 @@ import java.util.function.Supplier;
  *
  * @author Owner
  */
-public class ParserContext {
+public class ParserContext<T> {
+   
     private String target;
-    private List<MatchResult> matchResults;
-    
-    public ParserContext(String target, List<MatchResult> matchResults)
+    private T value;
+    private ParseResult parseResult;
+
+    public ParserContext(String target)
     {
         this.target = target;
-        this.matchResults = matchResults;
+        this.value = null;
+        this.parseResult = ParseResult.EMPTY;
+    }
+    
+    public ParserContext(ParserContext<T> sourceContext)
+    {
+        this.target = sourceContext.getTarget();
+        this.value = sourceContext.getValue();
+        this.parseResult = sourceContext.getParseResult();
+    }
+    
+    public ParserContext(String target, T value, ParseResult parseResult)
+    {
+        this.target = target;
+        this.value = value;
+        this.parseResult = parseResult;
     }
 
     public String getTarget() {
         return target;
     }
 
-    public List<MatchResult> getMatchResults() {
-        return matchResults;
+    public T getValue() {
+        return value;
+    }
+
+    public ParseResult getParseResult() {
+        return parseResult;
     }
     
-    public boolean allMatch()
+    public ParserContext<T> replaceValue(T newValue)
     {
-        List<MatchResult> matchResults = getMatchResults();
-        return matchResults
-                .stream()
-                .allMatch(r -> Boolean.valueOf(r.getConsumeCharCount() > 0)); 
+        return new ParserContext<>(target, newValue, parseResult);
     }
     
-    public boolean lastMatch()
-    {
-        MatchResult.Type lastMatchResultType
-                = getMatchResults().size() > 0
-                    ? getMatchResults().get(getMatchResults().size() - 1).getType() 
-                    : MatchResult.Type.FAILURE;
-        
-        return lastMatchResultType == MatchResult.Type.SUCCESS;
-    }
+    public boolean isSuccess() { return parseResult == ParseResult.SUCCESS; }
+    public boolean isFailure()  { return parseResult == ParseResult.FAILURE; }
+    public boolean isEmpty() { return parseResult == ParseResult.EMPTY; }
 }
