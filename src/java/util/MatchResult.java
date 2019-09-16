@@ -4,7 +4,7 @@ package util;
  *
  * @author Owner
  */
-public class MatchResult {
+public class MatchResult<T> {
     public enum Type {
         SUPPLY,
         SUCCESS,
@@ -13,31 +13,35 @@ public class MatchResult {
     
     private Type type;
     private int consumeCharCount;
-    private String matchString;
+    private T matchedPart;
 
-    public MatchResult(Type type, int consumeCharCount, String matchString)
+    public MatchResult(Type type, int consumeCharCount, T matchedPart)
     {
         this.type = type;
         this.consumeCharCount = consumeCharCount;
-        this.matchString = matchString;
+        this.matchedPart = matchedPart;
     }
     
     public Type   getType()               { return type;}
     public int    getConsumeCharCount()  { return consumeCharCount; }
-    public String getMatchString()       { return matchString; }
+    public T      getMatchedPart()       { return matchedPart; }
     
-    public static MatchResult success(int consumeCharCount, String matchString)
+    public boolean isSuccess() { return type == Type.SUCCESS; }
+    public boolean isFailure() { return type == Type.FAILURE; }
+    public boolean isSupply() { return type == Type.SUPPLY; }
+    
+    public static <T> MatchResult<T> success(int consumeCharCount, T matchedPart)
     {
-        return new MatchResult(Type.SUCCESS, consumeCharCount, matchString);
+        return new MatchResult(Type.SUCCESS, consumeCharCount, matchedPart);
     }
     
-    public static MatchResult failure()
+    public static <T> MatchResult<T> failure()
     {
-        return new MatchResult(Type.FAILURE, 0, "");
+        return new MatchResult(Type.FAILURE, 0, null);
     }
     
-    public static MatchResult supply()
+    public static <T> MatchResult supply()
     {
-        return new MatchResult(Type.SUPPLY, 0, "");
+        return new MatchResult(Type.SUPPLY, 0, null);
     }
 }

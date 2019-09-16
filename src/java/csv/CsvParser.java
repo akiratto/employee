@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package csv;
 
 import java.util.function.Supplier;
@@ -32,8 +27,7 @@ public class CsvParser {
     
     private String[] parseCsvLine()
     {
-//        Tuple<String, Integer> ret;
-//        ret = parseStringEnclosedInDoubleQuotes();
+        
         return null;
     }
     

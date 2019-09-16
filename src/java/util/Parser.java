@@ -8,42 +8,44 @@ import util.ParseResult;
  *
  * @author Owner
  */
-public class Parser {
-    private Supplier<String> provider;
-    
-    public Parser()
+public class Parser {   
+    public static <T,R> ParseContext<R> parse(ParseContext<T> context, Matcher<R> matcher)
     {
-        this.provider = () -> null;
-    }
-    
-    public Parser(Supplier<String> provider)
-    {
-        this.provider = provider;
-    }
-    
-    public <T> ParserContext<String> parse(ParserContext<T> context, Matcher matcher)
-    {
-        String target = context.getTarget();
-
-        MatchResult matchResult = matcher.match(target);
+        final String target = context.getTarget();
+        final Supplier<String> provider = context.getProvider();
+        
+        final StringBuilder targetSb = new StringBuilder(target);
+        final StringBuilder supplyStringSb = new StringBuilder();
+        
+        MatchResult<R> matchResult = matcher.match(target);
         while(matchResult.getType()==MatchResult.Type.SUPPLY) {
-            String addInput = provider.get();
-            if(addInput == null) {
+            final String supplyStringPart = provider.get();
+            if(supplyStringPart == null) {
                 matchResult = MatchResult.failure();
                 break;
             }
-            target += addInput;
+            targetSb.append(supplyStringPart);
+            supplyStringSb.append(supplyStringPart);
 
             matchResult = matcher.match(target);
         }
-        target = target.substring(matchResult.getConsumeCharCount());
+        final String newTarget = matchResult.isSuccess()
+                    ? targetSb.substring(matchResult.getConsumeCharCount())
+                    : targetSb.toString();
         
-        String matchString = matchResult.getMatchString();
+        final String newConsumedTarget = matchResult.isSuccess()
+                            ? targetSb.substring(0, matchResult.getConsumeCharCount())
+                            : "";
+
+        final R newMatchedPart = matchResult.getMatchedPart();
         
-        ParseResult parseResult
+        final ParseResult newParseResult
                 = matchResult.getType() == MatchResult.Type.SUCCESS
                     ? ParseResult.SUCCESS 
                     : ParseResult.FAILURE;
-        return new ParserContext<>(target, matchString, parseResult);
+        
+        final String newSupplyString = supplyStringSb.toString();
+        
+        return new ParseContext<>(newTarget, provider, newMatchedPart, newParseResult, newConsumedTarget, newSupplyString);
     }
 }

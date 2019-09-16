@@ -38,28 +38,27 @@ public class ParserTest {
     @Test
     public void testParserAllSuccess() {
         System.out.println("testParserAllSuccess");
+         
         
-        final Parser parser = new Parser();   
+        ParseContext context = new ParseContext("aiueo kakikukeko sasisuseso");
         
-        ParserContext context = new ParserContext("aiueo kakikukeko sasisuseso");
-        
-        context = parser.parse(context, Matchers.string("aiueo"));
+        context = Parser.parse(context, Matchers.string("aiueo"));
         assertEquals(" kakikukeko sasisuseso", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.space());
+        context = Parser.parse(context, Matchers.space());
         assertEquals("kakikukeko sasisuseso", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.string("kakikukeko"));
+        context = Parser.parse(context, Matchers.string("kakikukeko"));
         assertEquals(" sasisuseso", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.space());
+        context = Parser.parse(context, Matchers.space());
         assertEquals("sasisuseso", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.string("sasisuseso"));
+        context = Parser.parse(context, Matchers.string("sasisuseso"));
         assertEquals("", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
     }
@@ -68,26 +67,25 @@ public class ParserTest {
     public void testParserFailure() {
         System.out.println("testParserFailure");
         
-        final Parser parser = new Parser();
-        ParserContext context = new ParserContext("aiueo KAKIKUKEKO sasisuseso");
+        ParseContext context = new ParseContext("aiueo KAKIKUKEKO sasisuseso");
         
-        context = parser.parse(context, Matchers.string("aiueo"));
+        context = Parser.parse(context, Matchers.string("aiueo"));
         assertEquals(" KAKIKUKEKO sasisuseso", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.space());
+        context = Parser.parse(context, Matchers.space());
         assertEquals("KAKIKUKEKO sasisuseso", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.string("kakikukeko"));
+        context = Parser.parse(context, Matchers.string("kakikukeko"));
         assertEquals("KAKIKUKEKO sasisuseso", context.getTarget());
         assertEquals(ParseResult.FAILURE, context.getParseResult());
         
-        context = parser.parse(context, Matchers.space());
+        context = Parser.parse(context, Matchers.space());
         assertEquals("KAKIKUKEKO sasisuseso", context.getTarget());
         assertEquals(ParseResult.FAILURE, context.getParseResult());
         
-        context = parser.parse(context, Matchers.string("sasisuseso"));
+        context = Parser.parse(context, Matchers.string("sasisuseso"));
         assertEquals("KAKIKUKEKO sasisuseso", context.getTarget());
         assertEquals(ParseResult.FAILURE, context.getParseResult());
     }
@@ -97,19 +95,18 @@ public class ParserTest {
     {
         System.out.println("testParserDoubleQuoteString");
 
-        final Parser parser = new Parser();
 
-        ParserContext context = new ParserContext("\"aiueo\"");
-        context = parser.parse(context, Matchers.string("\""));
+        ParseContext context = new ParseContext("\"aiueo\"");
+        context = Parser.parse(context, Matchers.string("\""));
        
         StringBuilder sb = new StringBuilder();
-        context = parser.parse(context, Matchers.stringNot("\""));
+        context = Parser.parse(context, Matchers.stringNot("\""));
         while(context.isSuccess()) {
             sb.append(context.getValue());
-            context = parser.parse(context, Matchers.stringNot("\""));
+            context = Parser.parse(context, Matchers.stringNot("\""));
         }
         
-        context = parser.parse(context, Matchers.string("\""));
+        context = Parser.parse(context, Matchers.string("\""));
         
         assertEquals("", context.getTarget());
         assertEquals("aiueo", sb.toString());
@@ -144,27 +141,27 @@ public class ParserTest {
         System.out.println("testParserAllSuccessWithReader");
         
         final TextReader textReader = new TextReader();
-        final Parser parser = new Parser(() -> textReader.read());   
+//        final Parser parser = new Parser(() -> textReader.read());   
         
-        ParserContext context = new ParserContext("");
+        ParseContext context = new ParseContext("", () -> textReader.read());
         
-        context = parser.parse(context, Matchers.string("aiueo"));
+        context = Parser.parse(context, Matchers.string("aiueo"));
         assertEquals("", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.space());
+        context = Parser.parse(context, Matchers.space());
         assertEquals("kaki", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.string("kakikukeko"));
+        context = Parser.parse(context, Matchers.string("kakikukeko"));
         assertEquals(" sas", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.space());
+        context = Parser.parse(context, Matchers.space());
         assertEquals("sas", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
         
-        context = parser.parse(context, Matchers.string("sasisuseso"));
+        context = Parser.parse(context, Matchers.string("sasisuseso"));
         assertEquals("", context.getTarget());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
     }

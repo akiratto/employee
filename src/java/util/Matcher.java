@@ -4,6 +4,6 @@ package util;
  *
  * @author Owner
  */
-public interface Matcher {
-    MatchResult match(String target);
+public interface Matcher<T> {
+    MatchResult<T> match(String target);
 }
