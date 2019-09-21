@@ -17,7 +17,7 @@ public class ParseProcessor<T,R> {
     private final ParseContext<T> sentAroundContext;
     private final ParseContext<T> backContext;
     private final boolean whetherToContinue;
-    private final R returnValue;
+//    private final R returnValue;
     
     private ParseProcessor(Status status, StringBuilder consumedTargetSb, ParseContext<T> sentAroundContext, ParseContext<T> backContext, boolean whetherToContinue, R returnValue)
     {

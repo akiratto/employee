@@ -37,7 +37,7 @@ public class Parser {
                             ? targetSb.substring(0, matchResult.getConsumeCharCount())
                             : "";
 
-        final R newMatchedPart = matchResult.getMatchedPart();
+        final R newValue = matchResult.getMatchedPart();
         
         final ParseResult newParseResult
                 = matchResult.getType() == MatchResult.Type.SUCCESS
@@ -46,6 +46,6 @@ public class Parser {
         
         final String newSupplyString = supplyStringSb.toString();
         
-        return new ParseContext<>(newTarget, provider, newMatchedPart, newParseResult, newConsumedTarget, newSupplyString);
+        return new ParseContext<>(newTarget, provider, newValue, newParseResult, newConsumedTarget, newSupplyString);
     }
 }
