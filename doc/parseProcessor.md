@@ -149,9 +149,7 @@ ParseContextをパース前に戻すのもよくあるパターンなので
 
 ```
 
-ParseProcessorクラス
-
-上記の問題点を次のように解決する。
+ParseProcessorクラスは上記の問題点を次のように解決する。
 
 ### ParseContextインスタンスをたらいまわす記述が冗長である
 
@@ -161,7 +159,13 @@ ParseProcessorクラス
   記述が不要となる。
 
 ```
-
+            ParseProcessor<Character,Character> parseProcessor
+                = ParseProcessor
+                    .begin(new ParseContext("aiueo,kakikukeko,sasisuseso"), String.class)
+                    .parse(Matchers.string("aiueo,))
+                    .parse(Matchers.string("kakikukeko,"))
+                    .parse(Matchers.string("sasisuseso"))
+                    .end();
 ```
 
 ### パースの結果に応じて、パース方法を分けていくとif文の入れ子が深くなる
