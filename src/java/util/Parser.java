@@ -11,6 +11,9 @@ import util.ParseResult;
 public class Parser {   
     public static <T,R> ParseContext<R> parse(ParseContext<T> context, Matcher<R> matcher)
     {
+        if(context.isFailure()) 
+            return context.map(v -> null);
+        
         final String target = context.getTarget();
         final Supplier<String> provider = context.getProvider();
         
@@ -47,5 +50,10 @@ public class Parser {
         final String newSupplyString = supplyStringSb.toString();
         
         return new ParseContext<>(newTarget, provider, newValue, newParseResult, newConsumedTarget, newSupplyString);
+    }
+    
+    public static <T,R> ParseFunction<T,R> parseFunction(Matcher<R> matcher)
+    {
+        return ctx -> parse(ctx, matcher);
     }
 }

@@ -1,5 +1,8 @@
 package util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import static util.Parser.parse;
 
 /**
@@ -39,6 +42,7 @@ public class Parsers {
             sb.append(contentChar);
         } while(sentAroundContext.isSuccess());
         
+        sentAroundContext = sentAroundContext.clearResult(); //パース結果をクリア
         sentAroundContext = parse(sentAroundContext, Matchers.character(enclosedCharacter));
         if(sentAroundContext.isFailure()) return sentAroundContext.map(c -> String.valueOf(c));;
         
@@ -52,6 +56,47 @@ public class Parsers {
                 "",
                 ""
         );
-           
     }
+    
+    public static <T> ParseFunction<T,String> parseFuncStringEnclosed(char enclosedCharacter, char escapeCharacter)
+    {
+        return ctx -> parseStringEnclosed(ctx, enclosedCharacter, escapeCharacter);
+    }
+    
+    public static <T> ParseContext<List<String>> manyDelimiter(ParseContext<T> context, ParseFunction<String,String> function, ParseFunction<String,String> delimiter)
+    {
+        if(context.isFailure())
+            return context.map(v -> null);
+        
+        List<String> strings = new ArrayList<>();
+        ParseContext<String> sentAroundContext = context.map(v -> ""); 
+        do {
+            sentAroundContext = function.apply(sentAroundContext);
+            if(sentAroundContext.isSuccess()) {
+                strings.add(sentAroundContext.getValue());
+            }
+            sentAroundContext = delimiter.apply(sentAroundContext);
+        } while(sentAroundContext.isSuccess());
+        
+        return new ParseContext<>(
+                sentAroundContext.getTarget(),
+                sentAroundContext.getProvider(),
+                strings,
+                ParseResult.SUCCESS,
+                "",
+                ""
+        );
+    }
+    
+    public static <T> ParseContext<List<String>> parseCsvLine(ParseContext<T> context)
+    {
+        return Parsers.manyDelimiter(context, 
+                                        Parsers.parseFuncStringEnclosed('"', '\\'), 
+                                        Parser.parseFunction(Matchers.string(",")));
+    }
+    
+//    public static <T> ParseContext<T> skipSpaces(ParseContext<T> context)
+//    {
+//       
+//    }
 }

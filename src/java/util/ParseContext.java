@@ -83,6 +83,18 @@ public class ParseContext<T> {
         );
     }
     
+    public ParseContext<T> clearResult()
+    {
+        return new ParseContext<>(
+                this.target,
+                this.provider,
+                this.value,
+                ParseResult.EMPTY,
+                this.consumedTarget,
+                this.suppliedString
+        );
+    }
+    
     public boolean isSuccess() { return parseResult == ParseResult.SUCCESS; }
     public boolean isFailure()  { return parseResult == ParseResult.FAILURE; }
     public boolean isEmpty() { return parseResult == ParseResult.EMPTY; }

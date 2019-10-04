@@ -1,5 +1,6 @@
 package util;
 
+import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -95,23 +96,48 @@ public class ParserTest {
     {
         System.out.println("testParserDoubleQuoteString");
 
-
-        ParseContext context = new ParseContext("\"aiueo\"");
-        context = Parser.parse(context, Matchers.string("\""));
-       
-        StringBuilder sb = new StringBuilder();
-        context = Parser.parse(context, Matchers.stringNot("\""));
-        while(context.isSuccess()) {
-            sb.append(context.getValue());
-            context = Parser.parse(context, Matchers.stringNot("\""));
-        }
-        
-        context = Parser.parse(context, Matchers.string("\""));
+        ParseContext<String> context = new ParseContext("\"aiueo\"");
+        context = Parsers.parseStringEnclosed(context, '"', '\\');
         
         assertEquals("", context.getTarget());
-        assertEquals("aiueo", sb.toString());
+        assertEquals("aiueo", context.getValue());
         assertEquals(ParseResult.SUCCESS, context.getParseResult());
     }
+    
+    @Test
+    public void testParserDoubleQuoteString2()
+    {
+        System.out.println("testParserDoubleQuoteString2");
+        
+        ParseContext<String> context = new ParseContext("\"\\\\AIUEO\\\\\\\"\""); //"\\AIUEO\\\"" => \AIUEO\"
+        context = Parsers.parseStringEnclosed(context, '"', '\\');
+        
+        assertEquals("", context.getTarget());
+        assertEquals("\\AIUEO\\\"", context.getValue());
+        assertEquals(ParseResult.SUCCESS, context.getParseResult());
+    }
+    
+    @Test
+    public void testParserCsvLine()
+    {
+        System.out.println("testParserCsvLine");
+        
+        final String csvLine = "\"aiueo\",\"kakikukeko\",\"sasisuseso\"";
+        ParseContext<String> context = new ParseContext(csvLine);
+        ParseContext<List<String>> newContext 
+                = Parsers.manyDelimiter(context, 
+                                        Parsers.parseFuncStringEnclosed('"', '\\'), 
+                                        Parser.parseFunction(Matchers.string(",")));
+        
+        assertEquals(ParseResult.SUCCESS, newContext.getParseResult());
+        assertEquals("", newContext.getTarget());
+        assertEquals("aiueo", newContext.getValue().get(0));
+        assertEquals("kakikukeko", newContext.getValue().get(1));
+        assertEquals("sasisuseso", newContext.getValue().get(2));
+        
+        
+    }
+            
     
     
     static class TextReader {
