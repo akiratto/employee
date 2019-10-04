@@ -78,10 +78,6 @@
                     <h:outputLabel for="search_employee_address" value="住所"/>
                     <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" onkeypress="if(event.keyCode == 13) return false;"/>
                     <h:message for="search_employee_address" />
-
-                    <h:outputLabel for="search_employee_reamarks" value="備考"/>
-                    <h:inputText id="search_employee_reamarks" value="#{employeeList.searchCondition.remarks}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_reamarks" />
                 </h:panelGrid>
             </f:validateBean>
             <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.employeeList}" style="display: block;margin-top:16px;"/>
