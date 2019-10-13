@@ -28,22 +28,22 @@
             <h1>社員一覧</h1>
             <h:messages globalOnly="true" />
             <h:panelGrid columns="4">
-                <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
+                <h:commandButton action="#{employeeList.create()}" value="新規登録"/>
                 <h:commandButton action="#{employeeList.search()}" value="検索" />
                 <h:commandButton action="#{employeeList.clear()}" value="クリア"/>
-                <h:commandButton action="#{employeeList.batchEmployee()}" value="一括登録" />
-                <h:commandButton action="#{employeeList.deleteAllEmployee()}" 
+                <h:commandButton action="#{employeeList.createBatch()}" value="一括登録" />
+                <h:commandButton action="#{employeeList.deleteAll()}" 
                                   value="全件削除" 
                                   onclick="return confirm('社員情報をすべて削除します。\n本当によろしいです？')" />
             </h:panelGrid>
             <f:validateBean disabled="true">
                 <h:panelGrid columns="3">
                     <h:outputLabel for="search_employee_code" value="社員コード"/>
-                    <h:inputText id="search_employee_code" value="#{employeeList.searchCondition.employeeCode}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:inputText id="search_employee_code" value="#{employeeList.searchCondition.employeeCode}" onkeypress="if(event.keyCode === 13) return false;"/>
                     <h:message for="search_employee_code" />
 
                     <h:outputLabel for="search_employee_name" value="社員名"/>
-                    <h:inputText id="search_employee_name" value="#{employeeList.searchCondition.name}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:inputText id="search_employee_name" value="#{employeeList.searchCondition.name}" onkeypress="if(event.keyCode === 13) return false;"/>
                     <h:message for="search_employee_name" />
 
                     <h:outputLabel for="search_employee_gender" value="性別"/>
@@ -58,30 +58,30 @@
                     <h:outputLabel for="search_employee_birthday" value="誕生日" />
                     <h:inputText id="search_employee_birthday" 
                                   value="#{employeeList.searchCondition.birthday}" 
-                                  onkeypress="if(event.keyCode == 13) return false;">
+                                  onkeypress="if(event.keyCode === 13) return false;">
                         <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
                     </h:inputText>
                     <h:message for="search_employee_birthday" />
 
                     <h:outputLabel for="search_employee_phone" value="電話番号"/>
-                    <h:inputText id="search_employee_phone" value="#{employeeList.searchCondition.phone}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:inputText id="search_employee_phone" value="#{employeeList.searchCondition.phone}" onkeypress="if(event.keyCode === 13) return false;"/>
                     <h:message for="search_employee_phone" />
 
                     <h:outputLabel for="search_employee_mobile_phone" value="携帯電話番号"/>
-                    <h:inputText id="search_employee_mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:inputText id="search_employee_mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" onkeypress="if(event.keyCode === 13) return false;"/>
                     <h:message for="search_employee_mobile_phone" />
 
                     <h:outputLabel for="search_employee_zip_code" value="郵便番号"/>
-                    <h:inputText id="search_employee_zip_code" value="#{employeeList.searchCondition.zipCode}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:inputText id="search_employee_zip_code" value="#{employeeList.searchCondition.zipCode}" onkeypress="if(event.keyCode === 13) return false;"/>
                     <h:message for="search_employee_zip_code" />
 
                     <h:outputLabel for="search_employee_address" value="住所"/>
-                    <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" onkeypress="if(event.keyCode == 13) return false;"/>
+                    <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" onkeypress="if(event.keyCode === 13) return false;"/>
                     <h:message for="search_employee_address" />
                 </h:panelGrid>
             </f:validateBean>
-            <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.employeeList}" style="display: block;margin-top:16px;"/>
-            <div style="position: relative;width:1000px;height:30px;" jsf:rendered="#{not empty employeeList.employeeList}">
+            <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.entityList}" style="display: block;margin-top:16px;"/>
+            <div style="position: relative;width:1000px;height:30px;" jsf:rendered="#{not empty employeeList.entityList}">
                 <div id="topPageNavigator">
                     <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
                     <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
@@ -90,16 +90,16 @@
                     </ui:repeat>
                     <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
                 </div>
-                <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" /></div>
+                <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" /></div>
             </div>
-            <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp"  rendered="#{not empty employeeList.employeeList}">
+            <h:dataTable styleClass="employee_list" value="#{employeeList.entityList}" var="emp"  rendered="#{not empty employeeList.entityList}">
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="ボタン" />
                     </f:facet>
                     <h:commandButton value="削除" 
                                      onclick="return confirm('社員コード:#{emp.employeeCode}を削除してもよろしいですか？')"
-                                      action="#{employeeList.deleteEmployee(emp.employee_id)}" />
+                                      action="#{employeeList.delete(emp.employee_id)}" />
                 </h:column>
                 <h:column>
                     <f:facet name="header">

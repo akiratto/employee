@@ -25,7 +25,7 @@ import javax.persistence.PersistenceContext;
 @Named
 @ViewScoped
 public class PageNavigator implements Serializable {
-    public static class PageLink {
+    public static class PageLink implements Serializable {
         PageNavigator pageNavigator;
         
         public String baseURL;

@@ -31,7 +31,7 @@
                               value="#{employeeDetail.entity.employeeCode}"
                               disabled="#{not employeeDetail.isNew()}"
                               onkeypress="if(event.keyCode == 13) return false;" />
-                <h:outputText value="" />
+                <h:message for="employee_code" />
                 
                 <h:outputLabel value="社員名：" for="employee_name" />
                 <h:inputText id="employee_name" 
