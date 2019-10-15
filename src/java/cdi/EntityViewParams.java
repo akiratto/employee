@@ -17,18 +17,31 @@ import javax.inject.Named;
 @Named
 @ViewScoped
 public class EntityViewParams<E extends Serializable> {
-//    public static class EntityViewParameter
-//    {
-//        
-//        private Field field;
-//        
-//        public EntityViewParameter(E entity, Field field) { this.field = field; }
-//
-//        public String getName() { return field.getName(); }
-//
-//        public String getValue() { return field.get(this); }
-//        public void setValue(String value) { this.value = value; }
-//    }
+    public static class EntityViewParameter<E extends Serializable>
+    {
+        private final E entity;
+        private final Field field;
+        
+        public EntityViewParameter(E entity, Field field)
+        {
+            this.entity = entity;
+            this.field = field;
+        }
+
+        public String getName() { return field.getName(); }
+
+        public Object getValue() 
+                throws IllegalArgumentException, IllegalAccessException 
+        {
+            return field.get(entity);
+        }
+        
+        public void setValue(Object value) 
+                throws IllegalArgumentException, IllegalAccessException 
+        { 
+            field.set(entity,value); 
+        }
+    }
 //    
 //    private Map<String, EntityViewParameter> viewParams;
 }
