@@ -11,7 +11,10 @@
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
         <f:metadata>
-            <f:viewParam name="employee_code" value="#{employeeList.searchCondition.employeeCode}" />
+            <ui:repeat var="ent" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
+                <f:viewParam name="#{ent.snakeCaseName}" value="#{ent.value}" converter="#{ent.jsfConverterId}" />
+            </ui:repeat>
+<!--            <f:viewParam name="employee_code" value="#{employeeList.searchCondition.employeeCode}"/>
             <f:viewParam name="name" value="#{employeeList.searchCondition.name}" />
             <f:viewParam name="gender" value="#{employeeList.searchCondition.gender}">
                 <f:converter converterId="genderConverter" />
@@ -21,13 +24,13 @@
             <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
             <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
             <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
-            <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
+            <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />-->
             <f:viewAction action="#{employeeList.viewAction()}" />
         </f:metadata>
         <h:form id="f" enctype="multipart/form-data">
             <h1>社員一覧</h1>
-            <ui:repeat var="ent" value="#{entityViewParams.createViewParam(employeeList.searchCondition).entrySet()}" >
-                <p><h:outputText value="#{ent.key}" />：<h:outputText value="#{ent.value.value}" /></p>
+            <ui:repeat var="ent" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}" >
+                <p><h:outputText value="#{ent.snakeCaseName}" />：<h:outputText value="#{ent.value}" /><h:outputText value=" #{ent.jsfConverterId}" /></p>
             </ui:repeat>
             <h:messages globalOnly="true" />
             <h:panelGrid columns="4">

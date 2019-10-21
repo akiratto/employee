@@ -29,6 +29,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import jsf.annotation.JsfConverter;
 
 /**
  * @author owner
@@ -64,6 +65,8 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="性別")
     @CsvConverter(converter = GenderConverter.class)
+    //Jsf Converter
+    @JsfConverter(converterId = "genderConverter")
     private Gender gender;
     
     @Temporal(TemporalType.DATE)

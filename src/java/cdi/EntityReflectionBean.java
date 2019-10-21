@@ -7,41 +7,49 @@ package cdi;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import javax.enterprise.context.RequestScoped;
-import javax.faces.view.ViewScoped;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
+import jsf.annotation.JsfConverter;
+import static util.StringFunctions.toSnakeCase;
 
 /**
  *
  * @author Owner
  */
 @Named
-@ViewScoped
-public class EntityViewParams implements Serializable {
+@ApplicationScoped
+public class EntityReflectionBean implements Serializable {
     
-    public <E extends Serializable> Map<String, EntityViewParameter> createViewParam(E entity)
+    public <E extends Serializable> List<EntityField> getEntityFields(E entity)
     {
-        Map<String, EntityViewParameter> viewParams = new HashMap<>();
-        for(Field field : entity.getClass().getDeclaredFields()) {
-            viewParams.put(field.getName(), new EntityViewParameter(entity, field));
-        }
-        return viewParams;
+        return Arrays.asList( entity.getClass().getDeclaredFields() )
+                .stream()
+                .filter(field -> !field.getName().startsWith("_"))
+                .filter(field -> !field.getName().equals("serialVersionUID"))
+                .map(field -> new EntityField(entity, field))
+                .collect(Collectors.toList());
     } 
     
-    public static class EntityViewParameter<E extends Serializable>
+    public static class EntityField<E extends Serializable>
     {
         private final E entity;
         private final Field field;
         
-        public EntityViewParameter(E entity, Field field)
+        public EntityField(E entity, Field field)
         {
             this.entity = entity;
             this.field = field;
         }
 
         public String getName() { return field.getName(); }
+        public String getSnakeCaseName() { return toSnakeCase(field.getName()); }
+        public String getJsfConverterId() {
+            JsfConverter jsfConverter = field.getAnnotation(JsfConverter.class);
+            return jsfConverter != null ? jsfConverter.converterId() : "idConverter";
+        }
 
         public Object getValue()
         {
