@@ -11,26 +11,15 @@
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
         <f:metadata>
-            <ui:repeat var="ent" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
-                <f:viewParam name="#{ent.snakeCaseName}" value="#{ent.value}" converter="#{ent.jsfConverterId}" />
+            <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
+                <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
             </ui:repeat>
-<!--            <f:viewParam name="employee_code" value="#{employeeList.searchCondition.employeeCode}"/>
-            <f:viewParam name="name" value="#{employeeList.searchCondition.name}" />
-            <f:viewParam name="gender" value="#{employeeList.searchCondition.gender}">
-                <f:converter converterId="genderConverter" />
-            </f:viewParam>
-            <f:viewParam name="phone" value="#{employeeList.searchCondition.phone}" />
-            <f:viewParam name="mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" />
-            <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
-            <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
-            <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
-            <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />-->
             <f:viewAction action="#{employeeList.viewAction()}" />
         </f:metadata>
         <h:form id="f" enctype="multipart/form-data">
             <h1>社員一覧</h1>
-            <ui:repeat var="ent" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}" >
-                <p><h:outputText value="#{ent.snakeCaseName}" />：<h:outputText value="#{ent.value}" /><h:outputText value=" #{ent.jsfConverterId}" /></p>
+            <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}" >
+                <p><h:outputText value="#{fd.snakeCaseName}" />：<h:outputText value="#{fd.value}" /><h:outputText value=" #{fd.jsfConverter.toString()}" /></p>
             </ui:repeat>
             <h:messages globalOnly="true" />
             <h:panelGrid columns="4">
@@ -44,7 +33,21 @@
             </h:panelGrid>
             <f:validateBean disabled="true">
                 <h:panelGrid columns="3">
-                    <h:outputLabel for="search_employee_code" value="社員コード"/>
+                    <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
+                        <h:outputLabel for="#{fd.jsfUIColumn.componentId}" value="#{fd.jsfUIColumn.labelTitle}"/>
+                        <h:inputText rendered="#{fd.jsfUIColumn.columnType().eqHtmlInputText}" 
+                                      id="#{fd.jsfUIColumn.componentId}" 
+                                      value="#{fd.value}" 
+                                      onkeypress="if(event.keyCode === 13) return false;" />
+                        <h:selectOneMenu rendered="#{fd.jsfUIColumn.columnType().eqUISelectOne}"
+                                          id="#{fd.jsfUIColumn.componentId}"
+                                          value="#{fd.value}"
+                                          converter="#{fd.jsfConverter}">
+                            <f:selectItem itemValue="" itemLabel="" />
+                            
+                        </h:selectOneMenu>
+                    </ui:repeat>
+<!--                    <h:outputLabel for="search_employee_code" value="社員コード"/>
                     <h:inputText id="search_employee_code" value="#{employeeList.searchCondition.employeeCode}" onkeypress="if(event.keyCode === 13) return false;"/>
                     <h:message for="search_employee_code" />
 
@@ -83,7 +86,7 @@
 
                     <h:outputLabel for="search_employee_address" value="住所"/>
                     <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" onkeypress="if(event.keyCode === 13) return false;"/>
-                    <h:message for="search_employee_address" />
+                    <h:message for="search_employee_address" />-->
                 </h:panelGrid>
             </f:validateBean>
             <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.entityList}" style="display: block;margin-top:16px;"/>

@@ -66,7 +66,7 @@ public class TEmployee implements Serializable {
     @CsvColumn(field="性別")
     @CsvConverter(converter = GenderConverter.class)
     //Jsf Converter
-    @JsfConverter(converterId = "genderConverter")
+    @JsfConverter(converter = GenderConverter.class)
     private Gender gender;
     
     @Temporal(TemporalType.DATE)

@@ -11,8 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
+import javax.faces.convert.Converter;
 import javax.inject.Named;
 import jsf.annotation.JsfConverter;
+import jsf.annotation.JsfUIColumn;
+import jsf.converter.IdConverter;
 import static util.StringFunctions.toSnakeCase;
 
 /**
@@ -46,9 +49,18 @@ public class EntityReflectionBean implements Serializable {
 
         public String getName() { return field.getName(); }
         public String getSnakeCaseName() { return toSnakeCase(field.getName()); }
-        public String getJsfConverterId() {
+        public Converter getJsfConverter() 
+                throws InstantiationException, IllegalAccessException 
+        {
             JsfConverter jsfConverter = field.getAnnotation(JsfConverter.class);
-            return jsfConverter != null ? jsfConverter.converterId() : "idConverter";
+            return jsfConverter != null 
+                    ? jsfConverter.converter().newInstance() 
+                    : IdConverter.class.newInstance();
+        }
+        
+        public JsfUIColumn getJsfUIColumn()
+        {
+            return field.getAnnotation(JsfUIColumn.class);
         }
 
         public Object getValue()
