@@ -12,9 +12,9 @@
             <var>bundle</var>
         </resource-bundle>
     </application>
-    <factory>
+<!--    <factory>
         <exception-handler-factory>
             jsf.exception.CustomExceptionHandlerFactory
         </exception-handler-factory>
-    </factory>
+    </factory>-->
 </faces-config>

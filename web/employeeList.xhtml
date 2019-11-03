@@ -4,7 +4,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:jsf="http://xmlns.jcp.org/jsf">
+      xmlns:jsf="http://xmlns.jcp.org/jsf"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>社員一覧</title>
     </h:head>
@@ -18,9 +19,6 @@
         </f:metadata>
         <h:form id="f" enctype="multipart/form-data">
             <h1>社員一覧</h1>
-            <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}" >
-                <p><h:outputText value="#{fd.snakeCaseName}" />：<h:outputText value="#{fd.value}" /><h:outputText value=" #{fd.jsfConverter.toString()}" /></p>
-            </ui:repeat>
             <h:messages globalOnly="true" />
             <h:panelGrid columns="4">
                 <h:commandButton action="#{employeeList.create()}" value="新規登録"/>
@@ -33,60 +31,34 @@
             </h:panelGrid>
             <f:validateBean disabled="true">
                 <h:panelGrid columns="3">
-                    <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
-                        <h:outputLabel for="#{fd.jsfUIColumn.componentId}" value="#{fd.jsfUIColumn.labelTitle}"/>
-                        <h:inputText rendered="#{fd.jsfUIColumn.columnType().eqHtmlInputText}" 
-                                      id="#{fd.jsfUIColumn.componentId}" 
-                                      value="#{fd.value}" 
-                                      onkeypress="if(event.keyCode === 13) return false;" />
-                        <h:selectOneMenu rendered="#{fd.jsfUIColumn.columnType().eqUISelectOne}"
-                                          id="#{fd.jsfUIColumn.componentId}"
-                                          value="#{fd.value}"
-                                          converter="#{fd.jsfConverter}">
-                            <f:selectItem itemValue="" itemLabel="" />
-                            
-                        </h:selectOneMenu>
-                    </ui:repeat>
-<!--                    <h:outputLabel for="search_employee_code" value="社員コード"/>
-                    <h:inputText id="search_employee_code" value="#{employeeList.searchCondition.employeeCode}" onkeypress="if(event.keyCode === 13) return false;"/>
-                    <h:message for="search_employee_code" />
-
-                    <h:outputLabel for="search_employee_name" value="社員名"/>
-                    <h:inputText id="search_employee_name" value="#{employeeList.searchCondition.name}" onkeypress="if(event.keyCode === 13) return false;"/>
-                    <h:message for="search_employee_name" />
-
-                    <h:outputLabel for="search_employee_gender" value="性別"/>
-                    <h:selectOneMenu id="search_employee_gender"
-                                     value="#{employeeList.searchCondition.gender}"
-                                     converter="genderConverter">
-                        <f:selectItem itemValue="" itemLabel="" />
-                        <f:selectItems value="#{employeeList.genders}"/>
-                    </h:selectOneMenu>
-                    <h:message for="search_employee_gender" />
-                    
-                    <h:outputLabel for="search_employee_birthday" value="誕生日" />
-                    <h:inputText id="search_employee_birthday" 
-                                  value="#{employeeList.searchCondition.birthday}" 
-                                  onkeypress="if(event.keyCode === 13) return false;">
-                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
-                    </h:inputText>
-                    <h:message for="search_employee_birthday" />
-
-                    <h:outputLabel for="search_employee_phone" value="電話番号"/>
-                    <h:inputText id="search_employee_phone" value="#{employeeList.searchCondition.phone}" onkeypress="if(event.keyCode === 13) return false;"/>
-                    <h:message for="search_employee_phone" />
-
-                    <h:outputLabel for="search_employee_mobile_phone" value="携帯電話番号"/>
-                    <h:inputText id="search_employee_mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" onkeypress="if(event.keyCode === 13) return false;"/>
-                    <h:message for="search_employee_mobile_phone" />
-
-                    <h:outputLabel for="search_employee_zip_code" value="郵便番号"/>
-                    <h:inputText id="search_employee_zip_code" value="#{employeeList.searchCondition.zipCode}" onkeypress="if(event.keyCode === 13) return false;"/>
-                    <h:message for="search_employee_zip_code" />
-
-                    <h:outputLabel for="search_employee_address" value="住所"/>
-                    <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" onkeypress="if(event.keyCode === 13) return false;"/>
-                    <h:message for="search_employee_address" />-->
+                    <c:forEach var="fd" items="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
+                        <c:if test="#{not empty fd.jsfUIColumn}">
+                            <h:outputLabel for="#{fd.jsfUIColumn.componentId()}" 
+                                            value="#{fd.jsfUIColumn.labelTitle()}"/>
+                            <c:if test="#{fd.jsfUIColumn.columnType().eqHtmlInputText()}">
+                                <h:inputText id="#{fd.jsfUIColumn.componentId()}"
+                                              value="#{fd.value}" 
+                                              onkeypress="if(event.keyCode === 13) return false;" />
+                            </c:if>
+                            <c:if test="#{fd.jsfUIColumn.columnType().eqUISelectOne()}">
+                                <h:selectOneMenu id="#{fd.jsfUIColumn.componentId()}"
+                                                  value="#{fd.value}"
+                                                  converter="#{fd.jsfConverter}">
+                                    <c:forEach var="item" items="#{fd.jsfUIColumn.selectOne().selectItems()}">
+                                        <f:selectItem itemValue="#{item.itemValue()}" itemLabel="#{item.itemLabel()}" />
+                                    </c:forEach>
+                                </h:selectOneMenu>
+                            </c:if>
+                            <c:if test="#{fd.jsfUIColumn.columnType().eqHtmlInputDate()}">
+                                <h:inputText id="#{fd.jsfUIColumn.componentId()}"
+                                              value="#{fd.value}" 
+                                              onkeypress="if(event.keyCode === 13) return false;">
+                                    <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
+                                </h:inputText>
+                            </c:if>
+                            <h:message for="#{fd.jsfUIColumn.componentId()}" />
+                        </c:if>
+                    </c:forEach>
                 </h:panelGrid>
             </f:validateBean>
             <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.entityList}" style="display: block;margin-top:16px;"/>

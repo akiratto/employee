@@ -10,6 +10,7 @@ public enum JsfUIColumnType {
     HTML_INPUT_HIDDEN,
     HTML_INPUT_SECRET,
     HTML_INPUT_FILE,
+    HTML_INPUT_DATE,
     UI_SELECT_BOOLEAN,
     UI_SELECT_MANY,
     UI_SELECT_ONE,
@@ -20,6 +21,7 @@ public enum JsfUIColumnType {
     public boolean eqHtmlInputHidden() { return this == HTML_INPUT_HIDDEN; }
     public boolean eqHtmlInputSecret() { return this == HTML_INPUT_SECRET; }
     public boolean eqHtmlInputFile() { return this == HTML_INPUT_FILE; }
+    public boolean eqHtmlInputDate() { return this == HTML_INPUT_DATE; }
     public boolean eqUISelectBoolean() { return this == UI_SELECT_BOOLEAN; }
     public boolean eqUISelectMany() { return this == UI_SELECT_MANY; }
     public boolean eqUISelectOne() { return this == UI_SELECT_ONE; }
