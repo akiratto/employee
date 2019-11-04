@@ -7,120 +7,26 @@
       xmlns:jsf="http://xmlns.jcp.org/jsf"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title>社員一覧</title>
+        <title>社q</title>
     </h:head>
-    <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
-        <f:metadata>
-            <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
-                <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
-            </ui:repeat>
-            <f:viewAction action="#{employeeList.viewAction()}" />
-        </f:metadata>
-        <h:form id="f" enctype="multipart/form-data">
-            <h1>社員一覧</h1>
-            <h:messages globalOnly="true" />
-            <h:panelGrid columns="4">
-                <h:commandButton action="#{employeeList.create()}" value="新規登録"/>
-                <h:commandButton action="#{employeeList.search()}" value="検索" />
-                <h:commandButton action="#{employeeList.clear()}" value="クリア"/>
-                <h:commandButton action="#{employeeList.createBatch()}" value="一括登録" />
-                <h:commandButton action="#{employeeList.deleteAll()}" 
-                                  value="全件削除" 
-                                  onclick="return confirm('社員情報をすべて削除します。\n本当によろしいです？')" />
-            </h:panelGrid>
-            <f:validateBean disabled="true">
-                <h:panelGrid columns="3">
-                    <c:forEach var="fd" items="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
-                        <c:if test="#{not empty fd.jsfUIColumn}">
-                            <h:outputLabel for="#{fd.jsfUIColumn.componentId()}" 
-                                            value="#{fd.jsfUIColumn.labelTitle()}"/>
-                            <c:if test="#{fd.jsfUIColumn.columnType().eqHtmlInputText()}">
-                                <h:inputText id="#{fd.jsfUIColumn.componentId()}"
-                                              value="#{fd.value}" 
-                                              onkeypress="if(event.keyCode === 13) return false;" />
-                            </c:if>
-                            <c:if test="#{fd.jsfUIColumn.columnType().eqUISelectOne()}">
-                                <h:selectOneMenu id="#{fd.jsfUIColumn.componentId()}"
-                                                  value="#{fd.value}"
-                                                  converter="#{fd.jsfConverter}">
-                                    <c:forEach var="item" items="#{fd.jsfUIColumn.selectOne().selectItems()}">
-                                        <f:selectItem itemValue="#{item.itemValue()}" itemLabel="#{item.itemLabel()}" />
-                                    </c:forEach>
-                                </h:selectOneMenu>
-                            </c:if>
-                            <c:if test="#{fd.jsfUIColumn.columnType().eqHtmlInputDate()}">
-                                <h:inputText id="#{fd.jsfUIColumn.componentId()}"
-                                              value="#{fd.value}" 
-                                              onkeypress="if(event.keyCode === 13) return false;">
-                                    <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
-                                </h:inputText>
-                            </c:if>
-                            <h:message for="#{fd.jsfUIColumn.componentId()}" />
-                        </c:if>
-                    </c:forEach>
-                </h:panelGrid>
-            </f:validateBean>
-            <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.entityList}" style="display: block;margin-top:16px;"/>
-            <div style="position: relative;width:1000px;height:30px;" jsf:rendered="#{not empty employeeList.entityList}">
-                <div id="topPageNavigator">
-                    <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
-                    <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
-                        <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
-                        <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
-                    </ui:repeat>
-                    <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
-                </div>
-                <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" /></div>
-            </div>
-            <h:dataTable styleClass="employee_list" value="#{employeeList.entityList}" var="emp"  rendered="#{not empty employeeList.entityList}">
-                <h:column>
-                    <f:facet name="header">
-                        <h:outputText value="ボタン" />
-                    </f:facet>
-                    <h:commandButton value="削除" 
-                                     onclick="return confirm('社員コード:#{emp.employeeCode}を削除してもよろしいですか？')"
-                                      action="#{employeeList.delete(emp.employee_id)}" />
-                </h:column>
-                <h:column>
-                    <f:facet name="header">
-                        <h:outputText value="社員コード" />
-                    </f:facet>
-                    <h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}">
-                        <h:outputText value="#{emp.employeeCode}" />
-                    </h:commandLink>
-                </h:column>
-                <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
-                <h:column>
-                    <f:facet name="header"><h:outputText value="性別" /></f:facet>
-                    <h:outputText value="#{emp.gender.jpName()}" />
-                </h:column>
-                <h:column>
-                    <f:facet name="header"><h:outputText value="生年月日" /></f:facet>
-                    <h:outputText value="#{emp.birthday}">
-                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
-                    </h:outputText>
-                </h:column>
-                <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>
-                <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
-                <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>
-                <h:column><f:facet name="header"><h:outputText value="住所" /></f:facet>#{emp.address}</h:column>
-                <h:column>
-                    <f:facet name="header">
-                        <h:outputText value="備考" />
-                    </f:facet>
-                    <h:outputText class="preformatted" value="#{emp.remarks}"/>
-                </h:column>
-            </h:dataTable>
-            <p style="width:1000px; text-align:center;">
-                <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
-                <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
-                    <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
-                    <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
-                </ui:repeat>
-                <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
-            </p>
-        </h:form>
+        <ui:composition template="/templates/entityList.xhtml">
+            <ui:param name="entityList" value="#{employeeList}" />
+            
+            <ui:define name="title">社員一覧</ui:define>
+            <ui:define name="viewParameters">
+                <ui:include src="/templates/entityList/viewParameters.xhtml" />
+            </ui:define>
+            <ui:define name="buttonsInList">
+                <ui:include src="/templates/entityList/buttonsInList.xhtml" />
+            </ui:define>
+            <ui:define name="searchSection">
+                <ui:include src="/templates/entityList/searchSection.xhtml" />
+            </ui:define>
+            <ui:define name="entityDataTable">
+                <ui:include src="/templates/entityList/entityDataTable.xhtml" />
+            </ui:define>
+        </ui:composition>
     </h:body>
 </html>
 

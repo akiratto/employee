@@ -3,6 +3,7 @@
  */
 package entity;
 
+import cdi.EmployeeList;
 import csv.annotation.CsvColumn;
 import csv.annotation.CsvColumnFormula;
 import csv.annotation.CsvConverter;
@@ -30,16 +31,18 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import jsf.annotation.JsfConverter;
-import jsf.annotation.JsfUIColumn;
-import jsf.annotation.JsfUISelectItem;
-import jsf.annotation.JsfUISelectOne;
+import jsf.ui.annotation.JsfUIColumn;
+import jsf.ui.annotation.JsfUISelectItem;
+import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
+import jsf.ui.annotation.JsfUIButtonsInList;
 
 /**
  * @author owner
  */
 @Entity(name = "TEmployee")
 @Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
+@JsfUIButtonsInList(uiButtonsInListClass = EmployeeList.class)
 public class TEmployee implements Serializable {
 
     @Id
@@ -53,10 +56,7 @@ public class TEmployee implements Serializable {
     @CsvColumn(field="社員コード")
     @JsfUIColumn(componentId = "search_employee_code", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-                 labelTitle = "社員コード", 
-                 selectOne = @JsfUISelectOne(selectItems = {
-                     
-                 }))
+                 labelTitle = "社員コード")
     private String employeeCode;
     
     @Basic
@@ -67,10 +67,7 @@ public class TEmployee implements Serializable {
     @CsvColumn(field="氏名")
     @JsfUIColumn(componentId = "search_employee_name", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-                 labelTitle = "社員名", 
-                 selectOne = @JsfUISelectOne(selectItems = {
-                     
-                 }))
+                 labelTitle = "社員名")
     private String name;
 
     @Basic
@@ -86,13 +83,14 @@ public class TEmployee implements Serializable {
     //Jsf
     @JsfUIColumn(componentId = "search_employee_gender", 
              columnType = JsfUIColumnType.UI_SELECT_ONE, 
-             labelTitle = "性別", 
-             selectOne = @JsfUISelectOne(selectItems = {
+             labelTitle = "性別"
+    )
+    @JsfUISelectOne(selectItems = {
                  @JsfUISelectItem(itemLabel = "", itemValue = ""),
                  @JsfUISelectItem(itemLabel = "男", itemValue = "M"),
                  @JsfUISelectItem(itemLabel = "女", itemValue = "F"),
                  @JsfUISelectItem(itemLabel = "その他", itemValue = "O")
-             }))
+    })
     private Gender gender;
     
     @Temporal(TemporalType.DATE)
@@ -101,13 +99,10 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="生年月日")
     @CsvConverter(converter = CsvColumnDateConverter.class)
-    
+    //--Jsf
     @JsfUIColumn(componentId = "search_employee_birthday", 
                  columnType = JsfUIColumnType.HTML_INPUT_DATE, 
-                 labelTitle = "誕生日", 
-                 selectOne = @JsfUISelectOne(selectItems = {
-                     
-                 }))
+                 labelTitle = "誕生日")
     private Date birthday;
 
     @Basic
@@ -120,10 +115,7 @@ public class TEmployee implements Serializable {
     //--Jsf
     @JsfUIColumn(componentId = "search_employee_phone", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "電話番号", 
-             selectOne = @JsfUISelectOne(selectItems = {
-
-             }))
+             labelTitle = "電話番号")
     private String phone;
 
     @Basic
@@ -136,10 +128,7 @@ public class TEmployee implements Serializable {
     //--Jsf
     @JsfUIColumn(componentId = "search_employee_mobile_phone", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "携帯電話番号", 
-             selectOne = @JsfUISelectOne(selectItems = {
-
-             }))
+             labelTitle = "携帯電話番号")
     private String mobilePhone;
 
     @Basic
@@ -152,10 +141,7 @@ public class TEmployee implements Serializable {
     //--Jsf
     @JsfUIColumn(componentId = "search_employee_zip_code", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "郵便番号", 
-             selectOne = @JsfUISelectOne(selectItems = {
-
-             }))
+             labelTitle = "郵便番号")
     private String zipCode;
 
     @Basic
@@ -167,10 +153,8 @@ public class TEmployee implements Serializable {
     //--Jsf
     @JsfUIColumn(componentId = "search_employee_address", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "住所", 
-             selectOne = @JsfUISelectOne(selectItems = {
-
-             }))
+             labelTitle = "住所"
+    )
     private String address;
 
     @Basic

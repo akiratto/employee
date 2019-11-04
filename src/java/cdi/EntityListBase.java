@@ -17,14 +17,16 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.transaction.Transactional;
+import jsf.ui.UIButtonsInList;
 
 /**
  *
  * @author Owner
  */
-public abstract class EntityListBase<E extends Serializable, PK> implements Serializable {
+public abstract class EntityListBase<E extends Serializable, PK> 
+        implements Serializable, UIButtonsInList {
     private E searchCondition;
-    private List<E> entityList;
+    private List<E> entityDataList;
     private Long entityAllCount;
     
     abstract protected Class<E> entityClazz();
@@ -42,8 +44,8 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
     public String messageDeleteAllEntityCompleted(int deleteCount) { return deleteCount + "件の" + entityTitle() + "を削除しました。"; }
 
     public E       getSearchCondition() { return searchCondition; }
-    public List<E> getEntityList()      { return entityList; }
-    public int     getEntityCount()     { return entityList.size(); }
+    public List<E> getEntityDataList()   { return entityDataList; }
+    public int     getEntityCount()     { return entityDataList.size(); }
     public Long    getEntityAllCount()  { return entityAllCount; }
     
     @PostConstruct
@@ -54,7 +56,7 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
         } catch (InstantiationException | IllegalAccessException ex) {
             this.searchCondition = null;
         }
-        this.entityList = new ArrayList<>();
+        this.entityDataList = new ArrayList<>();
         this.entityAllCount = 0L;
     }
             
@@ -71,13 +73,33 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
 
         pageNavigator().build(entityAllCount, generateQueryStrings(searchCondition));
         
-        this.entityList = entityDbAction().search(searchCondition, 
+        this.entityDataList = entityDbAction().search(searchCondition, 
                                                 pageNavigator().getOffset(), 
                                                 pageNavigator().getRowCountPerPage()); 
     }
     
-    public String create() { return detailPageName() + "?faces-redirect=true&mode=New"; }
-    public String createBatch() { return createBatchPageName() + "?faces-redirect=true"; }
+    //-- UIButtonsInList インターフェース実装
+    @Override public String create() { return detailPageName() + "?faces-redirect=true&mode=New"; }
+    @Override
+    public String search()
+    {
+        String queryString = generateString(searchCondition);        
+        return listPageName() + "?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
+    }
+    @Override public String clear() { return listPageName() + "?faces-redirect=true"; }
+    @Override public String createBatch() { return createBatchPageName() + "?faces-redirect=true"; }
+    @Override
+    @Transactional
+    public String deleteAll()
+    {
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
+        int deleteCount = entityDbAction().deleteAll();
+        
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(messageDeleteAllEntityCompleted(deleteCount)));
+        String queryString = generateString(searchCondition);
+        return listPageName() + "?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
+    }
     
     @Transactional
     public String delete(PK entityId)
@@ -95,18 +117,6 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
         return search();
     }
     
-    @Transactional
-    public String deleteAll()
-    {
-        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-        flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = entityDbAction().deleteAll();
-        
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(messageDeleteAllEntityCompleted(deleteCount)));
-        String queryString = generateString(searchCondition);
-        return listPageName() + "?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
-    }
-    
     public String gotoDetail(PK entityId, String mode)
     {
         E entity = entityDbAction().find(entityId);
@@ -116,13 +126,9 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
         return detailPageName() + "?faces-redirect=true&employee_id=" + urlEncode(entityId.toString()) + "&mode=" + urlEncode(mode);
     }
     
-    public String search()
-    {
-        String queryString = generateString(searchCondition);        
-        return listPageName() + "?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
-    }
+
     
-    public String clear() { return listPageName() + "?faces-redirect=true"; }
+
 
 
     

@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <h:head>
+        <title>entityDataTable</title>
+    </h:head>
+    <h:body>
+        <ui:composition>
+            <h:outputText value="社員情報は見つかりません。" rendered="#{empty entityList.entityDataList}" style="display: block;margin-top:16px;"/>
+            <div style="position: relative;width:1000px;height:30px;" jsf:rendered="#{not empty entityList.entityDataList}">
+                <div id="topPageNavigator">
+                    <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
+                    <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                        <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
+                        <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
+                    </ui:repeat>
+                    <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
+                </div>
+                <div id="countInfo"><h:outputText value="[社員情報を #{entityList.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" /></div>
+            </div>
+            <h:dataTable styleClass="employee_list" value="#{entityList.entityDataList}" var="emp"  rendered="#{not empty entityList.entityDataList}">
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="ボタン" />
+                    </f:facet>
+                    <h:commandButton value="削除" 
+                                     onclick="return confirm('社員コード:#{emp.employeeCode}を削除してもよろしいですか？')"
+                                      action="#{entityList.delete(emp.employee_id)}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="社員コード" />
+                    </f:facet>
+                    <h:commandLink action="#{entityList.gotoDetail(emp.employee_id, 'Read')}">
+                        <h:outputText value="#{emp.employeeCode}" />
+                    </h:commandLink>
+                </h:column>
+                <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
+                <h:column>
+                    <f:facet name="header"><h:outputText value="性別" /></f:facet>
+                    <h:outputText value="#{emp.gender.jpName()}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header"><h:outputText value="生年月日" /></f:facet>
+                    <h:outputText value="#{emp.birthday}">
+                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
+                    </h:outputText>
+                </h:column>
+                <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
+                <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="住所" /></f:facet>#{emp.address}</h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="備考" />
+                    </f:facet>
+                    <h:outputText class="preformatted" value="#{emp.remarks}"/>
+                </h:column>
+            </h:dataTable>
+            <p style="width:1000px; text-align:center;">
+                <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
+                <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                    <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
+                    <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
+                </ui:repeat>
+                <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
+            </p>
+        </ui:composition>
+    </h:body>
+</html>
+

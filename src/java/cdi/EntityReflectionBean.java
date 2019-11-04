@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cdi;
 
 import java.io.Serializable;
@@ -14,8 +9,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.faces.convert.Converter;
 import javax.inject.Named;
 import jsf.annotation.JsfConverter;
-import jsf.annotation.JsfUIColumn;
+import jsf.ui.annotation.JsfUIColumn;
+import jsf.ui.annotation.JsfUISelectOne;
 import jsf.converter.IdConverter;
+import jsf.ui.UIButtonsInList;
+import jsf.ui.annotation.JsfUIButtonsInList;
 import static util.StringFunctions.toSnakeCase;
 
 /**
@@ -26,15 +24,35 @@ import static util.StringFunctions.toSnakeCase;
 @ApplicationScoped
 public class EntityReflectionBean implements Serializable {
     
-    public <E extends Serializable> List<EntityField> getEntityFields(E entity)
+    public UIButtonsInList getUIButtonsInList(UIButtonsInList uiButtonsInList) { return uiButtonsInList; }
+    
+    public <E extends Serializable> Entity<E> getEntity(E entity)
+    {
+        return new Entity<>(entity);
+    }
+    
+    public <E extends Serializable> List<EntityField<E>> getEntityFields(E entity)
     {
         return Arrays.asList( entity.getClass().getDeclaredFields() )
                 .stream()
                 .filter(field -> !field.getName().startsWith("_"))
                 .filter(field -> !field.getName().equals("serialVersionUID"))
-                .map(field -> new EntityField(entity, field))
+                .map(field -> new EntityField<>(entity, field))
                 .collect(Collectors.toList());
-    } 
+    }
+    
+    public static class Entity<E extends Serializable>
+    {
+        private final E entity;
+        
+        public Entity(E entity)
+        {
+            this.entity = entity;
+        }
+        
+        public String getName() { return entity.getClass().getSimpleName(); }
+        public String getSnakeCaseName() { return toSnakeCase(entity.getClass().getSimpleName()); }
+    }
     
     public static class EntityField<E extends Serializable>
     {
@@ -61,6 +79,11 @@ public class EntityReflectionBean implements Serializable {
         public JsfUIColumn getJsfUIColumn()
         {
             return field.getAnnotation(JsfUIColumn.class);
+        }
+        
+        public JsfUISelectOne getJsfUISelectOne()
+        {
+            return field.getAnnotation(JsfUISelectOne.class);
         }
 
         public Object getValue()
