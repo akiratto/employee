@@ -7,16 +7,18 @@
       xmlns:jsf="http://xmlns.jcp.org/jsf"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title>社q</title>
+        <title>employeeList</title>
     </h:head>
     <h:body>
-        <ui:composition template="/templates/entityList.xhtml">
+        <f:metadata>
+            <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
+                <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
+            </ui:repeat>
+            <f:viewAction action="#{employeeList.viewAction()}" />
+        </f:metadata>
+        <ui:composition template="/templates/entityList/template.xhtml">
             <ui:param name="entityList" value="#{employeeList}" />
-            
             <ui:define name="title">社員一覧</ui:define>
-            <ui:define name="viewParameters">
-                <ui:include src="/templates/entityList/viewParameters.xhtml" />
-            </ui:define>
             <ui:define name="buttonsInList">
                 <ui:include src="/templates/entityList/buttonsInList.xhtml" />
             </ui:define>
