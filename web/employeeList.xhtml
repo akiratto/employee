@@ -10,14 +10,25 @@
         <title>employeeList</title>
     </h:head>
     <h:body>
-        <f:metadata>
-            <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
-                <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
-            </ui:repeat>
-            <f:viewAction action="#{employeeList.viewAction()}" />
-        </f:metadata>
         <ui:composition template="/templates/entityList/template.xhtml">
             <ui:param name="entityList" value="#{employeeList}" />
+            <ui:define name="metadata">
+                <!--
+                    f:metadataはf:viewの直下のXHTMLか、テンプレートクライアントでしか動作しないので
+                    テンプレート化できない。
+                    そのため、f:metadataはコピペでBeanの名前だけ書き換えるしかない。
+
+                    【参考】
+                    https://stackoverflow.com/questions/46495519/unable-to-use-fmetadata-fviewaction-from-inside-components
+                    https://docs.oracle.com/javaee/6/javaserverfaces/2.1/docs/vdldocs/facelets/f/viewParam.html
+                -->
+                <f:metadata>
+                    <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
+                        <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
+                    </ui:repeat>
+                    <f:viewAction action="#{employeeList.viewAction()}" />
+                </f:metadata>
+            </ui:define>
             <ui:define name="title">社員一覧</ui:define>
             <ui:define name="buttonsInList">
                 <ui:include src="/templates/entityList/buttonsInList.xhtml" />

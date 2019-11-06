@@ -11,14 +11,17 @@
     </h:head>
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
-        mojarra version:<h:outputText value="#{info.version}" />
-        <h:form id="f" enctype="multipart/form-data">
-            <h1><ui:insert name="title" /></h1>
-            <h:messages globalOnly="true" />
-            <ui:insert name="buttonsInList" />
-            <ui:insert name="searchSection" />
-            <ui:insert name="entityDataTable" />
-        </h:form>
+        <f:view>
+            <ui:insert name="metadata" />
+            mojarra version:<h:outputText value="#{info.version}" />
+            <h:form id="f" enctype="multipart/form-data">
+                <h1><ui:insert name="title" /></h1>
+                <h:messages globalOnly="true" />
+                <ui:insert name="buttonsInList" />
+                <ui:insert name="searchSection" />
+                <ui:insert name="entityDataTable" />
+            </h:form>
+        </f:view>
     </h:body>
 </html>
 
