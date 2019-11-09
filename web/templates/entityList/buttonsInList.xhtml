@@ -9,11 +9,11 @@
     <h:body>
         <ui:composition>
             <h:panelGrid columns="4">
-                <h:commandButton action="#{entityReflectionBean.getUIButtonsInList(entityList).create()}" value="新規登録"/>
-                <h:commandButton action="#{entityReflectionBean.getUIButtonsInList(entityList).search()}" value="検索" />
-                <h:commandButton action="#{entityReflectionBean.getUIButtonsInList(entityList).clear()}" value="クリア"/>
-                <h:commandButton action="#{entityReflectionBean.getUIButtonsInList(entityList).createBatch()}" value="一括登録" />
-                <h:commandButton action="#{entityReflectionBean.getUIButtonsInList(entityList).deleteAll()}" 
+                <h:commandButton action="#{entityList.create()}" value="新規登録"/>
+                <h:commandButton action="#{entityList.search()}" value="検索" />
+                <h:commandButton action="#{entityList.clear()}" value="クリア"/>
+                <h:commandButton action="#{entityList.createBatch()}" value="一括登録" />
+                <h:commandButton action="#{entityList.deleteAll()}" 
                                   value="全件削除" 
                                   onclick="return confirm('社員情報をすべて削除します。\n本当によろしいです？')" />
             </h:panelGrid>
