@@ -11,7 +11,7 @@
     <h:body>
         <ui:composition>
             <!-- データが存在しない場合はメッセージを表示する -->
-            <h:outputText value="社員情報は見つかりません。"
+            <h:outputText value="#{entityJpName}は見つかりません。"
                            rendered="#{empty entityListBean.entityDataList}"
                            style="display: block;margin-top:16px;"/>
             
@@ -43,7 +43,7 @@
                 </div>
                 <!-- 一覧表の表示範囲、最大件数 を表示 -->
                 <div id="countInfo">
-                    <h:outputText value="[社員情報を #{entityListBean.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" />
+                    <h:outputText value="[#{entityJpName}を #{entityListBean.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" />
                 </div>
             </div>
             
