@@ -12,8 +12,6 @@ import jsf.annotation.JsfConverter;
 import jsf.ui.annotation.JsfUIColumn;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.converter.IdConverter;
-import jsf.ui.UIButtonsInList;
-import jsf.ui.annotation.JsfUIButtonsInList;
 import static util.StringFunctions.toSnakeCase;
 
 /**
@@ -23,9 +21,7 @@ import static util.StringFunctions.toSnakeCase;
 @Named
 @ApplicationScoped
 public class EntityReflectionBean implements Serializable {
-    
-    public UIButtonsInList getUIButtonsInList(UIButtonsInList uiButtonsInList) { return uiButtonsInList; }
-    
+
     public <E extends Serializable> Entity<E> getEntity(E entity)
     {
         return new Entity<>(entity);
