@@ -14,7 +14,7 @@
             <ui:param name="entityList" value="#{employeeList}" />
             <ui:define name="metadata">
                 <!--
-                    f:metadataはf:viewの直下のXHTMLか、テンプレートクライアントでしか動作しないので
+                    f:metadataはf:viewの直下か、テンプレートクライアントでしか動作しないので
                     テンプレート化できない。（複合コンポーネントも不可）
                     そのため、f:metadataはコピペでBeanの名前だけ書き換えるしかない。
 
@@ -26,6 +26,7 @@
                     <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
                         <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
                     </ui:repeat>
+                    <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
                     <f:viewAction action="#{employeeList.viewAction()}" />
                 </f:metadata>
             </ui:define>
