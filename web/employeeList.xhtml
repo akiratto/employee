@@ -11,7 +11,10 @@
     </h:head>
     <h:body>
         <ui:composition template="/templates/entityList/template.xhtml">
-            <ui:param name="entityList" value="#{employeeList}" />
+            <ui:param name="entityListBean" value="#{employeeList}" />
+            <ui:param name="entityListJpName" value="&lt;b&gt;社員一覧&lt;/b&gt;" />
+            <ui:param name="entityJpName" value="&lt;b&gt;社員情報&lt;/b&gt;&#39;&#13;&#10;" />
+            
             <ui:define name="metadata">
                 <!--
                     f:metadataはf:viewの直下か、テンプレートクライアントでしか動作しないので
@@ -30,7 +33,6 @@
                     <f:viewAction action="#{employeeList.viewAction()}" />
                 </f:metadata>
             </ui:define>
-            <ui:define name="title">社員一覧</ui:define>
             <ui:define name="buttonsInList">
                 <ui:include src="/templates/entityList/buttonsInList.xhtml" />
             </ui:define>

@@ -12,12 +12,12 @@
         <ui:composition>
             <!-- データが存在しない場合はメッセージを表示する -->
             <h:outputText value="社員情報は見つかりません。"
-                           rendered="#{empty entityList.entityDataList}"
+                           rendered="#{empty entityListBean.entityDataList}"
                            style="display: block;margin-top:16px;"/>
             
             <!-- データが1件以上存在する場合、一覧表の上部のナビゲートを表示 -->
             <div style="position: relative;width:1000px;height:30px;"
-                 jsf:rendered="#{not empty entityList.entityDataList}">
+                 jsf:rendered="#{not empty entityListBean.entityDataList}">
                 
                 <!-- ナビゲート部分  表示例) 前へ 1 2 3 4 5 次へ -->
                 <div id="topPageNavigator">
@@ -43,25 +43,27 @@
                 </div>
                 <!-- 一覧表の表示範囲、最大件数 を表示 -->
                 <div id="countInfo">
-                    <h:outputText value="[社員情報を #{entityList.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" />
+                    <h:outputText value="[社員情報を #{entityListBean.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" />
                 </div>
             </div>
             
             <!-- データが1件以上存在する場合、一覧表を表示 -->
-            <h:dataTable styleClass="employee_list" value="#{entityList.entityDataList}" var="emp"  rendered="#{not empty entityList.entityDataList}">
+            <h:dataTable id="employee_list" styleClass="employee_list" value="#{entityListBean.entityDataList}" var="emp"  rendered="#{not empty entityListBean.entityDataList}">
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="ボタン" />
                     </f:facet>
-                    <h:commandButton value="削除" 
-                                     onclick="return confirm('社員コード:#{emp.employeeCode}を削除してもよろしいですか？')"
-                                      action="#{entityList.delete(emp.employee_id)}" />
+                    <h:commandButton id="delete_button"
+                                      value="削除" 
+                                      onclick="return confirm('社員コード:'+ F2(this,'employee_code') + 'を削除してもよろしいですか？')"
+                                      action="#{entityListBean.delete(emp.employee_id)}" />
+                    <h:inputHidden id="employee_code" value="#{emp.employeeCode}" />
                 </h:column>
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="社員コード" />
                     </f:facet>
-                    <h:commandLink action="#{entityList.gotoDetail(emp.employee_id, 'Read')}">
+                    <h:commandLink action="#{entityListBean.gotoDetail(emp.employee_id, 'Read')}">
                         <h:outputText value="#{emp.employeeCode}" />
                     </h:commandLink>
                 </h:column>

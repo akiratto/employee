@@ -12,7 +12,7 @@
         <ui:composition>
             <f:validateBean disabled="true">
                 <h:panelGrid id="search" columns="3">
-                    <c:forEach var="fd" items="#{entityReflectionBean.getEntityFields(entityList.searchCondition)}">
+                    <c:forEach var="fd" items="#{entityReflectionBean.getEntityFields(entityListBean.searchCondition)}">
                         <c:if test="#{not empty fd.jsfUIColumn}">
                             <h:outputLabel for="#{fd.jsfUIColumn.componentId()}" 
                                             value="#{fd.jsfUIColumn.labelTitle()}"/>

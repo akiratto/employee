@@ -8,14 +8,14 @@
     </h:head>
     <h:body>
         <ui:composition>
-            <h:panelGrid columns="4">
-                <h:commandButton action="#{entityList.create()}" value="新規登録"/>
-                <h:commandButton action="#{entityList.search()}" value="検索" />
-                <h:commandButton action="#{entityList.clear()}" value="クリア"/>
-                <h:commandButton action="#{entityList.createBatch()}" value="一括登録" />
-                <h:commandButton action="#{entityList.deleteAll()}" 
+            <h:panelGrid id="pnl" columns="4">
+                <h:commandButton action="#{entityListBean.create()}" value="新規登録"/>
+                <h:commandButton action="#{entityListBean.search()}" value="検索" />
+                <h:commandButton action="#{entityListBean.clear()}" value="クリア"/>
+                <h:commandButton action="#{entityListBean.createBatch()}" value="一括登録" />
+                <h:commandButton action="#{entityListBean.deleteAll()}" 
                                   value="全件削除" 
-                                  onclick="return confirm('社員情報をすべて削除します。\n本当によろしいです？')" />
+                                  onclick="return confirm(F('entityJpName') + 'をすべて削除します。\n本当によろしいです？')" />
             </h:panelGrid>
         </ui:composition>
     </h:body>

@@ -7,19 +7,33 @@
       xmlns:jsf="http://xmlns.jcp.org/jsf"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title><ui:insert name="title" /></title>
+        <title>#{entityListJpName}</title>
     </h:head>
     <h:outputStylesheet library="css" name="employee_list.css" />
+    <h:outputScript library="js" name="common.js" target="head" />
     <h:body>
         <f:view>
             <ui:insert name="metadata" />
             mojarra version:<h:outputText value="#{info.version}" />
             <h:form id="f" enctype="multipart/form-data">
-                <h1><ui:insert name="title" /></h1>
+                <h1>#{entityListJpName}</h1>
                 <h:messages globalOnly="true" />
                 <ui:insert name="buttonsInList" />
                 <ui:insert name="searchSection" />
                 <ui:insert name="entityDataTable" />
+                
+                <!-- Javascript参照用inputタグ
+                
+                     Javascriptの文字列に直接、ui:paramの変数をEL式で指定しても
+                     Javascriptの文字列用にエスケープされないので
+                     インジェクション系の問題が発生する。
+                     (シングルクォートが入るとJavascriptの文法がくずれるなど)
+                  
+                     EL式はHTMLの属性値のエスケープは行われるので
+                     inputタグのvalue属性にui:paramの変数を指定して
+                     inputタグの値をJavascriptから参照することで値を取得する。
+                -->
+                <input id="entityJpName" type="hidden" value="#{entityJpName}" />
             </h:form>
         </f:view>
     </h:body>
