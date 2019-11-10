@@ -16,6 +16,7 @@ import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import jsf.ui.UIButtonsInList;
 
@@ -28,10 +29,15 @@ public abstract class EntityListBase<E extends Serializable, PK>
     private E searchCondition;
     private List<E> entityDataList;
     private Long entityAllCount;
+    @Inject
+    private PageNavigator pageNavigator;
     
     abstract protected Class<E> entityClazz();
     abstract protected EntityDbAction<E,PK> entityDbAction();
-    abstract protected PageNavigator pageNavigator();
+    public PageNavigator getPageNavigator()
+    {
+        return pageNavigator;
+    }
     
     abstract public String entityName();
     abstract public String entityTitle();
@@ -71,11 +77,11 @@ public abstract class EntityListBase<E extends Serializable, PK>
         //検索条件を基に抽出処理を実行する -------------------------------------
         this.entityAllCount = entityDbAction().countAll(searchCondition);
 
-        pageNavigator().build(entityAllCount, generateQueryStrings(searchCondition));
+        getPageNavigator().build(entityAllCount, generateQueryStrings(searchCondition));
         
         this.entityDataList = entityDbAction().search(searchCondition, 
-                                                pageNavigator().getOffset(), 
-                                                pageNavigator().getRowCountPerPage()); 
+                                                getPageNavigator().getOffset(), 
+                                                getPageNavigator().getRowCountPerPage()); 
     }
     
     //-- UIButtonsInList インターフェース実装

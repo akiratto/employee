@@ -4,17 +4,13 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.Dependent;
 import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -22,8 +18,7 @@ import javax.persistence.PersistenceContext;
  *
  * @author owner
  */
-@Named
-@ViewScoped
+@Dependent
 public class PageNavigator implements Serializable {
     public static class PageLink implements Serializable {
         PageNavigator pageNavigator;

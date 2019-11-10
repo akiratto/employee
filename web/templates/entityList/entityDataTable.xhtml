@@ -21,11 +21,11 @@
                 
                 <!-- ナビゲート部分  表示例) 前へ 1 2 3 4 5 次へ -->
                 <div id="topPageNavigator">
-                    <h:commandLink action="#{pageNavigator.prevPage()}"
+                    <h:commandLink action="#{entityListBean.pageNavigator.prevPage()}"
                                     value="前へ"
-                                    rendered="#{pageNavigator.prevPageEnabled()}"
+                                    rendered="#{entityListBean.pageNavigator.prevPageEnabled()}"
                                     style="margin-right:0.6em;"/>
-                    <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                    <ui:repeat value="#{entityListBean.pageNavigator.pageLinks}" var="p">
                         <!-- ページ番号が現在のページならリンク有で表示 -->
                         <h:commandLink action="#{p.moveToPage()}" 
                                         value="#{p.pageNo}" 
@@ -37,13 +37,13 @@
                                        rendered="#{p.isCurrentPage()}"
                                        style="font-weight: bold;margin-right:0.6em;" />
                     </ui:repeat>
-                    <h:commandLink action="#{pageNavigator.nextPage()}"
+                    <h:commandLink action="#{entityListBean.pageNavigator.nextPage()}"
                                     value="次へ"
-                                    rendered="#{pageNavigator.nextPageEnabled()}" />
+                                    rendered="#{entityListBean.pageNavigator.nextPageEnabled()}" />
                 </div>
                 <!-- 一覧表の表示範囲、最大件数 を表示 -->
                 <div id="countInfo">
-                    <h:outputText value="[#{entityJpName}を #{entityListBean.entityAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" />
+                    <h:outputText value="[#{entityJpName}を #{entityListBean.entityAllCount}件中#{entityListBean.pageNavigator.beginRowIndex}～#{entityListBean.pageNavigator.endRowIndex}件 表示]" />
                 </div>
             </div>
             
@@ -93,11 +93,11 @@
             <!-- データが1件以上存在する場合、一覧表の下部のナビゲートを表示 -->
             <p style="width:1000px; text-align:center;">
                 
-                <h:commandLink action="#{pageNavigator.prevPage()}" 
+                <h:commandLink action="#{entityListBean.pageNavigator.prevPage()}" 
                                 value="前へ" 
-                                rendered="#{pageNavigator.prevPageEnabled()}" 
+                                rendered="#{entityListBean.pageNavigator.prevPageEnabled()}" 
                                 style="margin-right:0.6em;"/>
-                <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                <ui:repeat value="#{entityListBean.pageNavigator.pageLinks}" var="p">
                     <h:commandLink action="#{p.moveToPage()}"
                                     value="#{p.pageNo}" 
                                     rendered="#{not p.isCurrentPage()}" 
@@ -106,9 +106,9 @@
                                    rendered="#{p.isCurrentPage()}" 
                                    style="font-weight: bold;margin-right:0.6em;" />
                 </ui:repeat>
-                <h:commandLink action="#{pageNavigator.nextPage()}" 
+                <h:commandLink action="#{entityListBean.pageNavigator.nextPage()}" 
                                 value="次へ" 
-                                rendered="#{pageNavigator.nextPageEnabled()}" />
+                                rendered="#{entityListBean.pageNavigator.nextPageEnabled()}" />
             </p>
         </ui:composition>
     </h:body>

@@ -29,7 +29,7 @@
                     <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
                         <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
                     </ui:repeat>
-                    <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
+                    <f:viewParam name="page_no" value="#{employeeList.pageNavigator.currentPageNo}" />
                     <f:viewAction action="#{employeeList.viewAction()}" />
                 </f:metadata>
             </ui:define>

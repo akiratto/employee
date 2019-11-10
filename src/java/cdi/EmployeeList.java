@@ -21,15 +21,13 @@ import javax.persistence.PersistenceContext;
 @Named
 @ViewScoped
 public class EmployeeList extends EntityListBase<TEmployee, Integer> {   
-    @Inject
-    private PageNavigator pageNavigator;
+
     
     @Inject
     private EmployeeDbAction employeeDbAction;
 
     @Override protected Class<TEmployee> entityClazz() { return TEmployee.class; }
     @Override protected EntityDbAction<TEmployee, Integer> entityDbAction() { return employeeDbAction; }
-    @Override protected PageNavigator pageNavigator() { return pageNavigator; }
     
     @Override public String entityName() { return "TEmployee"; }
     @Override public String entityTitle() { return "社員情報"; }
