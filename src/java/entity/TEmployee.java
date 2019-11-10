@@ -31,11 +31,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import jsf.annotation.JsfConverter;
-import jsf.ui.annotation.JsfUIColumn;
 import jsf.ui.annotation.JsfUISelectItem;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
 import jsf.ui.annotation.JsfUIButtonsInList;
+import jsf.ui.annotation.JsfUISearchColumn;
 
 /**
  * @author owner
@@ -54,7 +54,7 @@ public class TEmployee implements Serializable {
     @NotNull(message="社員コードの入力は必須です。")
     @Pattern(regexp="\\d{10}", message="社員コードは10桁の数字を入力してください。例)0000000001")
     @CsvColumn(field="社員コード")
-    @JsfUIColumn(componentId = "search_employee_code", 
+    @JsfUISearchColumn(componentId = "search_employee_code", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員コード")
     private String employeeCode;
@@ -65,7 +65,7 @@ public class TEmployee implements Serializable {
     @Size(min=1, max=60, message="${validatedValue == '' ? '社員名の入力は必須です。' : '社員名は' += min +='～'+=max+='文字以内で入力してください。'}")
     //--CSV パーサ
     @CsvColumn(field="氏名")
-    @JsfUIColumn(componentId = "search_employee_name", 
+    @JsfUISearchColumn(componentId = "search_employee_name", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員名")
     private String name;
@@ -81,7 +81,7 @@ public class TEmployee implements Serializable {
     //Jsf Converter
     @JsfConverter(converter = GenderConverter.class)
     //Jsf
-    @JsfUIColumn(componentId = "search_employee_gender", 
+    @JsfUISearchColumn(componentId = "search_employee_gender", 
              columnType = JsfUIColumnType.UI_SELECT_ONE, 
              labelTitle = "性別"
     )
@@ -100,7 +100,7 @@ public class TEmployee implements Serializable {
     @CsvColumn(field="生年月日")
     @CsvConverter(converter = CsvColumnDateConverter.class)
     //--Jsf
-    @JsfUIColumn(componentId = "search_employee_birthday", 
+    @JsfUISearchColumn(componentId = "search_employee_birthday", 
                  columnType = JsfUIColumnType.HTML_INPUT_DATE, 
                  labelTitle = "誕生日")
     private Date birthday;
@@ -113,7 +113,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="電話番号")
     //--Jsf
-    @JsfUIColumn(componentId = "search_employee_phone", 
+    @JsfUISearchColumn(componentId = "search_employee_phone", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
              labelTitle = "電話番号")
     private String phone;
@@ -126,7 +126,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="携帯電話")
     //--Jsf
-    @JsfUIColumn(componentId = "search_employee_mobile_phone", 
+    @JsfUISearchColumn(componentId = "search_employee_mobile_phone", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
              labelTitle = "携帯電話番号")
     private String mobilePhone;
@@ -139,7 +139,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="郵便番号")
     //--Jsf
-    @JsfUIColumn(componentId = "search_employee_zip_code", 
+    @JsfUISearchColumn(componentId = "search_employee_zip_code", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
              labelTitle = "郵便番号")
     private String zipCode;
@@ -151,7 +151,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumnFormula(formula="住所1 += 住所2 += 住所3 += 住所4 += 住所5")
     //--Jsf
-    @JsfUIColumn(componentId = "search_employee_address", 
+    @JsfUISearchColumn(componentId = "search_employee_address", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
              labelTitle = "住所"
     )

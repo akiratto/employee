@@ -12,7 +12,8 @@ import jsf.type.JsfUIColumnType;
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface JsfUIColumn {
+public @interface JsfUISearchColumn {
+    public boolean searchable() default true;
     public String componentId();
     public String labelTitle();
     public JsfUIColumnType columnType();

@@ -14,7 +14,8 @@ public enum JsfUIColumnType {
     UI_SELECT_BOOLEAN,
     UI_SELECT_MANY,
     UI_SELECT_ONE,
-    UI_VIEW_PARAMETER;
+    UI_VIEW_PARAMETER,
+    HTML_OUTPUT_TEXT;
     
     public boolean eqHtmlInputText() { return this == HTML_INPUT_TEXT; }
     public boolean eqHtmlInputTextArea() { return this == HTML_INPUT_TEXTAREA; }
@@ -26,4 +27,5 @@ public enum JsfUIColumnType {
     public boolean eqUISelectMany() { return this == UI_SELECT_MANY; }
     public boolean eqUISelectOne() { return this == UI_SELECT_ONE; }
     public boolean eqUIViewParameter() { return this == UI_VIEW_PARAMETER; }
+    public boolean eqUIHtmlOutputText() { return this == HTML_OUTPUT_TEXT; }
 }

@@ -9,10 +9,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.faces.convert.Converter;
 import javax.inject.Named;
 import jsf.annotation.JsfConverter;
-import jsf.ui.annotation.JsfUIColumn;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.converter.IdConverter;
 import static util.StringFunctions.toSnakeCase;
+import jsf.ui.annotation.JsfUISearchColumn;
 
 /**
  *
@@ -72,12 +72,12 @@ public class EntityReflectionBean implements Serializable {
                     : IdConverter.class.newInstance();
         }
         
-        public JsfUIColumn getJsfUIColumn()
+        public JsfUISearchColumn getJsfUISearchColumn()
         {
-            return field.getAnnotation(JsfUIColumn.class);
+            return field.getAnnotation(JsfUISearchColumn.class);
         }
         
-        public JsfUISelectOne getJsfUISelectOne()
+        public JsfUISelectOne getJsfUISearchSelectOne()
         {
             return field.getAnnotation(JsfUISelectOne.class);
         }
