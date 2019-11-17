@@ -67,7 +67,7 @@
                 <c:forEach var="fd" items="#{entityReflectionBean.getEntityFields(entityListBean.searchCondition)}">
                     <h:column>
                         <f:facet name="header">
-                            <h:outputText value="#{fd.jsfUISearchColumn.labelTitle}" />
+                            <h:outputText value="#{fd.jsfUIListColumn.labelTitle}" />
                         </f:facet>
                         <h:commandLink action="#{entityListBean.gotoDetail(emp.employee_id, 'Read')}">
                             <h:outputText value="#{emp.employeeCode}" />

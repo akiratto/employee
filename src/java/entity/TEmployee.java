@@ -35,6 +35,7 @@ import jsf.ui.annotation.JsfUISelectItem;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
 import jsf.ui.annotation.JsfUIButtonsInList;
+import jsf.ui.annotation.JsfUIPKColumn;
 import jsf.ui.annotation.JsfUISearchColumn;
 
 /**
@@ -45,8 +46,11 @@ import jsf.ui.annotation.JsfUISearchColumn;
 @JsfUIButtonsInList(uiButtonsInListClass = EmployeeList.class)
 public class TEmployee implements Serializable {
 
+    //--JPA
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //--Jsf
+    @JsfUIPKColumn
     private Integer employee_id;
     
     @Basic

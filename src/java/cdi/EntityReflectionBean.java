@@ -11,6 +11,7 @@ import javax.inject.Named;
 import jsf.annotation.JsfConverter;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.converter.IdConverter;
+import jsf.ui.annotation.JsfUIListColumn;
 import static util.StringFunctions.toSnakeCase;
 import jsf.ui.annotation.JsfUISearchColumn;
 
@@ -80,6 +81,11 @@ public class EntityReflectionBean implements Serializable {
         public JsfUISelectOne getJsfUISearchSelectOne()
         {
             return field.getAnnotation(JsfUISelectOne.class);
+        }
+        
+        public JsfUIListColumn getJsfUIListColumn()
+        {
+            return field.getAnnotation(JsfUIListColumn.class);
         }
 
         public Object getValue()
