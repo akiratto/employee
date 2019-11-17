@@ -35,8 +35,9 @@ import jsf.ui.annotation.JsfUISelectItem;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
 import jsf.ui.annotation.JsfUIButtonsInList;
-import jsf.ui.annotation.JsfUIPKColumn;
 import jsf.ui.annotation.JsfUISearchColumn;
+import jsf.ui.annotation.JsfUIId;
+import jsf.ui.annotation.JsfUIInternalId;
 
 /**
  * @author owner
@@ -50,7 +51,7 @@ public class TEmployee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     //--Jsf
-    @JsfUIPKColumn
+    @JsfUIInternalId
     private Integer employee_id;
     
     @Basic
@@ -58,6 +59,8 @@ public class TEmployee implements Serializable {
     @NotNull(message="社員コードの入力は必須です。")
     @Pattern(regexp="\\d{10}", message="社員コードは10桁の数字を入力してください。例)0000000001")
     @CsvColumn(field="社員コード")
+    //--Jsf
+    @JsfUIId
     @JsfUISearchColumn(componentId = "search_employee_code", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員コード")
