@@ -102,9 +102,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="#{fd.jsfUIListColumn.labelTitle}" />
                                     </f:facet>
-                                    <h:commandLink action="#{entityListBean.gotoDetail(jsfUIInternalIdField.value, 'Read')}">
-                                        <h:outputText value="#{jsfUIIdField.value}" />
-                                    </h:commandLink>
+                                    #{fd.value}
                                 </h:column>
                             </c:if>
                         </c:if>
@@ -115,7 +113,7 @@
                 
 
             
-            <h:dataTable id="employee_list" styleClass="employee_list" value="#{entityListBean.entityDataList}" var="emp"  rendered="#{not empty entityListBean.entityDataList}">
+<!--            <h:dataTable id="employee_list" styleClass="employee_list" value="#{entityListBean.entityDataList}" var="emp"  rendered="#{not empty entityListBean.entityDataList}">
                 <h:column>
                     <f:facet name="header">
                         <h:outputText value="ボタン" />
@@ -155,7 +153,7 @@
                     </f:facet>
                     <h:outputText class="preformatted" value="#{emp.remarks}"/>
                 </h:column>
-            </h:dataTable>
+            </h:dataTable>-->
             
             <!-- データが1件以上存在する場合、一覧表の下部のナビゲートを表示 -->
             <p style="width:1000px; text-align:center;">

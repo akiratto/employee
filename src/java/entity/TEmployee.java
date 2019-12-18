@@ -38,6 +38,7 @@ import jsf.ui.annotation.JsfUIButtonsInList;
 import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUIId;
 import jsf.ui.annotation.JsfUIInternalId;
+import jsf.ui.annotation.JsfUIListColumn;
 
 /**
  * @author owner
@@ -61,6 +62,9 @@ public class TEmployee implements Serializable {
     @CsvColumn(field="社員コード")
     //--Jsf
     @JsfUIId
+    @JsfUIListColumn(componentId = "search_employee_code",
+                     columnType = JsfUIColumnType.HTML_INPUT_TEXT,
+                     labelTitle = "社員コード")
     @JsfUISearchColumn(componentId = "search_employee_code", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員コード")
@@ -72,6 +76,10 @@ public class TEmployee implements Serializable {
     @Size(min=1, max=60, message="${validatedValue == '' ? '社員名の入力は必須です。' : '社員名は' += min +='～'+=max+='文字以内で入力してください。'}")
     //--CSV パーサ
     @CsvColumn(field="氏名")
+    //--Jsf
+    @JsfUIListColumn(componentId = "search_employee_name",
+                     columnType = JsfUIColumnType.HTML_INPUT_TEXT,
+                     labelTitle = "社員名")
     @JsfUISearchColumn(componentId = "search_employee_name", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員名")
@@ -88,6 +96,9 @@ public class TEmployee implements Serializable {
     //Jsf Converter
     @JsfConverter(converter = GenderConverter.class)
     //Jsf
+    @JsfUIListColumn(componentId = "search_employee_gender",
+                     columnType = JsfUIColumnType.HTML_INPUT_TEXT,
+                     labelTitle = "性別")
     @JsfUISearchColumn(componentId = "search_employee_gender", 
              columnType = JsfUIColumnType.UI_SELECT_ONE, 
              labelTitle = "性別"
