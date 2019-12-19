@@ -39,6 +39,7 @@ import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUIId;
 import jsf.ui.annotation.JsfUIInternalId;
 import jsf.ui.annotation.JsfUIListColumn;
+import jsf.ui.annotation.JsfUIListColumnConverter;
 
 /**
  * @author owner
@@ -96,9 +97,10 @@ public class TEmployee implements Serializable {
     //Jsf Converter
     @JsfConverter(converter = GenderConverter.class)
     //Jsf
-    @JsfUIListColumn(componentId = "search_employee_gender",
+    @JsfUIListColumn(componentId = "list_employee_gender",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "性別")
+    @JsfUIListColumnConverter(converter = jsf.ui.converter.impl.GenderConverter.class)
     @JsfUISearchColumn(componentId = "search_employee_gender", 
              columnType = JsfUIColumnType.UI_SELECT_ONE, 
              labelTitle = "性別"
