@@ -99,12 +99,7 @@
                                         <h:outputText value="#{fd.jsfUIListColumn.labelTitle()}" />
                                     </f:facet>
                                     <ui:fragment rendered="#{entityReflectionBean.findEntityField(emp, fd.name).hasJsfUIListColumnConverter()}">
-                                        #{entityReflectionBean
-                                          .findEntityField(emp, fd.name)
-                                          .jsfUIListColumnConverter()
-                                          .converter()
-                                          .convertToFieldObject( entityReflectionBean.findEntityField(emp, fd.name).value )
-                                        }
+                                        #{entityReflectionBean.findEntityField(emp, fd.name).valueAsString}
                                     </ui:fragment>
                                     <ui:fragment rendered="#{not entityReflectionBean.findEntityField(emp, fd.name).hasJsfUIListColumnConverter()}">
                                         #{entityReflectionBean.findEntityField(emp, fd.name).value}

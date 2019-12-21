@@ -19,6 +19,7 @@ import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUIId;
 import jsf.ui.annotation.JsfUIInternalId;
 import jsf.ui.annotation.JsfUIListColumnConverter;
+import jsf.ui.converter.UIColumnConverter;
 
 /**
  *
@@ -121,14 +122,17 @@ public class EntityReflectionBean implements Serializable {
         public JsfUISearchColumn getJsfUISearchColumn()    { return field.getAnnotation(JsfUISearchColumn.class); }
         public JsfUISelectOne    getJsfUISearchSelectOne() { return field.getAnnotation(JsfUISelectOne.class); }
         public JsfUIListColumn   getJsfUIListColumn()       { return field.getAnnotation(JsfUIListColumn.class); }
-        public JsfUIListColumnConverter getJsfUIListColumnConverter() { return field.getAnnotation(JsfUIListColumnConverter.class); }
+
         
         public boolean hasJsfUIId()               { return field.getAnnotation(JsfUIId.class)!=null; }
         public boolean hasJsfUIInternalId()      { return field.getAnnotation(JsfUIInternalId.class)!=null; }
         public boolean hasJsfUISearchColumn()    { return field.getAnnotation(JsfUISearchColumn.class)!=null; }
         public boolean hasJsfUISearchSelectOne() { return field.getAnnotation(JsfUISelectOne.class)!=null; }
         public boolean hasJsfUIListColumn()       { return field.getAnnotation(JsfUIListColumn.class)!=null; }
-        public boolean hasJsfUIListColumnConverter() { return field.getAnnotation(JsfUIListColumnConverter.class)!=null; }
+        public boolean hasJsfUIListColumnConverter() { 
+            JsfUIListColumnConverter jsfUIListColumnConverter = field.getAnnotation(JsfUIListColumnConverter.class);
+            return jsfUIListColumnConverter != null;
+        }
         
         public Converter getJsfConverter() 
                 throws InstantiationException, IllegalAccessException 
@@ -137,6 +141,23 @@ public class EntityReflectionBean implements Serializable {
             return jsfConverter != null 
                     ? jsfConverter.converter().newInstance() 
                     : IdConverter.class.newInstance();
+        }
+        
+        public UIColumnConverter getJsfUIListColumnConverter() throws InstantiationException, IllegalAccessException { 
+            
+            JsfUIListColumnConverter jsfUIListColumnConverter = field.getAnnotation(JsfUIListColumnConverter.class);
+            return jsfUIListColumnConverter != null
+                        ? (UIColumnConverter)jsfUIListColumnConverter.converter().newInstance()
+                        : null;
+        }
+        
+        public String getValueAsString() throws InstantiationException, IllegalAccessException
+        {
+            Object value = getValue();
+            UIColumnConverter uiColumnConverter = getJsfUIListColumnConverter();
+            return uiColumnConverter != null
+                        ? uiColumnConverter.convertToFieldObject(value)
+                        : "";
         }
         
         public Object getValue()
