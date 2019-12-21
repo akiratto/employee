@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.convert.Converter;
@@ -38,6 +40,21 @@ public class EntityReflectionBean implements Serializable {
                 .filter(field -> !field.getName().equals("serialVersionUID"))
                 .map(field -> new EntityField<>(entity, field))
                 .collect(Collectors.toList());
+    }
+    
+    public <E extends Serializable> EntityField<E> findEntityField(E entity, String name)
+    {
+        System.out.println("findEntityField name=" + name);
+        Field field = null;
+        try {
+            
+            field = entity.getClass().getDeclaredField(name);
+        } catch (NoSuchFieldException ex) { 
+            
+        } catch (SecurityException ex) {
+            
+        }
+        return field == null ? null : new EntityField<>(entity, field);
     }
     
     public <E extends Serializable> List<EntityField<E>> getEntityFieldsWithJsfUIListColumn(E entity)
@@ -94,7 +111,7 @@ public class EntityReflectionBean implements Serializable {
             this.entity = entity;
             this.field = field;
         }
-
+        
         public String getName() { return field.getName(); }
         public String getSnakeCaseName() { return toSnakeCase(field.getName()); }
 

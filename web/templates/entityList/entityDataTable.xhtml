@@ -80,28 +80,28 @@
                                           value="削除" 
                                           onclick="return confirm('社員コード:'+ F2(this,'employee_code') + 'を削除してもよろしいですか？')"
                                           action="#{entityListBean.delete( jsfUIInternalIdField.value )}" />
-                        <h:inputHidden id="#{jsfUIIdField.snakeCaseName}" value="#{jsfUIIdField.value}" />
+                        <h:inputHidden id="#{jsfUIIdField.snakeCaseName}" value="#{entityReflectionBean.getJsfUIIdField(emp).value}" />
                     </h:column>
 
                     <!-- エンティティのIDカラム -->
                     <h:column>
                         <f:facet name="header">
-                            <h:outputText value="#{jsfUIIdField.jsfUIListColumn.labelTitle()}" />
+                            <h:outputText value="#{jsfUIIdField.jsfUIListColumn.labelTitle()}" /> <!-- entityReflectionBean.getJsfUIIdField(emp).jsfUIListColumn.labelTitle() はempがnullになるのでエラーとなる。facetは評価のタイミングが違う？ -->
                         </f:facet>
-                        <h:commandLink action="#{entityListBean.gotoDetail(jsfUIInternalIdField.value, 'Read')}">
-                            <h:outputText value="#{jsfUIIdField.value}" />
+                        <h:commandLink action="#{entityListBean.gotoDetail(entityReflectionBean.getJsfUIInternalIdField(emp).value, 'Read')}">
+                            <h:outputText value="#{entityReflectionBean.getJsfUIIdField(emp).value}" />
                         </h:commandLink>
                     </h:column>
 
                     <c:forEach var="fd" items="#{entityReflectionBean.getEntityFieldsWithJsfUIListColumn(entityListBean.searchCondition)}">
-                        <c:if test="#{not fd.hasJsfUIId() or not fd.hasJsfUIInternalId()}">
+                        <c:if test="#{not fd.hasJsfUIId() and not fd.hasJsfUIInternalId()}">
                             <c:if test="#{fd.hasJsfUIListColumn()}">
                                 <c:if test="#{fd.jsfUIListColumn.columnType().eqHtmlInputText()}">
                                     <h:column>
                                         <f:facet name="header">
                                             <h:outputText value="#{fd.jsfUIListColumn.labelTitle()}" />
                                         </f:facet>
-                                        #{fd.value}
+                                        #{entityReflectionBean.findEntityField(emp, fd.name).value}
                                     </h:column>
                                 </c:if>
                             </c:if>
