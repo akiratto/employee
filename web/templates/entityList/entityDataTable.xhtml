@@ -69,8 +69,6 @@
                               var="emp"  
                               rendered="#{not empty entityListBean.entityDataList}">
 
-
-
                     <!-- 削除ボタン -->
                     <h:column>
                         <f:facet name="header">
@@ -79,7 +77,7 @@
                         <h:commandButton id="delete_button"
                                           value="削除" 
                                           onclick="return confirm('社員コード:'+ F2(this,'employee_code') + 'を削除してもよろしいですか？')"
-                                          action="#{entityListBean.delete( jsfUIInternalIdField.value )}" />
+                                          action="#{entityListBean.delete( entityReflectionBean.getJsfUIInternalIdField(emp).value )}" />
                         <h:inputHidden id="#{jsfUIIdField.snakeCaseName}" value="#{entityReflectionBean.getJsfUIIdField(emp).value}" />
                     </h:column>
 
