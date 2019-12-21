@@ -18,6 +18,7 @@ import static util.StringFunctions.toSnakeCase;
 import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUIId;
 import jsf.ui.annotation.JsfUIInternalId;
+import jsf.ui.annotation.JsfUIListColumnConverter;
 
 /**
  *
@@ -120,12 +121,14 @@ public class EntityReflectionBean implements Serializable {
         public JsfUISearchColumn getJsfUISearchColumn()    { return field.getAnnotation(JsfUISearchColumn.class); }
         public JsfUISelectOne    getJsfUISearchSelectOne() { return field.getAnnotation(JsfUISelectOne.class); }
         public JsfUIListColumn   getJsfUIListColumn()       { return field.getAnnotation(JsfUIListColumn.class); }
+        public JsfUIListColumnConverter getJsfUIListColumnConverter() { return field.getAnnotation(JsfUIListColumnConverter.class); }
         
         public boolean hasJsfUIId()               { return field.getAnnotation(JsfUIId.class)!=null; }
         public boolean hasJsfUIInternalId()      { return field.getAnnotation(JsfUIInternalId.class)!=null; }
         public boolean hasJsfUISearchColumn()    { return field.getAnnotation(JsfUISearchColumn.class)!=null; }
         public boolean hasJsfUISearchSelectOne() { return field.getAnnotation(JsfUISelectOne.class)!=null; }
         public boolean hasJsfUIListColumn()       { return field.getAnnotation(JsfUIListColumn.class)!=null; }
+        public boolean hasJsfUIListColumnConverter() { return field.getAnnotation(JsfUIListColumnConverter.class)!=null; }
         
         public Converter getJsfConverter() 
                 throws InstantiationException, IllegalAccessException 

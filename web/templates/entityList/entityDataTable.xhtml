@@ -93,15 +93,23 @@
 
                     <c:forEach var="fd" items="#{entityReflectionBean.getEntityFieldsWithJsfUIListColumn(entityListBean.searchCondition)}">
                         <c:if test="#{not fd.hasJsfUIId() and not fd.hasJsfUIInternalId()}">
-                            <c:if test="#{fd.hasJsfUIListColumn()}">
-                                <c:if test="#{fd.jsfUIListColumn.columnType().eqHtmlInputText()}">
-                                    <h:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="#{fd.jsfUIListColumn.labelTitle()}" />
-                                        </f:facet>
+                            <c:if test="#{fd.jsfUIListColumn.columnType().eqHtmlInputText()}">
+                                <h:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="#{fd.jsfUIListColumn.labelTitle()}" />
+                                    </f:facet>
+                                    <ui:fragment rendered="#{entityReflectionBean.findEntityField(emp, fd.name).hasJsfUIListColumnConverter()}">
+                                        #{entityReflectionBean
+                                          .findEntityField(emp, fd.name)
+                                          .jsfUIListColumnConverter()
+                                          .converter()
+                                          .convertToFieldObject( entityReflectionBean.findEntityField(emp, fd.name).value )
+                                        }
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{not entityReflectionBean.findEntityField(emp, fd.name).hasJsfUIListColumnConverter()}">
                                         #{entityReflectionBean.findEntityField(emp, fd.name).value}
-                                    </h:column>
-                                </c:if>
+                                    </ui:fragment>
+                                </h:column>
                             </c:if>
                         </c:if>
                     </c:forEach>
