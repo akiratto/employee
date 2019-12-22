@@ -1,5 +1,6 @@
 package cdi;
 
+import cdi.base.EntityDbAction;
 import entity.TEmployee;
 import entity.TEmployee_;
 import java.io.Serializable;

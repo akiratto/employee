@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cdi;
+package cdi.other;
 
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
@@ -15,7 +15,7 @@ import javax.inject.Named;
  */
 @Named
 @RequestScoped
-public class Info
+public class JsfVersionInfo
 {
   public String getVersion()
   {

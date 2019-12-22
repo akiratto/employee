@@ -1,5 +1,6 @@
-package cdi;
+package cdi.base;
 
+import cdi.PageNavigator;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -39,15 +40,15 @@ public abstract class EntityListBase<E extends Serializable, PK>
         return pageNavigator;
     }
     
-    abstract public String entityName();
-    abstract public String entityTitle();
-    abstract public String listPageName();
-    abstract public String detailPageName();
-    abstract public String createBatchPageName();
+//    abstract public String entityName();
+//    abstract public String entityTitle();
+//    abstract public String listPageName();
+//    abstract public String detailPageName();
+//    abstract public String createBatchPageName();
     
-    public String messageDeleteEntityNotFound(PK entityId) { return "削除する" + entityTitle() + "が見つかりません。"; }
-    public String messageDeleteEntityCompleted(E entity, PK entityId) { return entityTitle() + "(ID:" + entityId.toString() + ")を削除しました。"; }
-    public String messageDeleteAllEntityCompleted(int deleteCount) { return deleteCount + "件の" + entityTitle() + "を削除しました。"; }
+//    public String messageDeleteEntityNotFound(PK entityId) { return "削除する" + entityTitle() + "が見つかりません。"; }
+//    public String messageDeleteEntityCompleted(E entity, PK entityId) { return entityTitle() + "(ID:" + entityId.toString() + ")を削除しました。"; }
+//    public String messageDeleteAllEntityCompleted(int deleteCount) { return deleteCount + "件の" + entityTitle() + "を削除しました。"; }
 
     public E       getSearchCondition() { return searchCondition; }
     public List<E> getEntityDataList()   { return entityDataList; }

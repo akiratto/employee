@@ -14,7 +14,7 @@
     <h:body>
         <f:view>
             <ui:insert name="metadata" />
-            mojarra version:<h:outputText value="#{info.version}" />
+            mojarra version:<h:outputText value="#{jsfVersionInfo.version}" />
             <h:form id="f" enctype="multipart/form-data">
                 <h1>#{entityListJpName}</h1>
                 <h:messages globalOnly="true" />

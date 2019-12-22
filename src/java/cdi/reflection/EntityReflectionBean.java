@@ -1,4 +1,4 @@
-package cdi;
+package cdi.reflection;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;

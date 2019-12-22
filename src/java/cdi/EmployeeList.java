@@ -1,5 +1,7 @@
 package cdi;
 
+import cdi.base.EntityListBase;
+import cdi.base.EntityDbAction;
 import entity.TEmployee;
 import entity.type.Gender;
 import java.util.Arrays;
@@ -29,12 +31,12 @@ public class EmployeeList extends EntityListBase<TEmployee, Integer> {
     @Override protected Class<TEmployee> entityClazz() { return TEmployee.class; }
     @Override protected EntityDbAction<TEmployee, Integer> entityDbAction() { return employeeDbAction; }
     
-    @Override public String entityName() { return "TEmployee"; }
-    @Override public String entityTitle() { return "社員情報"; }
+//    @Override public String entityName() { return "TEmployee"; }
+//    @Override public String entityTitle() { return "社員情報"; }
 
-    @Override public String listPageName() { return "employeeList"; }
-    @Override public String detailPageName() { return "employeeDetail"; }
-    @Override public String createBatchPageName() { return "employeeBatch"; }
+//    @Override public String listPageName() { return "employeeList"; }
+//    @Override public String detailPageName() { return "employeeDetail"; }
+//    @Override public String createBatchPageName() { return "employeeBatch"; }
     
     public List<SelectItem> getGenders()
     {

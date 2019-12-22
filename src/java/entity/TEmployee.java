@@ -13,16 +13,11 @@ import entity.type.Gender;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Convert;
-import javax.persistence.Converter;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,12 +35,26 @@ import jsf.ui.annotation.JsfUIId;
 import jsf.ui.annotation.JsfUIInternalId;
 import jsf.ui.annotation.JsfUIListColumn;
 import jsf.ui.annotation.JsfUIListColumnConverter;
+import jsf.ui.annotation.JsfUIListPage;
 
 /**
  * @author owner
  */
 @Entity(name = "TEmployee")
 @Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
+@JsfUIListPage(
+        listPageTitle = "社員一覧", 
+        listPageName = "employeeList",
+        detailPageTitle = "社員詳細",
+        detailPageName = "employeeDetail",
+        createBatchPageTitle = "社員一括登録",
+        createBatchPageName = "employeeBatch"
+//        newPageURL = "{detailPageName}?faces-redirect=true&mode=New",
+//        searchPageURL = "{listPageName}?faces-redirect=true{queryString}",
+//        clearPageURL = "{listPageName}?faces-redirect=true",
+//        createBatchPageURL = "{createBatchPageName}?faces-redirect=true",
+//        viewDetailPageURL = "{detailPageName}?faces-redirect=true&{entityKey}={entityId}&mode={mode}"
+)
 @JsfUIButtonsInList(uiButtonsInListClass = EmployeeList.class)
 public class TEmployee implements Serializable {
 
