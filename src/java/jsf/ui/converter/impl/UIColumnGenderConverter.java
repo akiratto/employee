@@ -12,10 +12,10 @@ import jsf.ui.converter.UIColumnConverter;
  *
  * @author owner
  */
-public class GenderConverter implements UIColumnConverter {
+public class UIColumnGenderConverter implements UIColumnConverter {
 
     @Override
-    public String convertToFieldObject(Object fieldObject) {
+    public String convertToUIColumnValue(Object fieldObject) {
         Gender gender = (Gender)fieldObject;
         try {
             return gender.jpName();
@@ -25,7 +25,7 @@ public class GenderConverter implements UIColumnConverter {
     }
 
     @Override
-    public Object convertToUIColumnValue(String uiColumnValue) {
+    public Object convertToFieldObject(String uiColumnValue) {
         try {
             return Gender.valueForAllNames(uiColumnValue);
         } catch(IllegalArgumentException e) {

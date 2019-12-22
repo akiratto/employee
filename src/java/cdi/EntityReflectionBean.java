@@ -156,7 +156,7 @@ public class EntityReflectionBean implements Serializable {
             Object value = getValue();
             UIColumnConverter uiColumnConverter = getJsfUIListColumnConverter();
             return uiColumnConverter != null
-                        ? uiColumnConverter.convertToFieldObject(value)
+                        ? uiColumnConverter.convertToUIColumnValue(value)
                         : "";
         }
         
