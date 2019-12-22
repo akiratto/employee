@@ -69,6 +69,8 @@
                               var="emp"  
                               rendered="#{not empty entityListBean.entityDataList}">
 
+
+
                     <!-- 削除ボタン -->
                     <h:column>
                         <f:facet name="header">
@@ -77,40 +79,81 @@
                         <h:commandButton id="delete_button"
                                           value="削除" 
                                           onclick="return confirm('社員コード:'+ F2(this,'employee_code') + 'を削除してもよろしいですか？')"
-                                          action="#{entityListBean.delete( entityReflectionBean.getJsfUIInternalIdField(emp).value )}" />
-                        <h:inputHidden id="#{jsfUIIdField.snakeCaseName}" value="#{entityReflectionBean.getJsfUIIdField(emp).value}" />
+                                          action="#{entityListBean.delete( jsfUIInternalIdField.value )}" />
+                        <h:inputHidden id="#{jsfUIIdField.snakeCaseName}" value="#{jsfUIIdField.value}" />
                     </h:column>
 
                     <!-- エンティティのIDカラム -->
                     <h:column>
                         <f:facet name="header">
-                            <h:outputText value="#{jsfUIIdField.jsfUIListColumn.labelTitle()}" /> <!-- entityReflectionBean.getJsfUIIdField(emp).jsfUIListColumn.labelTitle() はempがnullになるのでエラーとなる。facetは評価のタイミングが違う？ -->
+                            <h:outputText value="#{jsfUIIdField.jsfUIListColumn.labelTitle}" />
                         </f:facet>
-                        <h:commandLink action="#{entityListBean.gotoDetail(entityReflectionBean.getJsfUIInternalIdField(emp).value, 'Read')}">
-                            <h:outputText value="#{entityReflectionBean.getJsfUIIdField(emp).value}" />
+                        <h:commandLink action="#{entityListBean.gotoDetail(jsfUIInternalIdField.value, 'Read')}">
+                            <h:outputText value="#{jsfUIIdField.value}" />
                         </h:commandLink>
                     </h:column>
 
                     <c:forEach var="fd" items="#{entityReflectionBean.getEntityFieldsWithJsfUIListColumn(entityListBean.searchCondition)}">
-                        <c:if test="#{not fd.hasJsfUIId() and not fd.hasJsfUIInternalId()}">
-                            <c:if test="#{fd.jsfUIListColumn.columnType().eqHtmlInputText()}">
-                                <h:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="#{fd.jsfUIListColumn.labelTitle()}" />
-                                    </f:facet>
-                                    <ui:fragment rendered="#{entityReflectionBean.findEntityField(emp, fd.name).hasJsfUIListColumnConverter()}">
-                                        #{entityReflectionBean.findEntityField(emp, fd.name).valueAsString}
-                                    </ui:fragment>
-                                    <ui:fragment rendered="#{not entityReflectionBean.findEntityField(emp, fd.name).hasJsfUIListColumnConverter()}">
-                                        #{entityReflectionBean.findEntityField(emp, fd.name).value}
-                                    </ui:fragment>
-                                </h:column>
+                        <c:if test="#{not fd.hasJsfUIId() or not fd.hasJsfUIInternalId()}">
+                            <c:if test="#{fd.hasJsfUIListColumn()}">
+                                <c:if test="#{fd.jsfUIListColumn.columnType().eqHtmlInputText()}">
+                                    <h:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="#{fd.jsfUIListColumn.labelTitle}" />
+                                        </f:facet>
+                                        #{fd.value}
+                                    </h:column>
+                                </c:if>
                             </c:if>
                         </c:if>
                     </c:forEach>
                 </h:dataTable>
                 
             </c:if>
+                
+
+            
+<!--            <h:dataTable id="employee_list" styleClass="employee_list" value="#{entityListBean.entityDataList}" var="emp"  rendered="#{not empty entityListBean.entityDataList}">
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="ボタン" />
+                    </f:facet>
+                    <h:commandButton id="delete_button"
+                                      value="削除" 
+                                      onclick="return confirm('社員コード:'+ F2(this,'employee_code') + 'を削除してもよろしいですか？')"
+                                      action="#{entityListBean.delete(emp.employee_id)}" />
+                    <h:inputHidden id="employee_code" value="#{emp.employeeCode}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="社員コード" />
+                    </f:facet>
+                    <h:commandLink action="#{entityListBean.gotoDetail(emp.employee_id, 'Read')}">
+                        <h:outputText value="#{emp.employeeCode}" />
+                    </h:commandLink>
+                </h:column>
+                <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
+                <h:column>
+                    <f:facet name="header"><h:outputText value="性別" /></f:facet>
+                    <h:outputText value="#{emp.gender.jpName()}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header"><h:outputText value="生年月日" /></f:facet>
+                    <h:outputText value="#{emp.birthday}">
+                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
+                    </h:outputText>
+                </h:column>
+                <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
+                <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>
+                <h:column><f:facet name="header"><h:outputText value="住所" /></f:facet>#{emp.address}</h:column>
+                <h:column>
+                    <f:facet name="header">
+                        <h:outputText value="備考" />
+                    </f:facet>
+                    <h:outputText class="preformatted" value="#{emp.remarks}"/>
+                </h:column>
+            </h:dataTable>-->
             
             <!-- データが1件以上存在する場合、一覧表の下部のナビゲートを表示 -->
             <p style="width:1000px; text-align:center;">

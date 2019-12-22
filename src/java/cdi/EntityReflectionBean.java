@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.convert.Converter;
@@ -11,8 +13,13 @@ import javax.inject.Named;
 import jsf.annotation.JsfConverter;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.converter.IdConverter;
+import jsf.ui.annotation.JsfUIListColumn;
 import static util.StringFunctions.toSnakeCase;
 import jsf.ui.annotation.JsfUISearchColumn;
+import jsf.ui.annotation.JsfUIId;
+import jsf.ui.annotation.JsfUIInternalId;
+import jsf.ui.annotation.JsfUIListColumnConverter;
+import jsf.ui.converter.UIColumnConverter;
 
 /**
  *
@@ -35,6 +42,52 @@ public class EntityReflectionBean implements Serializable {
                 .filter(field -> !field.getName().equals("serialVersionUID"))
                 .map(field -> new EntityField<>(entity, field))
                 .collect(Collectors.toList());
+    }
+    
+    public <E extends Serializable> EntityField<E> findEntityField(E entity, String name)
+    {
+        System.out.println("findEntityField name=" + name);
+        Field field = null;
+        try {
+            
+            field = entity.getClass().getDeclaredField(name);
+        } catch (NoSuchFieldException ex) { 
+            
+        } catch (SecurityException ex) {
+            
+        }
+        return field == null ? null : new EntityField<>(entity, field);
+    }
+    
+    public <E extends Serializable> List<EntityField<E>> getEntityFieldsWithJsfUIListColumn(E entity)
+    {
+        return Arrays.asList( entity.getClass().getDeclaredFields() )
+                        .stream()
+                        .filter(field -> !field.getName().startsWith("_"))
+                        .filter(field -> !field.getName().equals("serialVersionUID"))
+                        .filter(field -> field.getAnnotation(JsfUIListColumn.class)!=null)
+                        .map(field -> new EntityField<>(entity, field))
+                        .collect(Collectors.toList());
+    }
+    
+    public <E extends Serializable> EntityField<E> getJsfUIIdField(E entity)
+    {
+        return Arrays.asList( entity.getClass().getDeclaredFields() )
+                            .stream()
+                            .filter(field -> field.getAnnotation(JsfUIId.class)!=null)
+                            .map(field -> new EntityField<>(entity, field))
+                            .findFirst()
+                            .orElse(null);
+    }
+    
+    public <E extends Serializable> EntityField<E> getJsfUIInternalIdField(E entity)
+    {
+        return Arrays.asList( entity.getClass().getDeclaredFields() )
+                            .stream()
+                            .filter(field -> field.getAnnotation(JsfUIInternalId.class)!=null)
+                            .map(field -> new EntityField<>(entity, field))
+                            .findFirst()
+                            .orElse(null);
     }
     
     public static class Entity<E extends Serializable>
@@ -60,9 +113,27 @@ public class EntityReflectionBean implements Serializable {
             this.entity = entity;
             this.field = field;
         }
-
+        
         public String getName() { return field.getName(); }
         public String getSnakeCaseName() { return toSnakeCase(field.getName()); }
+
+        public JsfUIId           getJsfUIId()               { return field.getAnnotation(JsfUIId.class); }
+        public JsfUIInternalId   getJsfUIInternalId()      { return field.getAnnotation(JsfUIInternalId.class); }
+        public JsfUISearchColumn getJsfUISearchColumn()    { return field.getAnnotation(JsfUISearchColumn.class); }
+        public JsfUISelectOne    getJsfUISearchSelectOne() { return field.getAnnotation(JsfUISelectOne.class); }
+        public JsfUIListColumn   getJsfUIListColumn()       { return field.getAnnotation(JsfUIListColumn.class); }
+
+        
+        public boolean hasJsfUIId()               { return field.getAnnotation(JsfUIId.class)!=null; }
+        public boolean hasJsfUIInternalId()      { return field.getAnnotation(JsfUIInternalId.class)!=null; }
+        public boolean hasJsfUISearchColumn()    { return field.getAnnotation(JsfUISearchColumn.class)!=null; }
+        public boolean hasJsfUISearchSelectOne() { return field.getAnnotation(JsfUISelectOne.class)!=null; }
+        public boolean hasJsfUIListColumn()       { return field.getAnnotation(JsfUIListColumn.class)!=null; }
+        public boolean hasJsfUIListColumnConverter() { 
+            JsfUIListColumnConverter jsfUIListColumnConverter = field.getAnnotation(JsfUIListColumnConverter.class);
+            return jsfUIListColumnConverter != null;
+        }
+        
         public Converter getJsfConverter() 
                 throws InstantiationException, IllegalAccessException 
         {
@@ -72,16 +143,23 @@ public class EntityReflectionBean implements Serializable {
                     : IdConverter.class.newInstance();
         }
         
-        public JsfUISearchColumn getJsfUISearchColumn()
-        {
-            return field.getAnnotation(JsfUISearchColumn.class);
+        public UIColumnConverter getJsfUIListColumnConverter() throws InstantiationException, IllegalAccessException { 
+            
+            JsfUIListColumnConverter jsfUIListColumnConverter = field.getAnnotation(JsfUIListColumnConverter.class);
+            return jsfUIListColumnConverter != null
+                        ? (UIColumnConverter)jsfUIListColumnConverter.converter().newInstance()
+                        : null;
         }
         
-        public JsfUISelectOne getJsfUISearchSelectOne()
+        public String getValueAsString() throws InstantiationException, IllegalAccessException
         {
-            return field.getAnnotation(JsfUISelectOne.class);
+            Object value = getValue();
+            UIColumnConverter uiColumnConverter = getJsfUIListColumnConverter();
+            return uiColumnConverter != null
+                        ? uiColumnConverter.convertToUIColumnValue(value)
+                        : "";
         }
-
+        
         public Object getValue()
         {
             try {
