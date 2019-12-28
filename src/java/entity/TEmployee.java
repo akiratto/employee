@@ -29,7 +29,6 @@ import jsf.annotation.JsfConverter;
 import jsf.ui.annotation.JsfUISelectItem;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
-import jsf.ui.annotation.JsfUIButtonsInList;
 import jsf.ui.annotation.JsfUICreateBatchPage;
 import jsf.ui.annotation.JsfUIDetailPage;
 import jsf.ui.annotation.JsfUISearchColumn;
@@ -45,11 +44,10 @@ import jsf.ui.annotation.JsfUIModel;
  */
 @Entity(name = "TEmployee")
 @Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
-@JsfUIModel(           modelName            = "TEmployee",    modelTitle          = "社員情報" )
+@JsfUIModel(           modelTitle           = "社員情報",     modelName           = "TEmployee" )
 @JsfUIListPage(        listPageTitle        = "社員一覧",     listPageName        = "employeeList" )
 @JsfUIDetailPage(      detailPageTitle      = "社員詳細",     detailPageName      = "employeeDetail" )
 @JsfUICreateBatchPage( createBatchPageTitle = "社員一括登録", createBatchPageName = "employeeBatch" )
-@JsfUIButtonsInList(uiButtonsInListClass = EmployeeList.class)
 public class TEmployee implements Serializable {
 
     //--JPA
