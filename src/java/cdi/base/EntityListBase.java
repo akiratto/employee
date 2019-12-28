@@ -1,5 +1,6 @@
 package cdi.base;
 
+import cdi.EntityListSetting;
 import cdi.PageNavigator;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -11,7 +12,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import static java.util.stream.Collectors.joining;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -21,10 +21,6 @@ import javax.faces.context.Flash;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import jsf.ui.UIButtonsInList;
-import jsf.ui.annotation.JsfUICreateBatchPage;
-import jsf.ui.annotation.JsfUIDetailPage;
-import jsf.ui.annotation.JsfUIListPage;
-import jsf.ui.annotation.JsfUIModel;
 
 /**
  *
@@ -37,29 +33,14 @@ public abstract class EntityListBase<E extends Serializable, PK>
     private Long entityAllCount;
     @Inject
     private PageNavigator pageNavigator;
+    @Inject
+    private EntityListSetting setting;
     
     abstract protected Class<E> entityClazz();
     abstract protected EntityDbAction<E,PK> entityDbAction();
-    public PageNavigator getPageNavigator()
-    {
-        return pageNavigator;
-    }
+    public PageNavigator getPageNavigator() { return pageNavigator; }
+    public EntityListSetting getSetting() { return setting; }
     
-    public JsfUIModel           getJsfUIModel() { return entityClazz().getDeclaredAnnotation(JsfUIModel.class); }
-    public JsfUIListPage        getJsfUIListPage() { return entityClazz().getDeclaredAnnotation(JsfUIListPage.class); }
-    public JsfUIDetailPage      getJsfUIDetailPage() { return entityClazz().getDeclaredAnnotation(JsfUIDetailPage.class); }
-    public JsfUICreateBatchPage getJsfUICreateBatchPage() { return entityClazz().getDeclaredAnnotation(JsfUICreateBatchPage.class); }
-        
-    public String entityTitle()          { return Optional.of(this.getJsfUIModel()).map(m -> m.modelTitle()).orElse(""); }
-    public String listPageName()         { return Optional.of(this.getJsfUIListPage()).map(l -> l.listPageTitle()).orElse(""); }
-    public String detailPageName()       { return Optional.of(this.getJsfUIDetailPage()).map(d -> d.detailPageTitle()).orElse(""); }
-    public String createBatchPageName() { return Optional.of(this.getJsfUICreateBatchPage()).map(b -> b.createBatchPageName()).orElse(""); }
-    
-    public String messageDeleteEntityNotFound() { return Optional.of(this.getJsfUIListPage()).map(l -> l.listPageTitle()).orElse(""); }
-    
-//    public String messageDeleteEntityCompleted(E entity, PK entityId) { return entityTitle() + "(ID:" + entityId.toString() + ")を削除しました。"; }
-//    public String messageDeleteAllEntityCompleted(int deleteCount) { return deleteCount + "件の" + entityTitle() + "を削除しました。"; }
-
     public E       getSearchCondition() { return searchCondition; }
     public List<E> getEntityDataList()   { return entityDataList; }
     public int     getEntityCount()     { return entityDataList.size(); }
@@ -96,15 +77,33 @@ public abstract class EntityListBase<E extends Serializable, PK>
     }
     
     //-- UIButtonsInList インターフェース実装
-    @Override public String create() { return detailPageName() + "?faces-redirect=true&mode=New"; }
+    @Override
+    public String create()
+    { 
+        return setting.detailPageName(entityClazz()) 
+                        + "?faces-redirect=true&mode=New";
+    }
+    
     @Override
     public String search()
     {
         String queryString = generateString(searchCondition);        
-        return listPageName() + "?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
+        return setting.listPageName(entityClazz()) 
+                + "?faces-redirect=true" 
+                + (queryString.isEmpty() ? "" : "&" + queryString);
     }
-    @Override public String clear() { return listPageName() + "?faces-redirect=true"; }
-    @Override public String createBatch() { return createBatchPageName() + "?faces-redirect=true"; }
+    
+    @Override
+    public String clear()
+    {
+        return setting.listPageName(entityClazz()) + "?faces-redirect=true";
+    }
+    
+    @Override public String createBatch()
+    {
+        return setting.createBatchPageName(entityClazz()) + "?faces-redirect=true";
+    }
+    
     @Override
     @Transactional
     public String deleteAll()
@@ -113,9 +112,11 @@ public abstract class EntityListBase<E extends Serializable, PK>
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         int deleteCount = entityDbAction().deleteAll();
         
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(messageDeleteAllEntityCompleted(deleteCount)));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(entityClazz(),deleteCount)));
         String queryString = generateString(searchCondition);
-        return listPageName() + "?faces-redirect=true" + (queryString.isEmpty() ? "" : "&" + queryString);
+        return setting.listPageName(entityClazz()) 
+                        + "?faces-redirect=true" 
+                        + (queryString.isEmpty() ? "" : "&" + queryString);
     }
     
     @Transactional
@@ -126,11 +127,11 @@ public abstract class EntityListBase<E extends Serializable, PK>
         
         E entity = entityDbAction().find(entityId);
         if(entity == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( messageDeleteEntityNotFound(entityId) ));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound(entityClazz()) ));
             return search();
         }
         entityDbAction().delete(entityId);
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( messageDeleteEntityCompleted(entity, entityId) ));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityClazz(), entityId.toString()) ));
         return search();
     }
     
@@ -140,13 +141,12 @@ public abstract class EntityListBase<E extends Serializable, PK>
         if(entity == null) {
             return "";
         }
-        return detailPageName() + "?faces-redirect=true&employee_id=" + urlEncode(entityId.toString()) + "&mode=" + urlEncode(mode);
+        return setting.detailPageName(entityClazz()) 
+                            + "?faces-redirect=true&employee_id=" 
+                            + urlEncode(entityId.toString()) 
+                            + "&mode=" 
+                            + urlEncode(mode);
     }
-    
-
-    
-
-
 
     
     private Map<String,String> generateQueryStrings(E searchCondition)

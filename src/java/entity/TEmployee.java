@@ -38,24 +38,17 @@ import jsf.ui.annotation.JsfUIInternalId;
 import jsf.ui.annotation.JsfUIListColumn;
 import jsf.ui.annotation.JsfUIListColumnConverter;
 import jsf.ui.annotation.JsfUIListPage;
+import jsf.ui.annotation.JsfUIModel;
 
 /**
  * @author owner
  */
 @Entity(name = "TEmployee")
 @Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
-@JsfUIListPage(
-        listPageTitle = "社員一覧", 
-        listPageName = "employeeList"
-)
-@JsfUIDetailPage(
-        detailPageTitle = "社員詳細",
-        detailPageName = "employeeDetail"
-)
-@JsfUICreateBatchPage(
-        createBatchPageTitle = "社員一括登録",
-        createBatchPageName = "employeeBatch"
-)
+@JsfUIModel(           modelName            = "TEmployee",    modelTitle          = "社員情報" )
+@JsfUIListPage(        listPageTitle        = "社員一覧",     listPageName        = "employeeList" )
+@JsfUIDetailPage(      detailPageTitle      = "社員詳細",     detailPageName      = "employeeDetail" )
+@JsfUICreateBatchPage( createBatchPageTitle = "社員一括登録", createBatchPageName = "employeeBatch" )
 @JsfUIButtonsInList(uiButtonsInListClass = EmployeeList.class)
 public class TEmployee implements Serializable {
 
