@@ -30,6 +30,8 @@ import jsf.ui.annotation.JsfUISelectItem;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
 import jsf.ui.annotation.JsfUIButtonsInList;
+import jsf.ui.annotation.JsfUICreateBatchPage;
+import jsf.ui.annotation.JsfUIDetailPage;
 import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUIId;
 import jsf.ui.annotation.JsfUIInternalId;
@@ -44,16 +46,15 @@ import jsf.ui.annotation.JsfUIListPage;
 @Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
 @JsfUIListPage(
         listPageTitle = "社員一覧", 
-        listPageName = "employeeList",
+        listPageName = "employeeList"
+)
+@JsfUIDetailPage(
         detailPageTitle = "社員詳細",
-        detailPageName = "employeeDetail",
+        detailPageName = "employeeDetail"
+)
+@JsfUICreateBatchPage(
         createBatchPageTitle = "社員一括登録",
         createBatchPageName = "employeeBatch"
-//        newPageURL = "{detailPageName}?faces-redirect=true&mode=New",
-//        searchPageURL = "{listPageName}?faces-redirect=true{queryString}",
-//        clearPageURL = "{listPageName}?faces-redirect=true",
-//        createBatchPageURL = "{createBatchPageName}?faces-redirect=true",
-//        viewDetailPageURL = "{detailPageName}?faces-redirect=true&{entityKey}={entityId}&mode={mode}"
 )
 @JsfUIButtonsInList(uiButtonsInListClass = EmployeeList.class)
 public class TEmployee implements Serializable {

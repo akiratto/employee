@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import static java.util.stream.Collectors.joining;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -20,6 +21,10 @@ import javax.faces.context.Flash;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import jsf.ui.UIButtonsInList;
+import jsf.ui.annotation.JsfUICreateBatchPage;
+import jsf.ui.annotation.JsfUIDetailPage;
+import jsf.ui.annotation.JsfUIListPage;
+import jsf.ui.annotation.JsfUIModel;
 
 /**
  *
@@ -40,13 +45,18 @@ public abstract class EntityListBase<E extends Serializable, PK>
         return pageNavigator;
     }
     
-//    abstract public String entityName();
-//    abstract public String entityTitle();
-//    abstract public String listPageName();
-//    abstract public String detailPageName();
-//    abstract public String createBatchPageName();
+    public JsfUIModel           getJsfUIModel() { return entityClazz().getDeclaredAnnotation(JsfUIModel.class); }
+    public JsfUIListPage        getJsfUIListPage() { return entityClazz().getDeclaredAnnotation(JsfUIListPage.class); }
+    public JsfUIDetailPage      getJsfUIDetailPage() { return entityClazz().getDeclaredAnnotation(JsfUIDetailPage.class); }
+    public JsfUICreateBatchPage getJsfUICreateBatchPage() { return entityClazz().getDeclaredAnnotation(JsfUICreateBatchPage.class); }
+        
+    public String entityTitle()          { return Optional.of(this.getJsfUIModel()).map(m -> m.modelTitle()).orElse(""); }
+    public String listPageName()         { return Optional.of(this.getJsfUIListPage()).map(l -> l.listPageTitle()).orElse(""); }
+    public String detailPageName()       { return Optional.of(this.getJsfUIDetailPage()).map(d -> d.detailPageTitle()).orElse(""); }
+    public String createBatchPageName() { return Optional.of(this.getJsfUICreateBatchPage()).map(b -> b.createBatchPageName()).orElse(""); }
     
-//    public String messageDeleteEntityNotFound(PK entityId) { return "削除する" + entityTitle() + "が見つかりません。"; }
+    public String messageDeleteEntityNotFound() { return Optional.of(this.getJsfUIListPage()).map(l -> l.listPageTitle()).orElse(""); }
+    
 //    public String messageDeleteEntityCompleted(E entity, PK entityId) { return entityTitle() + "(ID:" + entityId.toString() + ")を削除しました。"; }
 //    public String messageDeleteAllEntityCompleted(int deleteCount) { return deleteCount + "件の" + entityTitle() + "を削除しました。"; }
 

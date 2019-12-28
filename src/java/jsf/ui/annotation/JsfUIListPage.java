@@ -14,13 +14,7 @@ import java.lang.annotation.Target;
 public @interface JsfUIListPage {
     public String listPageTitle();
     public String listPageName();
-    public String detailPageTitle();
-    public String detailPageName();
-    public String createBatchPageTitle();
-    public String createBatchPageName();
-//    public String newPageURL();
-//    public String searchPageURL();
-//    public String clearPageURL();
-//    public String createBatchPageURL();
-//    public String viewDetailPageURL();
+    public String messageDeleteEntityNotFound()     default "'削除する' += modelTitle += 'が見つかりません。'";
+    public String messageDeleteEntityCompleted()    default "modelTitle += '(ID:' += entityId += ')を削除しました。'";
+    public String messageDeleteAllEntityCompleted() default "deleteCount += '件の' += modelTitle += 'を削除しました。'";
 }
