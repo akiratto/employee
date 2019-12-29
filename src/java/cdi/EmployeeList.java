@@ -24,19 +24,7 @@ import javax.persistence.PersistenceContext;
 @ViewScoped
 public class EmployeeList extends EntityListBase<TEmployee, Integer> {   
 
-    
-    @Inject
-    private EmployeeDbAction employeeDbAction;
-
     @Override protected Class<TEmployee> entityClazz() { return TEmployee.class; }
-    @Override protected EntityDbAction<TEmployee, Integer> entityDbAction() { return employeeDbAction; }
-    
-//    @Override public String entityName() { return "TEmployee"; }
-//    @Override public String entityTitle() { return "社員情報"; }
-
-//    @Override public String listPageName() { return "employeeList"; }
-//    @Override public String detailPageName() { return "employeeDetail"; }
-//    @Override public String createBatchPageName() { return "employeeBatch"; }
     
     public List<SelectItem> getGenders()
     {

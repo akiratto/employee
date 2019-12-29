@@ -5,24 +5,33 @@
  */
 package cdi;
 
-import entity.TEmployee;
-import entity.TEmployee_;
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import javax.enterprise.context.Dependent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 import jsf.ui.annotation.JsfUIModel;
 
 /**
  *
  * @author owner
  */
-public class EntityCRUD<E extends Serializable, PK> {
+@Dependent
+public class EntityCRUD<E extends Serializable, PK extends Serializable> implements Serializable {
     @PersistenceContext
     private EntityManager em;
     
@@ -71,84 +80,119 @@ public class EntityCRUD<E extends Serializable, PK> {
         return deleteCount;
     }
 
-    public Long countAll(E condition,  Class<E> entityClazz) {
-        CriteriaBuilder build = em.getCriteriaBuilder();
-        CriteriaQuery<Long> cqCount = build.createQuery(Long.class);
-        Root<E> rootCount = cqCount.from(entityClazz);
-        Predicate where = constructWhere(condition,build,rootCount);
-        cqCount = cqCount.select(build.count(rootCount)).where(where);
-        return em.createQuery(cqCount).getSingleResult();        
+    public Long countAll(E condition,  Class<E> entityClazz) 
+            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
+    {
+        List<String> jpqlWords = new ArrayList<>();
+        jpqlWords.add("SELECT");
+        jpqlWords.add("count(t)");
+        jpqlWords.add(constructJPQLFrom(entityClazz));
+        jpqlWords.add(constructJPQLWhere(condition, entityClazz));
+        String jpql = String.join(" ", jpqlWords);
+        
+        return em.createQuery(jpql, Long.class).getSingleResult();    
     }
 
-    public List<TEmployee> search(TEmployee condition, int offset, int rowCountPerPage) {
-        CriteriaBuilder build = em.getCriteriaBuilder();
-        CriteriaQuery<TEmployee> cq = build.createQuery(TEmployee.class);
-        Root<TEmployee> root = cq.from(TEmployee.class);
-        Predicate where = constructWhere(condition, build, root);
-        cq = cq.select(root)
-                .where(where)
-                .orderBy(build.asc(root.get(TEmployee_.employeeCode)));
-        return em.createQuery(cq)
-                    .setFirstResult(offset)
+    public List<E> search(E condition, int offset, int rowCountPerPage, Class<E> entityClass) 
+            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
+    {
+        List<String> jpqlWords = new ArrayList<>();
+        jpqlWords.add("SELECT");
+        jpqlWords.add(constructJPQLColumns(entityClass));
+        jpqlWords.add(constructJPQLFrom(entityClass));
+        jpqlWords.add(constructJPQLWhere(condition, entityClass));
+        String jpql = String.join(" ", jpqlWords);
+        
+        Query query = em.createQuery(jpql, entityClass);
+        for(Field field : entityClass.getDeclaredFields()) {
+            //JPAのEntityは、開発者が定義したフィールドとは別に
+            //JPA側で自動で名前の先頭に_(アンダーバー)が付くフィールドと
+            //serialVersionUIDフィールドが付加する。
+            //これらをフィールドは処理しない。
+            if(field.getName().startsWith("_")) continue;
+            if(field.getName().equals("serialVersionUID")) continue;
+            
+            Object value = null;
+            boolean tmpAccessible = field.isAccessible();
+            field.setAccessible(true);
+            value = field.get(condition);
+            field.setAccessible(tmpAccessible);
+            
+            if(value != null) {
+                String searchMethod = "equal";
+                switch(searchMethod) {
+                    case "equal":
+                        query.setParameter(field.getName(), value);
+                        break;
+                        
+                    case "include":
+                        query.setParameter(field.getName(), likeEscape((String)value));
+                        break;
+                }
+            }
+        }
+        return query.setFirstResult(offset)
                     .setMaxResults(rowCountPerPage)
                     .getResultList();
     }
     
-    private Predicate constructWhere(E condition, CriteriaBuilder build, Root<E> root)
+    private String constructJPQLColumns(Class<E> entityClass)
     {
-        Predicate where = build.conjunction();
-        if(condition.getEmployeeCode()!=null) {
-            where = build.and(where, build.equal(
-                                        root.get(TEmployee_.employeeCode), 
-                                        condition.getEmployeeCode()
-            ));
+        return Arrays.asList( entityClass.getDeclaredFields() )
+                .stream()
+                .filter(field -> !field.getName().startsWith("_"))
+                .filter(field -> !field.getName().equals("serialVersionUID"))
+                .map(field -> "t." + field.getName())
+                .collect(Collectors.joining(", "));
+    }
+    
+    private String constructJPQLFrom(Class<E> entityClass)
+    {
+        return "FROM " + entityClass.getName() + " t";
+    }
+    
+    private String constructJPQLWhere(E condition, Class<E> entityClass) throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException
+    {
+        List<String> wherePhrases = new ArrayList<>();
+        
+        for(Field field : entityClass.getDeclaredFields()) {
+            //JPAのEntityは、開発者が定義したフィールドとは別に
+            //JPA側で自動で名前の先頭に_(アンダーバー)が付くフィールドと
+            //serialVersionUIDフィールドが付加する。
+            //これらをフィールドは処理しない。
+            if(field.getName().startsWith("_")) continue;
+            if(field.getName().equals("serialVersionUID")) continue;
+            
+            Object value = null;
+            
+            boolean tmpAccessible = field.isAccessible();
+            field.setAccessible(true);
+            value = field.get(condition);
+            field.setAccessible(tmpAccessible);
+            
+            String searchMethod = "equal";
+            
+            if(value != null) {
+                String wherePhrase;
+                switch(searchMethod) {
+                    case "equal":
+                        wherePhrase = "t." + field.getName() + "= :" + field.getName(); 
+                        wherePhrases.add(wherePhrase);
+                        break;
+                        
+                    case "include":
+                        wherePhrase = "t." + field.getName() + " like :"  + field.getName();
+                        wherePhrases.add(wherePhrase);
+                        break;
+                        
+                    default:
+                        break;
+                }
+
+            }
         }
-        if(condition.getName()!=null && !condition.getName().isEmpty()) {
-            where = build.and(where, build.like(
-                                        root.get(TEmployee_.name), 
-                                        "%" + likeEscape(condition.getName()) + "%", '\\'
-            ));
-        }
-        if(condition.getGender()!=null) {
-            where = build.and(where, build.equal(
-                                        root.get(TEmployee_.gender), 
-                                        condition.getGender()
-            ));
-        }
-        if(condition.getBirthday()!=null) {
-            where = build.and(where, build.equal(root.get(TEmployee_.birthday), condition.getBirthday()));
-        }
-        if(condition.getPhone()!=null && !condition.getPhone().isEmpty()) {
-            where = build.and(where, build.like(
-                                        root.get(TEmployee_.phone), 
-                                        "%" + likeEscape(condition.getPhone()) + "%", '\\'
-            ));
-        }
-        if(condition.getMobilePhone()!=null && !condition.getMobilePhone().isEmpty()) {
-            where = build.and(where, build.like(
-                                        root.get(TEmployee_.mobilePhone), 
-                                        "%" + likeEscape(condition.getMobilePhone()) + "%", '\\'
-            ));
-        }
-        if(condition.getZipCode()!=null && !condition.getZipCode().isEmpty()) {
-            where = build.and(where, build.like(
-                                        root.get(TEmployee_.zipCode), 
-                                        "%" + likeEscape(condition.getZipCode()) + "%", '\\'
-            ));
-        }
-        if(condition.getAddress()!=null && !condition.getAddress().isEmpty()) {
-            where = build.and(where, build.like(
-                                        root.get(TEmployee_.address), 
-                                        "%" + likeEscape(condition.getAddress()) + "%", '\\'
-            ));
-        }
-        if(condition.getRemarks()!=null && !condition.getRemarks().isEmpty()) {
-            where = build.and(where, build.like(
-                                        root.get(TEmployee_.remarks), 
-                                        "%" + likeEscape(condition.getRemarks()) + "%", '\\'
-            ));
-        }     
-        return where;
+        return wherePhrases.size() > 0 
+                ? "WHERE " + String.join(" and ", wherePhrases) : "";
     }
 
     private String likeEscape(String likeCondition)

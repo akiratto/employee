@@ -1,5 +1,6 @@
 package cdi.base;
 
+import cdi.EntityCRUD;
 import cdi.EntityListSetting;
 import cdi.EntityURLQueryHandler;
 import cdi.PageNavigator;
@@ -18,10 +19,12 @@ import javax.transaction.Transactional;
  *
  * @author Owner
  */
-public abstract class EntityListBase<E extends Serializable, PK> implements Serializable {
+public abstract class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {
     private E searchCondition;
     private List<E> entityDataList;
     private Long entityAllCount;
+    @Inject
+    private EntityCRUD<E,PK> entityCRUD;
     @Inject
     private PageNavigator pageNavigator;
     @Inject
@@ -30,7 +33,7 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
     private EntityURLQueryHandler<E> urlQueryHandler;
     
     abstract protected Class<E> entityClazz();
-    abstract protected EntityDbAction<E,PK> entityDbAction();
+//    abstract protected EntityDbAction<E,PK> entityDbAction();
     public PageNavigator getPageNavigator() { return pageNavigator; }
     public EntityListSetting getSetting() { return setting; }
     
@@ -57,16 +60,17 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
         
     }
     
-    public void viewAction()
+    public void viewAction() throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException
     {
         //検索条件を基に抽出処理を実行する -------------------------------------
-        this.entityAllCount = entityDbAction().countAll(searchCondition);
+        this.entityAllCount = entityCRUD.countAll(searchCondition, entityClazz());
 
         getPageNavigator().build(entityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
         
-        this.entityDataList = entityDbAction().search(searchCondition, 
-                                                getPageNavigator().getOffset(), 
-                                                getPageNavigator().getRowCountPerPage()); 
+        this.entityDataList = entityCRUD.search(searchCondition, 
+                                               getPageNavigator().getOffset(), 
+                                               getPageNavigator().getRowCountPerPage(),
+                                               entityClazz()); 
     }
     
     public String create()
@@ -98,7 +102,7 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = entityDbAction().deleteAll();
+        int deleteCount = entityCRUD.deleteAll(entityClazz());
         
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(entityClazz(),deleteCount)));
         String queryString = urlQueryHandler.generateString(searchCondition);
@@ -113,19 +117,19 @@ public abstract class EntityListBase<E extends Serializable, PK> implements Seri
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
-        E entity = entityDbAction().find(entityId);
+        E entity = entityCRUD.find(entityId, entityClazz());
         if(entity == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound(entityClazz()) ));
             return search();
         }
-        entityDbAction().delete(entityId);
+        entityCRUD.delete(entityId, entityClazz());
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityClazz(), entityId.toString()) ));
         return search();
     }
     
     public String gotoDetail(PK entityId, String mode)
     {
-        E entity = entityDbAction().find(entityId);
+        E entity = entityCRUD.find(entityId, entityClazz());
         if(entity == null) {
             return "";
         }

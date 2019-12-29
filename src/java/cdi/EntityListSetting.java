@@ -32,7 +32,7 @@ public class EntityListSetting implements Serializable {
         
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage(modelClazz))
-                                    .map(l -> l.messageDeleteEntityNotFound())
+                                    .map(JsfUIListPage::messageDeleteEntityNotFound)
                                     .orElse("");
         Object evalResult = elProcessor.eval(messageTemplate);
         return evalResult instanceof String 
@@ -48,7 +48,7 @@ public class EntityListSetting implements Serializable {
         
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage(modelClazz))
-                                    .map(l -> l.messageDeleteEntityCompleted())
+                                    .map(JsfUIListPage::messageDeleteEntityCompleted)
                                     .orElse("");
         Object evalResult = elProcessor.eval(messageTemplate);
         return evalResult instanceof String 
@@ -64,7 +64,7 @@ public class EntityListSetting implements Serializable {
         
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage(modelClazz))
-                                    .map(l -> l.messageDeleteAllEntityCompleted())
+                                    .map(JsfUIListPage::messageDeleteAllEntityCompleted)
                                     .orElse("");
         Object evalResult = elProcessor.eval(messageTemplate);
         return evalResult instanceof String 
