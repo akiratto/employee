@@ -44,10 +44,10 @@ import jsf.ui.annotation.JsfUIModel;
  */
 @Entity(name = "TEmployee")
 @Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
-@JsfUIModel(           modelTitle           = "社員情報",     modelName           = "TEmployee" )
-@JsfUIListPage(        listPageTitle        = "社員一覧",     listPageName        = "employeeList" )
-@JsfUIDetailPage(      detailPageTitle      = "社員詳細",     detailPageName      = "employeeDetail" )
-@JsfUICreateBatchPage( createBatchPageTitle = "社員一括登録", createBatchPageName = "employeeBatch" )
+@JsfUIModel           ( modelTitle           = "社員情報",     modelName           = "TEmployee" )
+@JsfUIListPage        ( listPageTitle        = "社員一覧",     listPageName        = "employeeList" )
+@JsfUIDetailPage      ( detailPageTitle      = "社員詳細",     detailPageName      = "employeeDetail" )
+@JsfUICreateBatchPage ( createBatchPageTitle = "社員一括登録", createBatchPageName = "employeeBatch" )
 public class TEmployee implements Serializable {
 
     //--JPA

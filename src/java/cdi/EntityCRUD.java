@@ -1,29 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cdi;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.enterprise.context.Dependent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.TypedQuery;
 import jsf.ui.annotation.JsfUIModel;
 
 /**
@@ -98,12 +85,12 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
-        jpqlWords.add(constructJPQLColumns(entityClass));
+        jpqlWords.add("t");
         jpqlWords.add(constructJPQLFrom(entityClass));
         jpqlWords.add(constructJPQLWhere(condition, entityClass));
         String jpql = String.join(" ", jpqlWords);
         
-        Query query = em.createQuery(jpql, entityClass);
+        TypedQuery<E> query = em.createQuery(jpql, entityClass);
         for(Field field : entityClass.getDeclaredFields()) {
             //JPAのEntityは、開発者が定義したフィールドとは別に
             //JPA側で自動で名前の先頭に_(アンダーバー)が付くフィールドと
@@ -134,16 +121,6 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         return query.setFirstResult(offset)
                     .setMaxResults(rowCountPerPage)
                     .getResultList();
-    }
-    
-    private String constructJPQLColumns(Class<E> entityClass)
-    {
-        return Arrays.asList( entityClass.getDeclaredFields() )
-                .stream()
-                .filter(field -> !field.getName().startsWith("_"))
-                .filter(field -> !field.getName().equals("serialVersionUID"))
-                .map(field -> "t." + field.getName())
-                .collect(Collectors.joining(", "));
     }
     
     private String constructJPQLFrom(Class<E> entityClass)
