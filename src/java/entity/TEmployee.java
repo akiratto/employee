@@ -88,7 +88,6 @@ public class TEmployee implements Serializable {
     private String name;
 
     @Basic
-//    @Enumerated(EnumType.STRING)
     @Convert(converter = GenderConverter.class)
     //--Bean バリデーション
     @NotNull(message="性別の入力は必須です。")

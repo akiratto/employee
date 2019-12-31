@@ -4,14 +4,22 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.enterprise.context.Dependent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import jsf.type.JsfUISearchMethodType;
 import jsf.ui.annotation.JsfUIModel;
+import jsf.ui.annotation.JsfUISearchColumn;
+import util.Tuple;
 
 /**
  *
@@ -68,7 +76,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
     }
 
     public Long countAll(E condition,  Class<E> entityClazz) 
-            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
+//            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
@@ -81,7 +89,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
     }
 
     public List<E> search(E condition, int offset, int rowCountPerPage, Class<E> entityClass) 
-            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
+//            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
@@ -90,34 +98,29 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         jpqlWords.add(constructJPQLWhere(condition, entityClass));
         String jpql = String.join(" ", jpqlWords);
         
-        TypedQuery<E> query = em.createQuery(jpql, entityClass);
-        for(Field field : entityClass.getDeclaredFields()) {
-            //JPAのEntityは、開発者が定義したフィールドとは別に
-            //JPA側で自動で名前の先頭に_(アンダーバー)が付くフィールドと
-            //serialVersionUIDフィールドが付加する。
-            //これらをフィールドは処理しない。
-            if(field.getName().startsWith("_")) continue;
-            if(field.getName().equals("serialVersionUID")) continue;
-            
-            Object value = null;
-            boolean tmpAccessible = field.isAccessible();
-            field.setAccessible(true);
-            value = field.get(condition);
-            field.setAccessible(tmpAccessible);
-            
-            if(value != null) {
-                String searchMethod = "equal";
-                switch(searchMethod) {
-                    case "equal":
-                        query.setParameter(field.getName(), value);
+        Function<EntityField, Tuple<String,Object>> function = entityField -> {
+            Tuple<String,Object> nameAndValue = new Tuple<>();
+            if(entityField.fieldValue != null) {
+                switch(entityField.jsfUISearchMethodType) {
+                    case SEARCH_METHOD_EQUAL:
+                        nameAndValue._1 = entityField.fieldName;
+                        nameAndValue._2 = entityField.fieldValue;
                         break;
                         
-                    case "include":
-                        query.setParameter(field.getName(), likeEscape((String)value));
+                    case SEARCH_METHOD_INCLUDE:
+                        nameAndValue._1 = entityField.fieldName;
+                        nameAndValue._2 = likeEscape((String)entityField.fieldValue);
                         break;
                 }
             }
-        }
+            return nameAndValue;
+        };
+        
+        final TypedQuery<E> query = em.createQuery(jpql, entityClass);
+        mapEntityFields(condition, entityClass, function)
+                .stream()
+                .filter(nameAndValue -> nameAndValue._1 != null)
+                .forEach(nameAndValue -> query.setParameter(nameAndValue._1, nameAndValue._2));
         return query.setFirstResult(offset)
                     .setMaxResults(rowCountPerPage)
                     .getResultList();
@@ -128,9 +131,16 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         return "FROM " + entityClass.getName() + " t";
     }
     
-    private String constructJPQLWhere(E condition, Class<E> entityClass) throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException
+    private static class EntityField
     {
-        List<String> wherePhrases = new ArrayList<>();
+        public String fieldName;
+        public Object fieldValue;
+        JsfUISearchColumn jsfUISearchColumn;
+        JsfUISearchMethodType jsfUISearchMethodType;
+    }
+    private <R> List<R> mapEntityFields(E entity, Class<E> entityClass, Function<EntityField,R> function)
+    {
+        List<R> result = new ArrayList<>();
         
         for(Field field : entityClass.getDeclaredFields()) {
             //JPAのEntityは、開発者が定義したフィールドとは別に
@@ -140,38 +150,58 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
             if(field.getName().startsWith("_")) continue;
             if(field.getName().equals("serialVersionUID")) continue;
             
-            Object value = null;
+            JsfUISearchColumn jsfUISearchColumn = field.getAnnotation(JsfUISearchColumn.class);
+            if(jsfUISearchColumn==null) continue;
             
-            boolean tmpAccessible = field.isAccessible();
-            field.setAccessible(true);
-            value = field.get(condition);
-            field.setAccessible(tmpAccessible);
+            JsfUISearchMethodType jsfUISearchMethodType = jsfUISearchColumn.searchMethodType();
             
-            String searchMethod = "equal";
-            
-            if(value != null) {
-                String wherePhrase;
-                switch(searchMethod) {
-                    case "equal":
-                        wherePhrase = "t." + field.getName() + "= :" + field.getName(); 
-                        wherePhrases.add(wherePhrase);
+            Object fieldValue = null;
+            try {
+                boolean tmpAccessible = field.isAccessible();
+                field.setAccessible(true);
+                fieldValue = field.get(entity);
+                field.setAccessible(tmpAccessible);
+            } catch (IllegalAccessException ex) {
+                
+            } catch (IllegalArgumentException ex) {
+                
+            }
+            EntityField entityField = new EntityField();
+            entityField.fieldName = field.getName();
+            entityField.fieldValue = fieldValue;
+            entityField.jsfUISearchColumn = jsfUISearchColumn;
+            entityField.jsfUISearchMethodType = jsfUISearchMethodType;
+            result.add( function.apply(entityField) );
+        }
+        return result;
+    }
+    private String constructJPQLWhere(E condition, Class<E> entityClass) 
+//            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException
+    {
+        Function<EntityField,String> function = entityField -> {
+            String conditionExpression = "";
+            if(entityField.fieldValue != null) {
+                switch(entityField.jsfUISearchMethodType) {
+                    case SEARCH_METHOD_EQUAL:
+                        conditionExpression = "t." + entityField.fieldName + "= :" + entityField.fieldName; 
                         break;
-                        
-                    case "include":
-                        wherePhrase = "t." + field.getName() + " like :"  + field.getName();
-                        wherePhrases.add(wherePhrase);
-                        break;
-                        
-                    default:
+
+                    case SEARCH_METHOD_INCLUDE:
+                        conditionExpression = "t." + entityField.fieldName + " like :"  + entityField.fieldName;
                         break;
                 }
-
             }
-        }
-        return wherePhrases.size() > 0 
-                ? "WHERE " + String.join(" and ", wherePhrases) : "";
+            return conditionExpression;
+        };
+        
+        String wherePhrase = mapEntityFields(condition, entityClass, function)
+                                        .stream()
+                                        .filter(conditionExpression -> !conditionExpression.isEmpty())
+                                        .collect(Collectors.joining(" and "));
+        return wherePhrase.isEmpty() == false 
+                ? "WHERE " + wherePhrase : "";
     }
-
+    
     private String likeEscape(String likeCondition)
     {
         return likeCondition

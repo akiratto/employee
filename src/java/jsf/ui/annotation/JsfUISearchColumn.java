@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import jsf.type.JsfUIColumnType;
+import jsf.type.JsfUISearchMethodType;
+import static jsf.type.JsfUISearchMethodType.SEARCH_METHOD_EQUAL;
 
 /**
  *
@@ -17,4 +19,5 @@ public @interface JsfUISearchColumn {
     public String componentId();
     public String labelTitle();
     public JsfUIColumnType columnType();
+    public JsfUISearchMethodType searchMethodType() default SEARCH_METHOD_EQUAL;
 }
