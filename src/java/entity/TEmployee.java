@@ -29,6 +29,7 @@ import jsf.annotation.JsfConverter;
 import jsf.ui.annotation.JsfUISelectItem;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
+import jsf.type.JsfUISearchMethodType;
 import jsf.ui.annotation.JsfUICreateBatchPage;
 import jsf.ui.annotation.JsfUIDetailPage;
 import jsf.ui.annotation.JsfUISearchColumn;
@@ -87,7 +88,8 @@ public class TEmployee implements Serializable {
                      labelTitle = "社員名")
     @JsfUISearchColumn(componentId = "search_employee_name", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-                 labelTitle = "社員名")
+                 labelTitle = "社員名",
+                 searchMethodType = JsfUISearchMethodType.SEARCH_METHOD_INCLUDE)
     private String name;
 
     @Basic
@@ -193,7 +195,8 @@ public class TEmployee implements Serializable {
                      labelTitle = "住所")
     @JsfUISearchColumn(componentId = "search_employee_address", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "住所"
+             labelTitle = "住所",
+             searchMethodType = JsfUISearchMethodType.SEARCH_METHOD_INCLUDE
     )
     private String address;
 

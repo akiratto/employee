@@ -46,7 +46,6 @@ public class EntityReflectionBean implements Serializable {
     
     public <E extends Serializable> EntityField<E> findEntityField(E entity, String name)
     {
-        System.out.println("findEntityField name=" + name);
         Field field = null;
         try {
             

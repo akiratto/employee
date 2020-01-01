@@ -3,11 +3,7 @@ package cdi;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -18,7 +14,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import jsf.type.JsfUISearchMethodType;
-import jsf.ui.annotation.JsfUIListColumnConverter;
 import jsf.ui.annotation.JsfUIModel;
 import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUISearchColumnConverter;
@@ -80,7 +75,6 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
     }
 
     public Long countAll(E condition,  Class<E> entityClass) 
-//            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
@@ -101,7 +95,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                         
                     case SEARCH_METHOD_INCLUDE:
                         nameAndValue._1 = entityField.fieldName;
-                        nameAndValue._2 = likeEscape(entityField.fieldValueAsStringInUISearchColumn);
+                        nameAndValue._2 = "%" + likeEscape(entityField.fieldValueAsStringInUISearchColumn) + "%";
                         break;
                 }
             }
@@ -112,7 +106,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         mapEntityFields(condition, entityClass, function)
                 .stream()
                 .filter(nameAndValue -> nameAndValue._1 != null)
-                .peek(nameAndValue -> System.out.println(nameAndValue._1 + " " + nameAndValue._2 + " "  + nameAndValue._2.getClass()))
+//                .peek(nameAndValue -> System.out.println(nameAndValue._1 + " " + nameAndValue._2 + " "  + nameAndValue._2.getClass()))
                 .forEach(nameAndValue -> query.setParameter(nameAndValue._1, nameAndValue._2));
         
         return query.getSingleResult();    
@@ -139,7 +133,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                         
                     case SEARCH_METHOD_INCLUDE:
                         nameAndValue._1 = entityField.fieldName;
-                        nameAndValue._2 = likeEscape(entityField.fieldValueAsStringInUISearchColumn);
+                        nameAndValue._2 = "%" + likeEscape(entityField.fieldValueAsStringInUISearchColumn) + "%";
                         break;
                 }
             }
@@ -235,7 +229,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                         break;
 
                     case SEARCH_METHOD_INCLUDE:
-                        conditionExpression = "t." + entityField.fieldName + " like :"  + entityField.fieldName;
+                        conditionExpression = "t." + entityField.fieldName + " like :"  + entityField.fieldName + " ESCAPE '\\'";
                         break;
                 }
             }
