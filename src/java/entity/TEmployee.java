@@ -38,6 +38,9 @@ import jsf.ui.annotation.JsfUIListColumn;
 import jsf.ui.annotation.JsfUIListColumnConverter;
 import jsf.ui.annotation.JsfUIListPage;
 import jsf.ui.annotation.JsfUIModel;
+import jsf.ui.annotation.JsfUISearchColumnConverter;
+import jsf.ui.converter.impl.UIColumnGenderConverterAsAbbrName;
+import jsf.ui.converter.impl.UIColumnGenderConverterAsJpName;
 
 /**
  * @author owner
@@ -100,11 +103,12 @@ public class TEmployee implements Serializable {
     @JsfUIListColumn(componentId = "list_employee_gender",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "性別")
-    @JsfUIListColumnConverter(converter = jsf.ui.converter.impl.UIColumnGenderConverter.class)
+    @JsfUIListColumnConverter(converter = UIColumnGenderConverterAsJpName.class)
     @JsfUISearchColumn(componentId = "search_employee_gender", 
              columnType = JsfUIColumnType.UI_SELECT_ONE, 
              labelTitle = "性別"
     )
+    @JsfUISearchColumnConverter(converter = UIColumnGenderConverterAsAbbrName.class)
     @JsfUISelectOne(selectItems = {
                  @JsfUISelectItem(itemLabel = "", itemValue = ""),
                  @JsfUISelectItem(itemLabel = "男", itemValue = "M"),

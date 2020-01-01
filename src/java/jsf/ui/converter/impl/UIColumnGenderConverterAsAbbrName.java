@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package jsf.ui.converter.impl;
 
 import entity.type.Gender;
@@ -12,13 +7,13 @@ import jsf.ui.converter.UIColumnConverter;
  *
  * @author owner
  */
-public class UIColumnGenderConverter implements UIColumnConverter {
+public class UIColumnGenderConverterAsAbbrName implements UIColumnConverter {
 
     @Override
     public String convertToUIColumnValue(Object fieldObject) {
         Gender gender = (Gender)fieldObject;
         try {
-            return gender.jpName();
+            return gender.name();
         } catch(IllegalArgumentException e) {
             return null;
         }

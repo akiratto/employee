@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -17,8 +18,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import jsf.type.JsfUISearchMethodType;
+import jsf.ui.annotation.JsfUIListColumnConverter;
 import jsf.ui.annotation.JsfUIModel;
 import jsf.ui.annotation.JsfUISearchColumn;
+import jsf.ui.annotation.JsfUISearchColumnConverter;
+import jsf.ui.converter.UIColumnConverter;
 import util.Tuple;
 
 /**
@@ -75,21 +79,46 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         return deleteCount;
     }
 
-    public Long countAll(E condition,  Class<E> entityClazz) 
+    public Long countAll(E condition,  Class<E> entityClass) 
 //            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
         jpqlWords.add("count(t)");
-        jpqlWords.add(constructJPQLFrom(entityClazz));
-        jpqlWords.add(constructJPQLWhere(condition, entityClazz));
+        jpqlWords.add(constructJPQLFrom(entityClass));
+        jpqlWords.add(constructJPQLWhere(condition, entityClass));
         String jpql = String.join(" ", jpqlWords);
         
-        return em.createQuery(jpql, Long.class).getSingleResult();    
+        Function<EntityField, Tuple<String,Object>> function = entityField -> {
+            Tuple<String,Object> nameAndValue = new Tuple<>();
+            if(entityField.fieldValue != null) {
+                
+                switch(entityField.jsfUISearchMethodType) {
+                    case SEARCH_METHOD_EQUAL:
+                        nameAndValue._1 = entityField.fieldName;
+                        nameAndValue._2 = entityField.fieldValue;
+                        break;
+                        
+                    case SEARCH_METHOD_INCLUDE:
+                        nameAndValue._1 = entityField.fieldName;
+                        nameAndValue._2 = likeEscape(entityField.fieldValueAsStringInUISearchColumn);
+                        break;
+                }
+            }
+            return nameAndValue;
+        };
+        
+        final TypedQuery<Long> query = em.createQuery(jpql, Long.class);
+        mapEntityFields(condition, entityClass, function)
+                .stream()
+                .filter(nameAndValue -> nameAndValue._1 != null)
+                .peek(nameAndValue -> System.out.println(nameAndValue._1 + " " + nameAndValue._2 + " "  + nameAndValue._2.getClass()))
+                .forEach(nameAndValue -> query.setParameter(nameAndValue._1, nameAndValue._2));
+        
+        return query.getSingleResult();    
     }
 
     public List<E> search(E condition, int offset, int rowCountPerPage, Class<E> entityClass) 
-//            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
@@ -101,6 +130,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         Function<EntityField, Tuple<String,Object>> function = entityField -> {
             Tuple<String,Object> nameAndValue = new Tuple<>();
             if(entityField.fieldValue != null) {
+                
                 switch(entityField.jsfUISearchMethodType) {
                     case SEARCH_METHOD_EQUAL:
                         nameAndValue._1 = entityField.fieldName;
@@ -109,7 +139,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                         
                     case SEARCH_METHOD_INCLUDE:
                         nameAndValue._1 = entityField.fieldName;
-                        nameAndValue._2 = likeEscape((String)entityField.fieldValue);
+                        nameAndValue._2 = likeEscape(entityField.fieldValueAsStringInUISearchColumn);
                         break;
                 }
             }
@@ -135,8 +165,10 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
     {
         public String fieldName;
         public Object fieldValue;
+        public String fieldValueAsStringInUISearchColumn;
         JsfUISearchColumn jsfUISearchColumn;
         JsfUISearchMethodType jsfUISearchMethodType;
+        JsfUISearchColumnConverter jsfUISearchColumnConverter;
     }
     private <R> List<R> mapEntityFields(E entity, Class<E> entityClass, Function<EntityField,R> function)
     {
@@ -154,12 +186,25 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
             if(jsfUISearchColumn==null) continue;
             
             JsfUISearchMethodType jsfUISearchMethodType = jsfUISearchColumn.searchMethodType();
+            JsfUISearchColumnConverter jsfUISearchColumnConverter = field.getAnnotation(JsfUISearchColumnConverter.class);
             
-            Object fieldValue = null;
+            UIColumnConverter uiSearchColumnConverter = null;
+            try {
+                if(jsfUISearchColumnConverter != null) {
+                    uiSearchColumnConverter = (UIColumnConverter)jsfUISearchColumnConverter.converter().newInstance();
+                }
+            } catch (InstantiationException ex) {
+                Logger.getLogger(EntityCRUD.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(EntityCRUD.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+            Object fieldValueAsObject = null;
             try {
                 boolean tmpAccessible = field.isAccessible();
                 field.setAccessible(true);
-                fieldValue = field.get(entity);
+                fieldValueAsObject = field.get(entity);
                 field.setAccessible(tmpAccessible);
             } catch (IllegalAccessException ex) {
                 
@@ -168,15 +213,18 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
             }
             EntityField entityField = new EntityField();
             entityField.fieldName = field.getName();
-            entityField.fieldValue = fieldValue;
+            entityField.fieldValue = fieldValueAsObject;
+            entityField.fieldValueAsStringInUISearchColumn = fieldValueAsObject      == null ? "" 
+                                                           : uiSearchColumnConverter == null ? fieldValueAsObject.toString()
+                                                           : uiSearchColumnConverter.convertToUIColumnValue(fieldValueAsObject);
             entityField.jsfUISearchColumn = jsfUISearchColumn;
             entityField.jsfUISearchMethodType = jsfUISearchMethodType;
+            entityField.jsfUISearchColumnConverter = jsfUISearchColumnConverter;
             result.add( function.apply(entityField) );
         }
         return result;
     }
     private String constructJPQLWhere(E condition, Class<E> entityClass) 
-//            throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException
     {
         Function<EntityField,String> function = entityField -> {
             String conditionExpression = "";
