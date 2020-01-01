@@ -1,9 +1,9 @@
 package cdi.base;
 
-import cdi.EntityCRUD;
-import cdi.EntityListSetting;
-import cdi.EntityURLQueryHandler;
-import cdi.PageNavigator;
+import cdi.dependent.EntityCRUD;
+import cdi.dependent.EntityListSetting;
+import cdi.dependent.EntityURLQueryHandler;
+import cdi.dependent.PageNavigator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     @Inject
     private EntityURLQueryHandler<E> urlQueryHandler;
     
-    abstract protected Class<E> entityClazz();
-//    abstract protected EntityDbAction<E,PK> entityDbAction();
+    abstract protected Class<E> entityClass();
+
     public PageNavigator getPageNavigator() { return pageNavigator; }
     public EntityListSetting getSetting() { return setting; }
     
@@ -46,7 +46,7 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     public void init()
     {
         try {
-            this.searchCondition = entityClazz().newInstance();
+            this.searchCondition = entityClass().newInstance();
         } catch (InstantiationException | IllegalAccessException ex) {
             this.searchCondition = null;
         }
@@ -60,41 +60,41 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
         
     }
     
-    public void viewAction() throws ClassNotFoundException, IllegalArgumentException, IllegalAccessException
+    public void viewAction() 
     {
         //検索条件を基に抽出処理を実行する -------------------------------------
-        this.entityAllCount = entityCRUD.countAll(searchCondition, entityClazz());
+        this.entityAllCount = entityCRUD.countAll(searchCondition, entityClass());
 
         getPageNavigator().build(entityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
         
         this.entityDataList = entityCRUD.search(searchCondition, 
                                                getPageNavigator().getOffset(), 
                                                getPageNavigator().getRowCountPerPage(),
-                                               entityClazz()); 
+                                               entityClass()); 
     }
     
     public String create()
     { 
-        return setting.detailPageName(entityClazz()) 
+        return setting.detailPageName(entityClass()) 
                         + "?faces-redirect=true&mode=New";
     }
     
     public String search()
     {
         String queryString = urlQueryHandler.generateString(searchCondition);        
-        return setting.listPageName(entityClazz()) 
+        return setting.listPageName(entityClass()) 
                 + "?faces-redirect=true" 
                 + (queryString.isEmpty() ? "" : "&" + queryString);
     }
     
     public String clear()
     {
-        return setting.listPageName(entityClazz()) + "?faces-redirect=true";
+        return setting.listPageName(entityClass()) + "?faces-redirect=true";
     }
     
     public String createBatch()
     {
-        return setting.createBatchPageName(entityClazz()) + "?faces-redirect=true";
+        return setting.createBatchPageName(entityClass()) + "?faces-redirect=true";
     }
     
     @Transactional
@@ -102,11 +102,11 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = entityCRUD.deleteAll(entityClazz());
+        int deleteCount = entityCRUD.deleteAll(entityClass());
         
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(entityClazz(),deleteCount)));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(entityClass(),deleteCount)));
         String queryString = urlQueryHandler.generateString(searchCondition);
-        return setting.listPageName(entityClazz()) 
+        return setting.listPageName(entityClass()) 
                         + "?faces-redirect=true" 
                         + (queryString.isEmpty() ? "" : "&" + queryString);
     }
@@ -117,23 +117,23 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
-        E entity = entityCRUD.find(entityId, entityClazz());
+        E entity = entityCRUD.find(entityId, entityClass());
         if(entity == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound(entityClazz()) ));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound(entityClass()) ));
             return search();
         }
-        entityCRUD.delete(entityId, entityClazz());
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityClazz(), entityId.toString()) ));
+        entityCRUD.delete(entityId, entityClass());
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityClass(), entityId.toString()) ));
         return search();
     }
     
     public String gotoDetail(PK entityId, String mode)
     {
-        E entity = entityCRUD.find(entityId, entityClazz());
+        E entity = entityCRUD.find(entityId, entityClass());
         if(entity == null) {
             return "";
         }
-        return setting.detailPageName(entityClazz()) 
+        return setting.detailPageName(entityClass()) 
                             + "?faces-redirect=true&employee_id=" 
                             + urlQueryHandler.urlEncode(entityId.toString()) 
                             + "&mode=" 

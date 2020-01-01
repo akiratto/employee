@@ -1,4 +1,4 @@
-package cdi;
+package cdi.dependent;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -43,7 +43,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         return foundEntity;
     }
 
-    public int update(Integer entityId, Consumer<E> updater, Class<E> entityClazz) {
+    public int update(PK entityId, Consumer<E> updater, Class<E> entityClazz) {
         E foundEntity = em.find(entityClazz, entityId);
         if(foundEntity==null) {
             em.clear();

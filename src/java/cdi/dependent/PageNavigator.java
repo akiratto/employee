@@ -1,4 +1,4 @@
-package cdi;
+package cdi.dependent;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;

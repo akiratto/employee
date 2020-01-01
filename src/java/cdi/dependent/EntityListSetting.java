@@ -1,4 +1,4 @@
-package cdi;
+package cdi.dependent;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -20,10 +20,13 @@ public class EntityListSetting implements Serializable {
     public JsfUIDetailPage      getJsfUIDetailPage(Class<?> modelClazz) { return modelClazz.getDeclaredAnnotation(JsfUIDetailPage.class); }
     public JsfUICreateBatchPage getJsfUICreateBatchPage(Class<?> modelClazz) { return modelClazz.getDeclaredAnnotation(JsfUICreateBatchPage.class); }
         
-    public String modelTitle(Class<?> modelClazz)          { return Optional.ofNullable(this.getJsfUIModel(modelClazz)).map(m -> m.modelTitle()).orElse(""); }
-    public String listPageName(Class<?> modelClazz)         { return Optional.ofNullable(this.getJsfUIListPage(modelClazz)).map(l -> l.listPageName()).orElse(""); }
-    public String detailPageName(Class<?> modelClazz)       { return Optional.ofNullable(this.getJsfUIDetailPage(modelClazz)).map(d -> d.detailPageName()).orElse(""); }
-    public String createBatchPageName(Class<?> modelClazz) { return Optional.ofNullable(this.getJsfUICreateBatchPage(modelClazz)).map(b -> b.createBatchPageName()).orElse(""); }
+    public String modelTitle(Class<?> modelClazz)          { return Optional.ofNullable(this.getJsfUIModel(modelClazz)).map(JsfUIModel::modelTitle).orElse(""); }
+    public String listPageName(Class<?> modelClazz)         { return Optional.ofNullable(this.getJsfUIListPage(modelClazz)).map(JsfUIListPage::listPageName).orElse(""); }
+    public String listPageTitle(Class<?> modelClazz)         { return Optional.ofNullable(this.getJsfUIListPage(modelClazz)).map(JsfUIListPage::listPageTitle).orElse(""); }
+    public String detailPageName(Class<?> modelClazz)       { return Optional.ofNullable(this.getJsfUIDetailPage(modelClazz)).map(JsfUIDetailPage::detailPageName).orElse(""); }
+    public String detailPageTitle(Class<?> modelClazz)       { return Optional.ofNullable(this.getJsfUIDetailPage(modelClazz)).map(JsfUIDetailPage::detailPageTitle).orElse(""); }
+    public String createBatchPageName(Class<?> modelClazz) { return Optional.ofNullable(this.getJsfUICreateBatchPage(modelClazz)).map(JsfUICreateBatchPage::createBatchPageName).orElse(""); }
+    public String createBatchPageTitle(Class<?> modelClazz) { return Optional.ofNullable(this.getJsfUICreateBatchPage(modelClazz)).map(JsfUICreateBatchPage::createBatchPageTitle).orElse(""); }
     
     public String messageDeleteEntityNotFound(Class<?> modelClazz)
     {

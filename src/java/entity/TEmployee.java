@@ -148,7 +148,8 @@ public class TEmployee implements Serializable {
                      labelTitle = "電話番号")
     @JsfUISearchColumn(componentId = "search_employee_phone", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "電話番号")
+             labelTitle = "電話番号",
+             searchMethodType = JsfUISearchMethodType.SEARCH_METHOD_INCLUDE)
     private String phone;
 
     @Basic
@@ -164,7 +165,8 @@ public class TEmployee implements Serializable {
                      labelTitle = "携帯電話番号")
     @JsfUISearchColumn(componentId = "search_employee_mobile_phone", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "携帯電話番号")
+             labelTitle = "携帯電話番号",
+             searchMethodType = JsfUISearchMethodType.SEARCH_METHOD_INCLUDE)
     private String mobilePhone;
 
     @Basic
@@ -180,7 +182,8 @@ public class TEmployee implements Serializable {
                      labelTitle = "郵便番号")
     @JsfUISearchColumn(componentId = "search_employee_zip_code", 
              columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
-             labelTitle = "郵便番号")
+             labelTitle = "郵便番号",
+             searchMethodType = JsfUISearchMethodType.SEARCH_METHOD_INCLUDE)
     private String zipCode;
 
     @Basic
