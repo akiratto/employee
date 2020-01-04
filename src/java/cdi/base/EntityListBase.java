@@ -1,9 +1,9 @@
 package cdi.base;
 
-import cdi.dependent.EntityCRUD;
-import cdi.dependent.EntityListSetting;
-import cdi.dependent.EntityURLQueryHandler;
-import cdi.dependent.PageNavigator;
+import cdi.dependent.util.EntityCRUD;
+import cdi.base.dependent.EntityListSetting;
+import cdi.dependent.util.EntityURLQueryHandler;
+import cdi.dependent.util.PageNavigator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,9 @@ import javax.transaction.Transactional;
  *
  * @author Owner
  */
-public abstract class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {
+public class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {
+    private Class<?> modelClass;
+    
     private E searchCondition;
     private List<E> entityDataList;
     private Long entityAllCount;
@@ -28,11 +30,22 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     @Inject
     private PageNavigator pageNavigator;
     @Inject
-    private EntityListSetting setting;
+    private EntityListSetting<E> setting;
     @Inject
     private EntityURLQueryHandler<E> urlQueryHandler;
     
-    abstract protected Class<E> entityClass();
+    public EntityListBase()
+    {
+        EntityListBase_();
+    }
+    
+    public void EntityListBase_(E... dummy)
+    {
+        if(dummy.length > 0) {
+            throw new IllegalArgumentException("dummy引数を指定してはいけません。");
+        }
+        modelClass = dummy.getClass().getComponentType();
+    }
 
     public PageNavigator getPageNavigator() { return pageNavigator; }
     public EntityListSetting getSetting() { return setting; }
@@ -46,8 +59,9 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     public void init()
     {
         try {
-            this.searchCondition = entityClass().newInstance();
+            this.searchCondition = (E)modelClass.newInstance();
         } catch (InstantiationException | IllegalAccessException ex) {
+            ex.printStackTrace();
             this.searchCondition = null;
         }
         this.entityDataList = new ArrayList<>();
@@ -63,38 +77,38 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     public void viewAction() 
     {
         //検索条件を基に抽出処理を実行する -------------------------------------
-        this.entityAllCount = entityCRUD.countAll(searchCondition, entityClass());
+        this.entityAllCount = entityCRUD.countAll(searchCondition, modelClass);
 
         getPageNavigator().build(entityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
         
         this.entityDataList = entityCRUD.search(searchCondition, 
                                                getPageNavigator().getOffset(), 
                                                getPageNavigator().getRowCountPerPage(),
-                                               entityClass()); 
+                                               modelClass); 
     }
     
     public String create()
     { 
-        return setting.detailPageName(entityClass()) 
+        return setting.detailPageName() 
                         + "?faces-redirect=true&mode=New";
     }
     
     public String search()
     {
         String queryString = urlQueryHandler.generateString(searchCondition);        
-        return setting.listPageName(entityClass()) 
+        return setting.listPageName() 
                 + "?faces-redirect=true" 
                 + (queryString.isEmpty() ? "" : "&" + queryString);
     }
     
     public String clear()
     {
-        return setting.listPageName(entityClass()) + "?faces-redirect=true";
+        return setting.listPageName() + "?faces-redirect=true";
     }
     
     public String createBatch()
     {
-        return setting.createBatchPageName(entityClass()) + "?faces-redirect=true";
+        return setting.createBatchPageName() + "?faces-redirect=true";
     }
     
     @Transactional
@@ -102,11 +116,11 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = entityCRUD.deleteAll(entityClass());
+        int deleteCount = entityCRUD.deleteAll(modelClass);
         
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(entityClass(),deleteCount)));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(deleteCount)));
         String queryString = urlQueryHandler.generateString(searchCondition);
-        return setting.listPageName(entityClass()) 
+        return setting.listPageName() 
                         + "?faces-redirect=true" 
                         + (queryString.isEmpty() ? "" : "&" + queryString);
     }
@@ -117,23 +131,23 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
-        E entity = entityCRUD.find(entityId, entityClass());
+        E entity = entityCRUD.find(entityId, modelClass);
         if(entity == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound(entityClass()) ));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound() ));
             return search();
         }
-        entityCRUD.delete(entityId, entityClass());
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityClass(), entityId.toString()) ));
+        entityCRUD.delete(entityId, modelClass);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityId.toString()) ));
         return search();
     }
     
     public String gotoDetail(PK entityId, String mode)
     {
-        E entity = entityCRUD.find(entityId, entityClass());
+        E entity = entityCRUD.find(entityId, modelClass);
         if(entity == null) {
             return "";
         }
-        return setting.detailPageName(entityClass()) 
+        return setting.detailPageName() 
                             + "?faces-redirect=true&employee_id=" 
                             + urlQueryHandler.urlEncode(entityId.toString()) 
                             + "&mode=" 
