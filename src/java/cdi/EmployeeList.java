@@ -13,6 +13,9 @@ import javax.inject.Named;
 @ViewScoped
 public class EmployeeList extends EntityListBase<TEmployee, Integer> {   
 
-    @Override protected Class<TEmployee> entityClass() { return TEmployee.class; }
-
+    @Override
+    public Class<TEmployee> modelClass() {
+        return TEmployee.class;
+    }
+    
 }

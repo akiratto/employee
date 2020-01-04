@@ -12,8 +12,8 @@
     <h:body>
         <ui:composition template="/templates/entityList/template.xhtml">
             <ui:param name="entityListBean" value="#{employeeList}" />
-            <ui:param name="entityListJpName" value="社員一覧" />
-            <ui:param name="entityJpName" value="社員情報" />
+            <ui:param name="entityListJpName" value="#{employeeList.setting.listPageTitle()}" />
+            <ui:param name="entityJpName" value="#{employeeList.setting.listPageTitle()}" />
             
             <ui:define name="metadata">
                 <!--
