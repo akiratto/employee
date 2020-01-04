@@ -34,12 +34,7 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
     @Inject
     private EntityURLQueryHandler<E> urlQueryHandler;
     
-    public EntityListBase()
-    {
-        EntityListBase_();
-    }
-    
-    public void EntityListBase_(E... dummy)
+    public EntityListBase(E... dummy)
     {
         if(dummy.length > 0) {
             throw new IllegalArgumentException("dummy引数を指定してはいけません。");

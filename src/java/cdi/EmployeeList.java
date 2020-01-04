@@ -12,5 +12,7 @@ import javax.inject.Named;
 @Named
 @ViewScoped
 public class EmployeeList extends EntityListBase<TEmployee, Integer> {   
-
+    public EmployeeList() {
+        super();
+    }
 }
