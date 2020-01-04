@@ -19,9 +19,7 @@ import javax.transaction.Transactional;
  *
  * @author Owner
  */
-public class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {
-    private Class<E> modelClass;
-    
+public abstract class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {   
     private E searchCondition;
     private List<E> entityDataList;
     private Long entityAllCount;
@@ -34,13 +32,7 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
     @Inject
     private EntityURLQueryHandler<E> urlQueryHandler;
     
-    public EntityListBase(E... dummy)
-    {
-        if(dummy.length > 0) {
-            throw new IllegalArgumentException("dummy引数を指定してはいけません。");
-        }
-        modelClass = (Class<E>)dummy.getClass().getComponentType();
-    }
+    abstract public Class<E> modelClass();
 
     public PageNavigator getPageNavigator() { return pageNavigator; }
     public EntityListSetting getSetting() { return setting; }
@@ -54,7 +46,7 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
     public void init()
     {
         try {
-            this.searchCondition = modelClass.newInstance();
+            this.searchCondition = modelClass().newInstance();
         } catch (InstantiationException | IllegalAccessException ex) {
             ex.printStackTrace();
             this.searchCondition = null;
@@ -72,14 +64,14 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
     public void viewAction() 
     {
         //検索条件を基に抽出処理を実行する -------------------------------------
-        this.entityAllCount = entityCRUD.countAll(searchCondition, modelClass);
+        this.entityAllCount = entityCRUD.countAll(searchCondition, modelClass());
 
         getPageNavigator().build(entityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
         
         this.entityDataList = entityCRUD.search(searchCondition, 
                                                getPageNavigator().getOffset(), 
                                                getPageNavigator().getRowCountPerPage(),
-                                               modelClass); 
+                                               modelClass()); 
     }
     
     public String create()
@@ -111,7 +103,7 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = entityCRUD.deleteAll(modelClass);
+        int deleteCount = entityCRUD.deleteAll(modelClass());
         
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(deleteCount)));
         String queryString = urlQueryHandler.generateString(searchCondition);
@@ -126,19 +118,19 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
-        E entity = entityCRUD.find(entityId, modelClass);
+        E entity = entityCRUD.find(entityId, modelClass());
         if(entity == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound() ));
             return search();
         }
-        entityCRUD.delete(entityId, modelClass);
+        entityCRUD.delete(entityId, modelClass());
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityId.toString()) ));
         return search();
     }
     
     public String gotoDetail(PK entityId, String mode)
     {
-        E entity = entityCRUD.find(entityId, modelClass);
+        E entity = entityCRUD.find(entityId, modelClass());
         if(entity == null) {
             return "";
         }
