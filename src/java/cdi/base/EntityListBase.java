@@ -20,7 +20,7 @@ import javax.transaction.Transactional;
  * @author Owner
  */
 public class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {
-    private Class<?> modelClass;
+    private Class<E> modelClass;
     
     private E searchCondition;
     private List<E> entityDataList;
@@ -44,7 +44,7 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
         if(dummy.length > 0) {
             throw new IllegalArgumentException("dummy引数を指定してはいけません。");
         }
-        modelClass = dummy.getClass().getComponentType();
+        modelClass = (Class<E>)dummy.getClass().getComponentType();
     }
 
     public PageNavigator getPageNavigator() { return pageNavigator; }
@@ -59,7 +59,7 @@ public class EntityListBase<E extends Serializable, PK extends Serializable> imp
     public void init()
     {
         try {
-            this.searchCondition = (E)modelClass.newInstance();
+            this.searchCondition = modelClass.newInstance();
         } catch (InstantiationException | IllegalAccessException ex) {
             ex.printStackTrace();
             this.searchCondition = null;
