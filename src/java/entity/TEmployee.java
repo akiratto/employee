@@ -38,6 +38,7 @@ import jsf.ui.annotation.JsfUIInternalId;
 import jsf.ui.annotation.JsfUIListColumn;
 import jsf.ui.annotation.JsfUIListColumnConverter;
 import jsf.ui.annotation.JsfUIListPage;
+import jsf.ui.annotation.JsfUIListPageButtons;
 import jsf.ui.annotation.JsfUIModel;
 import jsf.ui.annotation.JsfUISearchColumnConverter;
 import jsf.ui.converter.impl.UIColumnGenderConverterAsAbbrName;
@@ -52,6 +53,7 @@ import jsf.ui.converter.impl.UIColumnGenderConverterAsJpName;
 @JsfUIListPage        ( listPageTitle        = "社員一覧",     listPageName        = "employeeList" )
 @JsfUIDetailPage      ( detailPageTitle      = "社員詳細",     detailPageName      = "employeeDetail" )
 @JsfUICreateBatchPage ( createBatchPageTitle = "社員一括登録", createBatchPageName = "employeeBatch" )
+@JsfUIListPageButtons ( createButtonTitle = "新規登録", searchButtonTitle = "検索", clearButtonTitle = "クリア", createBatchButtonTitle = "一括登録", deleteAllButtonTitle = "全件削除")
 public class TEmployee implements Serializable {
 
     //--JPA

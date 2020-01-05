@@ -6,6 +6,7 @@ import javax.el.ELProcessor;
 import jsf.ui.annotation.JsfUICreateBatchPage;
 import jsf.ui.annotation.JsfUIDetailPage;
 import jsf.ui.annotation.JsfUIListPage;
+import jsf.ui.annotation.JsfUIListPageButtons;
 import jsf.ui.annotation.JsfUIModel;
 
 /**
@@ -37,7 +38,8 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
     public JsfUIListPage        getJsfUIListPage() { return modelClass.getDeclaredAnnotation(JsfUIListPage.class); }
     public JsfUIDetailPage      getJsfUIDetailPage() { return modelClass.getDeclaredAnnotation(JsfUIDetailPage.class); }
     public JsfUICreateBatchPage getJsfUICreateBatchPage() { return modelClass.getDeclaredAnnotation(JsfUICreateBatchPage.class); }
-        
+    public JsfUIListPageButtons getJsfUIListPageButtons() { return modelClass.getDeclaredAnnotation(JsfUIListPageButtons.class); }
+    
     public String modelTitle()          { return Optional.ofNullable(getJsfUIModel()).map(JsfUIModel::modelTitle).orElse(""); }
     public String listPageName()         { return Optional.ofNullable(getJsfUIListPage()).map(JsfUIListPage::listPageName).orElse(""); }
     public String listPageTitle()         { return Optional.ofNullable(getJsfUIListPage()).map(JsfUIListPage::listPageTitle).orElse(""); }
@@ -45,6 +47,12 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
     public String detailPageTitle()       { return Optional.ofNullable(getJsfUIDetailPage()).map(JsfUIDetailPage::detailPageTitle).orElse(""); }
     public String createBatchPageName() { return Optional.ofNullable(getJsfUICreateBatchPage()).map(JsfUICreateBatchPage::createBatchPageName).orElse(""); }
     public String createBatchPageTitle() { return Optional.ofNullable(getJsfUICreateBatchPage()).map(JsfUICreateBatchPage::createBatchPageTitle).orElse(""); }
+    
+    public String createButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::createButtonTitle).orElse(""); }
+    public String searchButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::searchButtonTitle).orElse(""); }
+    public String clearButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::clearButtonTitle).orElse(""); }
+    public String createBatchButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::createBatchButtonTitle).orElse(""); }
+    public String deleteAllButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::deleteAllButtonTitle).orElse(""); }
     
     public String messageDeleteEntityNotFound()
     {
