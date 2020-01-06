@@ -15,7 +15,7 @@
                 <h:commandButton action="#{entityListBean.createBatch()}" value="#{entityListBean.setting.createBatchButtonTitle()}" />
                 <h:commandButton action="#{entityListBean.deleteAll()}" 
                                   value="#{entityListBean.setting.deleteAllButtonTitle()}" 
-                                  onclick="return confirm(F('entityJpName') + 'をすべて削除します。\n本当によろしいです？')" />
+                                  onclick="return confirm(F('messageDeleteAllEntityConfirm'))" />
             </h:panelGrid>
         </ui:composition>
     </h:body>

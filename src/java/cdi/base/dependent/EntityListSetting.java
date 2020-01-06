@@ -100,4 +100,19 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
                 ? (String)evalResult 
                 : "";
     }
+    
+    public String messageDeleteAllEntityConfirm()
+    {
+        ELProcessor elProcessor = new ELProcessor();
+        elProcessor.defineBean("modelTitle", modelTitle());
+        
+        String messageTemplate = Optional
+                                    .ofNullable(getJsfUIListPage())
+                                    .map(JsfUIListPage::messageDeleteAllEntityConfirm)
+                                    .orElse("");
+        Object evalResult = elProcessor.eval(messageTemplate);
+        return evalResult instanceof String 
+                ? (String)evalResult 
+                : "";
+    }
 }

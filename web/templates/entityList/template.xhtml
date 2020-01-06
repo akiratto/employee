@@ -7,7 +7,7 @@
       xmlns:jsf="http://xmlns.jcp.org/jsf"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title>#{entityListJpName}</title>
+        <title>#{entityListBean.setting.listPageTitle()}</title>
     </h:head>
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:outputScript library="js" name="common.js" target="head" />
@@ -16,7 +16,7 @@
             <ui:insert name="metadata" />
             mojarra version:<h:outputText value="#{jsfVersionInfo.version}" />
             <h:form id="f" enctype="multipart/form-data">
-                <h1>#{entityListJpName}</h1>
+                <h1>#{entityListBean.setting.listPageTitle()}</h1>
                 <h:messages globalOnly="true" />
                 <ui:insert name="buttonsInList" />
                 <ui:insert name="searchSection" />
@@ -30,10 +30,10 @@
                      (シングルクォートが入るとJavascriptの文法がくずれるなど)
                   
                      EL式はHTMLの属性値のエスケープは行われるので
-                     inputタグのvalue属性にui:paramの変数を指定して
-                     inputタグの値をJavascriptから参照することで値を取得する。
+                     inputタグのvalue属性にEL式で値を指定して
+                     このvalue属性の値をJavascriptから参照することで値を取得する。
                 -->
-                <input id="entityJpName" type="hidden" value="#{entityJpName}" />
+                <input id="messageDeleteAllEntityConfirm" type="hidden" value="#{entityListBean.setting.messageDeleteAllEntityConfirm()}" />
             </h:form>
         </f:view>
     </h:body>

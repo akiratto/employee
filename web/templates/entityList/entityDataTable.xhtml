@@ -26,7 +26,7 @@
                      かつ、そのフィールドに@JsfUIListColumnが指定されていること  -->
                 
                 <!-- データが存在しない場合はメッセージを表示する -->
-                <h:outputText value="#{entityJpName}は見つかりません。"
+                <h:outputText value="#{entityListBean.setting.modelTitle()}は見つかりません。"
                                rendered="#{empty entityListBean.entityDataList}"
                                style="display: block;margin-top:16px;"/>
 
@@ -58,7 +58,7 @@
                     </div>
                     <!-- 一覧表の表示範囲、最大件数 を表示 -->
                     <div id="countInfo">
-                        <h:outputText value="[#{entityJpName}を #{entityListBean.entityAllCount}件中#{entityListBean.pageNavigator.beginRowIndex}～#{entityListBean.pageNavigator.endRowIndex}件 表示]" />
+                        <h:outputText value="[#{entityListBean.setting.modelTitle()}を #{entityListBean.entityAllCount}件中#{entityListBean.pageNavigator.beginRowIndex}～#{entityListBean.pageNavigator.endRowIndex}件 表示]" />
                     </div>
                 </div>
 
