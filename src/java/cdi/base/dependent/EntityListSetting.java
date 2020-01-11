@@ -1,6 +1,9 @@
 package cdi.base.dependent;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import javax.el.ELProcessor;
 import jsf.ui.annotation.JsfUICreateBatchPage;
@@ -56,75 +59,96 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
     
     public String messageDeleteEntityNotFound()
     {
-        ELProcessor elProcessor = new ELProcessor();
-        elProcessor.defineBean("modelTitle", modelTitle());
-        
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage())
                                     .map(JsfUIListPage::messageDeleteEntityNotFound)
                                     .orElse("");
-        Object evalResult = elProcessor.eval(messageTemplate);
-        return evalResult instanceof String 
-                ? (String)evalResult 
-                : "";
+        return generateMessage(messageTemplate);
     }
     
     public String messageDeleteEntityCompleted(String entityId)
     {
-        ELProcessor elProcessor = new ELProcessor();
-        elProcessor.defineBean("modelTitle", modelTitle());
-        elProcessor.defineBean("entityId", entityId);
+        Map<String,Object> additionResources = new HashMap<>();
+        additionResources.put("entityId", entityId);
         
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage())
                                     .map(JsfUIListPage::messageDeleteEntityCompleted)
                                     .orElse("");
-        Object evalResult = elProcessor.eval(messageTemplate);
-        return evalResult instanceof String 
-                ? (String)evalResult 
-                : "";
+        return generateMessage(messageTemplate,additionResources);
     }
     
     public String messageDeleteAllEntityCompleted(int deleteCount)
     {
-        ELProcessor elProcessor = new ELProcessor();
-        elProcessor.defineBean("modelTitle", modelTitle());
-        elProcessor.defineBean("deleteCount", deleteCount);
+        Map<String,Object> addtionResources = new HashMap<>();
+        addtionResources.put("deleteCount", deleteCount);
         
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage())
                                     .map(JsfUIListPage::messageDeleteAllEntityCompleted)
                                     .orElse("");
-        Object evalResult = elProcessor.eval(messageTemplate);
-        return evalResult instanceof String 
-                ? (String)evalResult 
-                : "";
+        return generateMessage(messageTemplate, addtionResources);
     }
     
     public String messageDeleteAllEntityConfirm()
     {
-        ELProcessor elProcessor = new ELProcessor();
-        elProcessor.defineBean("modelTitle", modelTitle());
-        
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage())
                                     .map(JsfUIListPage::messageDeleteAllEntityConfirm)
                                     .orElse("");
-        Object evalResult = elProcessor.eval(messageTemplate);
-        return evalResult instanceof String 
-                ? (String)evalResult 
-                : "";
+        return generateMessage(messageTemplate);
     }
     
     public String messageEntityNotFoundInDataTable()
     {
-        ELProcessor elProcessor = new ELProcessor();
-        elProcessor.defineBean("modelTitle", modelTitle());
-        
         String messageTemplate = Optional
                                     .ofNullable(getJsfUIListPage())
                                     .map(JsfUIListPage::messageEntityNotFoundInDataTable)
                                     .orElse("");
+        return generateMessage(messageTemplate);
+    }
+    
+    public String messageDisplayRangeInDataTable(Long entityAllCount, Long beginRowIndex, Long endRowIndex)
+    {
+        Map<String,Object> addResources = new HashMap<>();
+        addResources.put("entityAllCount", entityAllCount);
+        addResources.put("beginRowIndex", beginRowIndex);
+        addResources.put("endRowIndex", endRowIndex);
+        
+        String messageTemplate = Optional
+                                    .ofNullable(getJsfUIListPage())
+                                    .map(JsfUIListPage::messageDisplayRangeInDataTable)
+                                    .orElse("");
+        return generateMessage(messageTemplate, addResources);
+    }
+    
+    protected String generateMessage(String messageTemplate)
+    {
+        return generateMessage(messageTemplate, null);
+    }
+    
+    protected String generateMessage(String messageTemplate, Map<String, Object> additionResources)
+    {
+        ELProcessor elProcessor = new ELProcessor();
+        elProcessor.defineBean("modelTitle",                modelTitle());
+        elProcessor.defineBean("listPageName",              listPageName());
+        elProcessor.defineBean("listPageTitle",             listPageTitle());
+        elProcessor.defineBean("detailPageName",            detailPageName());
+        elProcessor.defineBean("detailPageTitle",           detailPageTitle());
+        elProcessor.defineBean("createBatchPageName",       createBatchPageName());
+        elProcessor.defineBean("createBatchPageTitle",      createBatchPageTitle());
+        elProcessor.defineBean("createButtonTitle",         createButtonTitle());
+        elProcessor.defineBean("searchButtonTitle",         searchButtonTitle());
+        elProcessor.defineBean("clearButtonTitle",          clearButtonTitle());
+        elProcessor.defineBean("createBatchButtonTitle",    createBatchButtonTitle());
+        elProcessor.defineBean("deleteAllButtonTitle",      deleteAllButtonTitle());
+        
+        if(additionResources != null) {
+            for(Entry<String,Object> entry : additionResources.entrySet()) {
+                elProcessor.defineBean(entry.getKey(), entry.getValue());
+            }
+        }
+        
         Object evalResult = elProcessor.eval(messageTemplate);
         return evalResult instanceof String 
                 ? (String)evalResult 

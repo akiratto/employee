@@ -58,7 +58,10 @@
                     </div>
                     <!-- 一覧表の表示範囲、最大件数 を表示 -->
                     <div id="countInfo">
-                        <h:outputText value="[#{entityListBean.setting.modelTitle()}を #{entityListBean.entityAllCount}件中#{entityListBean.pageNavigator.beginRowIndex}～#{entityListBean.pageNavigator.endRowIndex}件 表示]" />
+                        <h:outputText value="#{entityListBean.setting.messageDisplayRangeInDataTable(
+                                                                            entityListBean.entityAllCount,
+                                                                            entityListBean.pageNavigator.beginRowIndex, 
+                                                                            entityListBean.pageNavigator.endRowIndex)}" />
                     </div>
                 </div>
 
