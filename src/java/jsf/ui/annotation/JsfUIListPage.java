@@ -18,4 +18,5 @@ public @interface JsfUIListPage {
     public String messageDeleteEntityCompleted()    default "modelTitle += '(ID:' += entityId += ')を削除しました。'";
     public String messageDeleteAllEntityCompleted() default "deleteCount += '件の' += modelTitle += 'を削除しました。'";
     public String messageDeleteAllEntityConfirm() default "modelTitle += 'をすべて削除します。\n本当によろしいです？'";
+    public String messageEntityNotFoundInDataTable() default "modelTitle += 'は見つかりません。'";
 }

@@ -26,7 +26,7 @@
                      かつ、そのフィールドに@JsfUIListColumnが指定されていること  -->
                 
                 <!-- データが存在しない場合はメッセージを表示する -->
-                <h:outputText value="#{entityListBean.setting.modelTitle()}は見つかりません。"
+                <h:outputText value="#{entityListBean.setting.messageEntityNotFoundInDataTable()}"
                                rendered="#{empty entityListBean.entityDataList}"
                                style="display: block;margin-top:16px;"/>
 

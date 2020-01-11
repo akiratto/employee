@@ -115,4 +115,19 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
                 ? (String)evalResult 
                 : "";
     }
+    
+    public String messageEntityNotFoundInDataTable()
+    {
+        ELProcessor elProcessor = new ELProcessor();
+        elProcessor.defineBean("modelTitle", modelTitle());
+        
+        String messageTemplate = Optional
+                                    .ofNullable(getJsfUIListPage())
+                                    .map(JsfUIListPage::messageEntityNotFoundInDataTable)
+                                    .orElse("");
+        Object evalResult = elProcessor.eval(messageTemplate);
+        return evalResult instanceof String 
+                ? (String)evalResult 
+                : "";
+    }
 }

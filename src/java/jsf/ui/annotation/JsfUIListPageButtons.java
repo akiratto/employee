@@ -17,4 +17,5 @@ public @interface JsfUIListPageButtons {
     public String clearButtonTitle() default "クリア";
     public String createBatchButtonTitle() default "一括登録";
     public String deleteAllButtonTitle() default "全件削除";
+    public String deleteAllButtonConfirmMessage() default "modelTitle += 'をすべて削除します。\n本当によろしいです？'";
 }
