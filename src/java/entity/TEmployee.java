@@ -40,6 +40,7 @@ import jsf.ui.annotation.JsfUIListColumnConverter;
 import jsf.ui.annotation.JsfUIListPage;
 import jsf.ui.annotation.JsfUIListPageButtons;
 import jsf.ui.annotation.JsfUIModel;
+import jsf.ui.annotation.JsfUIModelColumn;
 import jsf.ui.annotation.JsfUISearchColumnConverter;
 import jsf.ui.converter.impl.UIColumnGenderConverterAsAbbrName;
 import jsf.ui.converter.impl.UIColumnGenderConverterAsJpName;
@@ -70,6 +71,7 @@ public class TEmployee implements Serializable {
     @CsvColumn(field="社員コード")
     //--Jsf
     @JsfUIId
+    @JsfUIModelColumn(columnTitle = "社員コード")
     @JsfUIListColumn(componentId = "search_employee_code",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "社員コード")
@@ -85,6 +87,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="氏名")
     //--Jsf
+    @JsfUIModelColumn(columnTitle = "社員名")
     @JsfUIListColumn(componentId = "search_employee_name",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "社員名")
@@ -104,6 +107,7 @@ public class TEmployee implements Serializable {
     //Jsf Converter
     @JsfConverter(converter = GenderConverter.class)
     //Jsf
+    @JsfUIModelColumn(columnTitle = "性別")
     @JsfUIListColumn(componentId = "list_employee_gender",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "性別")
@@ -128,6 +132,7 @@ public class TEmployee implements Serializable {
     @CsvColumn(field="生年月日")
     @CsvConverter(converter = CsvColumnDateConverter.class)
     //--Jsf
+    @JsfUIModelColumn(columnTitle = "生年月日")
     @JsfUIListColumn(componentId = "list_employee_birthday",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "生年月日")
@@ -145,6 +150,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="電話番号")
     //--Jsf
+    @JsfUIModelColumn(columnTitle = "電話番号")
     @JsfUIListColumn(componentId = "list_employee_phone",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "電話番号")
@@ -162,6 +168,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="携帯電話")
     //--Jsf
+    @JsfUIModelColumn(columnTitle = "携帯電話番号")
     @JsfUIListColumn(componentId = "list_employee_mobile_phone",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "携帯電話番号")
@@ -179,6 +186,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumn(field="郵便番号")
     //--Jsf
+    @JsfUIModelColumn(columnTitle = "郵便番号")
     @JsfUIListColumn(componentId = "list_employee_zip_code",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "郵便番号")
@@ -195,6 +203,7 @@ public class TEmployee implements Serializable {
     //--CSV パーサ
     @CsvColumnFormula(formula="住所1 += 住所2 += 住所3 += 住所4 += 住所5")
     //--Jsf
+    @JsfUIModelColumn(columnTitle = "住所")
     @JsfUIListColumn(componentId = "list_employee_address",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "住所")

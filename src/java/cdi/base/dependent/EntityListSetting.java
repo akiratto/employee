@@ -1,6 +1,7 @@
 package cdi.base.dependent;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,9 +9,11 @@ import java.util.Optional;
 import javax.el.ELProcessor;
 import jsf.ui.annotation.JsfUICreateBatchPage;
 import jsf.ui.annotation.JsfUIDetailPage;
+import jsf.ui.annotation.JsfUIId;
 import jsf.ui.annotation.JsfUIListPage;
 import jsf.ui.annotation.JsfUIListPageButtons;
 import jsf.ui.annotation.JsfUIModel;
+import jsf.ui.annotation.JsfUIModelColumn;
 
 /**
  *
@@ -56,6 +59,36 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
     public String clearButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::clearButtonTitle).orElse(""); }
     public String createBatchButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::createBatchButtonTitle).orElse(""); }
     public String deleteAllButtonTitle() { return Optional.ofNullable(getJsfUIListPageButtons()).map(JsfUIListPageButtons::deleteAllButtonTitle).orElse(""); }
+    
+    public String modelIdName()
+    {
+        String modelIdName = "";
+        for(Field field : modelClass.getDeclaredFields()) {
+            JsfUIId jsfUIId = field.getAnnotation(JsfUIId.class);
+            if(jsfUIId == null) continue;
+            
+            JsfUIModelColumn jsfUIModelColumn = field.getDeclaredAnnotation(JsfUIModelColumn.class);
+            if(jsfUIModelColumn == null) continue;
+            
+            modelIdName = jsfUIModelColumn.columnName();
+        }
+        return modelIdName;
+    }
+    
+    public String modelIdTitle()
+    {
+        String modelIdTitle = "";
+        for(Field field : modelClass.getDeclaredFields()) {
+            JsfUIId jsfUIId = field.getAnnotation(JsfUIId.class);
+            if(jsfUIId == null) continue;
+            
+            JsfUIModelColumn jsfUIModelColumn = field.getDeclaredAnnotation(JsfUIModelColumn.class);
+            if(jsfUIModelColumn == null) continue;
+            
+            modelIdTitle = jsfUIModelColumn.columnTitle();
+        }
+        return modelIdTitle;
+    }
     
     public String messageDeleteEntityNotFound()
     {
@@ -122,6 +155,18 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
         return generateMessage(messageTemplate, addResources);
     }
     
+    public String messageDeleteConfirmInDataTable(String modelId)
+    {
+        Map<String,Object> addResources = new HashMap<>();
+        addResources.put("modelId", modelId);
+        
+        String messageTemplate = Optional
+                                    .ofNullable(getJsfUIListPage())
+                                    .map(JsfUIListPage::messageDeleteConfirmInDataTable)
+                                    .orElse("");
+        return generateMessage(messageTemplate, addResources);
+    }
+    
     protected String generateMessage(String messageTemplate)
     {
         return generateMessage(messageTemplate, null);
@@ -142,6 +187,8 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
         elProcessor.defineBean("clearButtonTitle",          clearButtonTitle());
         elProcessor.defineBean("createBatchButtonTitle",    createBatchButtonTitle());
         elProcessor.defineBean("deleteAllButtonTitle",      deleteAllButtonTitle());
+        elProcessor.defineBean("modelIdName",               modelIdName());
+        elProcessor.defineBean("modelIdTitle",              modelIdTitle());
         
         if(additionResources != null) {
             for(Entry<String,Object> entry : additionResources.entrySet()) {

@@ -79,9 +79,9 @@
                         </f:facet>
                         <h:commandButton id="delete_button"
                                           value="削除" 
-                                          onclick="return confirm('社員コード:'+ F2(this,'employee_code') + 'を削除してもよろしいですか？')"
+                                          onclick="return confirm(F2(this,'delete_confirm_message'))"
                                           action="#{entityListBean.delete( entityReflectionBean.getJsfUIInternalIdField(emp).value )}" />
-                        <h:inputHidden id="#{jsfUIIdField.snakeCaseName}" value="#{entityReflectionBean.getJsfUIIdField(emp).value}" />
+                        <h:inputHidden id="delete_confirm_message" value="#{entityListBean.setting.messageDeleteConfirmInDataTable( entityReflectionBean.getJsfUIIdField(emp).value )}" />
                     </h:column>
 
                     <!-- エンティティのIDカラム -->
