@@ -3,6 +3,7 @@ package cdi.dependent.util;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -13,7 +14,11 @@ import javax.enterprise.context.Dependent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import static jsf.type.JsfUIOrderType.ASCENDING;
+import static jsf.type.JsfUIOrderType.DESCENDING;
+import static jsf.type.JsfUIOrderType.NONE;
 import jsf.type.JsfUISearchMethodType;
+import jsf.ui.annotation.JsfUIListColumnOrder;
 import jsf.ui.annotation.JsfUIModel;
 import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUISearchColumnConverter;
@@ -119,7 +124,10 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         jpqlWords.add("t");
         jpqlWords.add(constructJPQLFrom(entityClass));
         jpqlWords.add(constructJPQLWhere(condition, entityClass));
-        String jpql = String.join(" ", jpqlWords);
+        jpqlWords.add(constructJPQLOrderBy(condition, entityClass));
+        String jpql = jpqlWords.stream()
+                               .filter(s -> !s.isEmpty())
+                               .collect(Collectors.joining(" "));
         
         Function<EntityField, Tuple<String,Object>> function = entityField -> {
             Tuple<String,Object> nameAndValue = new Tuple<>();
@@ -163,6 +171,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         JsfUISearchColumn jsfUISearchColumn;
         JsfUISearchMethodType jsfUISearchMethodType;
         JsfUISearchColumnConverter jsfUISearchColumnConverter;
+        JsfUIListColumnOrder jsfUIListColumnOrder;
     }
     private <R> List<R> mapEntityFields(E entity, Class<E> entityClass, Function<EntityField,R> function)
     {
@@ -193,6 +202,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                 Logger.getLogger(EntityCRUD.class.getName()).log(Level.SEVERE, null, ex);
             }
             
+            JsfUIListColumnOrder jsfUIListColumnOrder = field.getAnnotation(JsfUIListColumnOrder.class);
             
             Object fieldValueAsObject = null;
             try {
@@ -214,6 +224,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
             entityField.jsfUISearchColumn = jsfUISearchColumn;
             entityField.jsfUISearchMethodType = jsfUISearchMethodType;
             entityField.jsfUISearchColumnConverter = jsfUISearchColumnConverter;
+            entityField.jsfUIListColumnOrder = jsfUIListColumnOrder;
             result.add( function.apply(entityField) );
         }
         return result;
@@ -242,6 +253,26 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                                         .collect(Collectors.joining(" and "));
         return wherePhrase.isEmpty() == false 
                 ? "WHERE " + wherePhrase : "";
+    }
+    
+    private String constructJPQLOrderBy(E condition, Class<E> entityClass)
+    {
+        //JsfUIListColumnOrder
+        Function<EntityField,Tuple<String,JsfUIListColumnOrder>> function = entityField -> {
+            return new Tuple<>(entityField.fieldName, entityField.jsfUIListColumnOrder);
+        };
+        Comparator<Tuple<String, JsfUIListColumnOrder>> comparator =
+                Comparator.comparing(tp -> tp._2.orderSequence());
+        
+        String orderPhase = mapEntityFields(condition, entityClass, function)
+                                        .stream()
+                                        .filter(tp -> tp._2 != null)
+                                        .filter(tp -> !tp._2.orderType().equals(NONE))
+                                        .sorted(comparator)
+                                        .map(tp -> "t." + tp._1 + " " + (tp._2.orderType().equals(DESCENDING) ? "DESC" : "ASC" ))
+                                        .collect(Collectors.joining(", "));
+        return orderPhase.isEmpty() == false
+                ? "ORDER BY " + orderPhase : "";
     }
     
     private String likeEscape(String likeCondition)

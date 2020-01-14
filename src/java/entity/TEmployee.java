@@ -29,6 +29,7 @@ import jsf.annotation.JsfConverter;
 import jsf.ui.annotation.JsfUISelectItem;
 import jsf.ui.annotation.JsfUISelectOne;
 import jsf.type.JsfUIColumnType;
+import jsf.type.JsfUIOrderType;
 import jsf.type.JsfUISearchMethodType;
 import jsf.ui.annotation.JsfUICreateBatchPage;
 import jsf.ui.annotation.JsfUIDetailPage;
@@ -44,6 +45,7 @@ import jsf.ui.annotation.JsfUIModelColumn;
 import jsf.ui.annotation.JsfUISearchColumnConverter;
 import jsf.ui.converter.impl.UIColumnGenderConverterAsAbbrName;
 import jsf.ui.converter.impl.UIColumnGenderConverterAsJpName;
+import jsf.ui.annotation.JsfUIListColumnOrder;
 
 /**
  * @author owner
@@ -75,6 +77,7 @@ public class TEmployee implements Serializable {
     @JsfUIListColumn(componentId = "search_employee_code",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "社員コード")
+    @JsfUIListColumnOrder(orderSequence = 1, orderType = JsfUIOrderType.DESCENDING)
     @JsfUISearchColumn(componentId = "search_employee_code", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員コード")
