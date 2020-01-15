@@ -12,3 +12,11 @@ function F2(field_in_samegroup, field_name)
     return F(field_name2);
 }
 
+function F3(field_in_samegroup, field_name)
+{
+    var id_name = field_in_samegroup.id;
+    var sections = id_name.split(':');
+    var num = sections[2];
+    return document.getElementById(field_name + "_" + num).firstChild.data;
+}
+

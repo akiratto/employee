@@ -27,12 +27,12 @@
                 
                 <!-- データが存在しない場合はメッセージを表示する -->
                 <h:outputText value="#{entityListBean.setting.messageEntityNotFoundInDataTable()}"
-                               rendered="#{empty entityListBean.entityDataList}"
+                               rendered="#{empty entityListBean.entities}"
                                style="display: block;margin-top:16px;"/>
 
                 <!-- データが1件以上存在する場合、一覧表の上部のナビゲートを表示 -->
                 <div style="position: relative;width:1000px;height:30px;"
-                     jsf:rendered="#{not empty entityListBean.entityDataList}">
+                     jsf:rendered="#{not empty entityListBean.entities}">
 
                     <!-- ナビゲート部分  表示例) 前へ 1 2 3 4 5 次へ -->
                     <div id="topPageNavigator">
@@ -68,9 +68,9 @@
                 <!-- データが1件以上存在する場合、一覧表を表示 -->
                 <h:dataTable id="employee_list"
                               styleClass="employee_list" 
-                              value="#{entityListBean.entityDataList}" 
+                              value="#{entityListBean.entityDataModel}" 
                               var="emp"  
-                              rendered="#{not empty entityListBean.entityDataList}">
+                              rendered="#{not empty entityListBean.entities}">
 
                     <!-- 削除ボタン -->
                     <h:column>
@@ -79,9 +79,9 @@
                         </f:facet>
                         <h:commandButton id="delete_button"
                                           value="削除" 
-                                          onclick="return confirm(F2(this,'delete_confirm_message'))"
+                                          onclick="return confirm(F3(this,'delete_confirm_message'))"
                                           action="#{entityListBean.delete( entityReflectionBean.getJsfUIInternalIdField(emp).value )}" />
-                        <h:inputHidden id="delete_confirm_message" value="#{entityListBean.setting.messageDeleteConfirmInDataTable( entityReflectionBean.getJsfUIIdField(emp).value )}" />
+                        <div id="delete_confirm_message_#{entityListBean.entityDataModel.rowIndex}" style="display:none">#{entityListBean.setting.messageDeleteConfirmInDataTable( entityReflectionBean.getJsfUIIdField(emp).value )}</div>
                     </h:column>
 
                     <!-- エンティティのIDカラム -->

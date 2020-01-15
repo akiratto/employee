@@ -12,6 +12,9 @@ import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import javax.faces.model.ArrayDataModel;
+import javax.faces.model.DataModel;
+import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
@@ -21,7 +24,8 @@ import javax.transaction.Transactional;
  */
 public abstract class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {   
     private E searchCondition;
-    private List<E> entityDataList;
+    private List<E> entities;
+    private DataModel<E> entityDataModel;
     private Long entityAllCount;
     @Inject
     private EntityCRUD<E,PK> entityCRUD;
@@ -38,8 +42,10 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     public EntityListSetting getSetting() { return setting; }
     
     public E       getSearchCondition() { return searchCondition; }
-    public List<E> getEntityDataList()   { return entityDataList; }
-    public int     getEntityCount()     { return entityDataList.size(); }
+    public List<E> getEntities()   { return entities; }
+    public DataModel<E> getEntityDataModel() { return entityDataModel; }
+   
+    public int     getEntityCount()     { return entities.size(); }
     public Long    getEntityAllCount()  { return entityAllCount; }
     
     @PostConstruct
@@ -51,7 +57,8 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
             ex.printStackTrace();
             this.searchCondition = null;
         }
-        this.entityDataList = new ArrayList<>();
+        this.entities = new ArrayList<>();
+        this.entityDataModel = new ListDataModel<>(entities);
         this.entityAllCount = 0L;
     }
             
@@ -68,10 +75,11 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
 
         getPageNavigator().build(entityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
         
-        this.entityDataList = entityCRUD.search(searchCondition, 
+        this.entities = entityCRUD.search(searchCondition, 
                                                getPageNavigator().getOffset(), 
                                                getPageNavigator().getRowCountPerPage(),
                                                modelClass()); 
+        this.entityDataModel = new ListDataModel<>(entities);
     }
     
     public String create()
