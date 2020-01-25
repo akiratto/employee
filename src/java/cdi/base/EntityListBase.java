@@ -17,6 +17,10 @@ import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import jsf.type.JsfUIOrderType;
+import jsf.ui.annotation.JsfUIListColumnOrder;
+import jsf.ui.annotation.dynamic.DynJsfUIListColumnOrder;
+import util.AnnotationHelper;
 
 /**
  *
@@ -147,5 +151,26 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
                             + urlQueryHandler.urlEncode(entityId.toString()) 
                             + "&mode=" 
                             + urlQueryHandler.urlEncode(mode);
+    }
+    
+    
+    public String sortAscending()
+    {
+        AnnotationHelper.alterAnnotationOn(
+                            modelClass(),
+                            "employeeCode",
+                            JsfUIListColumnOrder.class, 
+                            new DynJsfUIListColumnOrder(JsfUIOrderType.ASCENDING, 1));
+        return search();
+    }
+    
+    public String sortDescending()
+    {
+        AnnotationHelper.alterAnnotationOn(
+                            modelClass(),
+                            "employeeCode",
+                            JsfUIListColumnOrder.class, 
+                            new DynJsfUIListColumnOrder(JsfUIOrderType.DESCENDING, 1));
+        return search();
     }
 }

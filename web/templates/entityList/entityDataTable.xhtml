@@ -64,6 +64,10 @@
                                                                             entityListBean.pageNavigator.endRowIndex)}" />
                     </div>
                 </div>
+                
+                <!-- データが1件以上存在する場合、ソートボタンを表示 -->
+                <h:commandButton value="昇順" action="#{entityListBean.sortAscending()}" rendered="#{not empty entityListBean.entities}" />
+                <h:commandButton value="降順" action="#{entityListBean.sortDescending()}" rendered="#{not empty entityListBean.entities}" />
 
                 <!-- データが1件以上存在する場合、一覧表を表示 -->
                 <h:dataTable id="employee_list"
