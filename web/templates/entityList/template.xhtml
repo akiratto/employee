@@ -16,6 +16,7 @@
             <ui:insert name="metadata" />
             mojarra version:<h:outputText value="#{jsfVersionInfo.version}" /><br />
             sessionId:<h:outputText value="#{employeeListSession.sessionId}" /><br />
+            test:<h:outputText value="#{employeeListSession.test}" /><br />
             <h:form id="f" enctype="multipart/form-data">
                 <h1>#{entityListBean.setting.listPageTitle()}</h1>
                 <h:messages globalOnly="true" />
