@@ -85,9 +85,10 @@ public class EmployeeListSession implements Serializable {
             System.out.println("Compiler is not found");
             return;
         }
-        
+        String sep = File.pathSeparator;
+        String classPath = System.getProperty("entity.compiler.classpath") + sep + "C:/Users/owner/Documents/NetBeansProjects/Employee/target/Employee-1.0-SNAPSHOT/WEB-INF/classes";
         String p = Paths.get(employeeEntitySourceFileName).toAbsolutePath().toString();
-        int ret = compiler.run(null, null, null, new String[] { "-encoding","UTF-8", "-classpath", "C:\\Users\\Owner\\Documents\\NetBeansProjects\\Employee\\build\\web\\WEB-INF\\classes;C:\\Program Files\\NetBeans 8.2\\enterprise\\modules\\ext\\javaee-api-7.0.jar",p } );
+        int ret = compiler.run(null, null, null, new String[] { "-encoding", "UTF-8", "-classpath", classPath, p } );
         if(ret == 0) {
             System.out.println("Compile successed");
         } else {
