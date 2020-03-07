@@ -1,5 +1,6 @@
 package cdi.dependent.util;
 
+import cdi.base.EntityListSessionBase;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import jsf.ui.annotation.JsfUIModel;
 import jsf.ui.annotation.JsfUISearchColumn;
 import jsf.ui.annotation.JsfUISearchColumnConverter;
 import jsf.ui.converter.UIColumnConverter;
+import misc.JsfUIColumnSetting;
 import util.Tuple;
 
 /**
@@ -79,13 +81,13 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         return deleteCount;
     }
 
-    public Long countAll(E condition,  Class<E> entityClass) 
+    public Long countAll(E condition,  Class<E> modelClass) 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
         jpqlWords.add("count(t)");
-        jpqlWords.add(constructJPQLFrom(entityClass));
-        jpqlWords.add(constructJPQLWhere(condition, entityClass));
+        jpqlWords.add(constructJPQLFrom(modelClass));
+        jpqlWords.add(constructJPQLWhere(condition, modelClass));
         String jpql = String.join(" ", jpqlWords);
         
         Function<EntityField, Tuple<String,Object>> function = entityField -> {
@@ -108,7 +110,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         };
         
         final TypedQuery<Long> query = em.createQuery(jpql, Long.class);
-        mapEntityFields(condition, entityClass, function)
+        mapEntityFields(condition, modelClass, function)
                 .stream()
                 .filter(nameAndValue -> nameAndValue._1 != null)
 //                .peek(nameAndValue -> System.out.println(nameAndValue._1 + " " + nameAndValue._2 + " "  + nameAndValue._2.getClass()))
@@ -117,14 +119,18 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         return query.getSingleResult();    
     }
 
-    public List<E> search(E condition, int offset, int rowCountPerPage, Class<E> entityClass) 
+    public List<E> search(E condition, 
+                          int offset, 
+                          int rowCountPerPage, 
+                          Class<E> modelClass, 
+                          EntityListSessionBase<E> modelListSession) 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
         jpqlWords.add("t");
-        jpqlWords.add(constructJPQLFrom(entityClass));
-        jpqlWords.add(constructJPQLWhere(condition, entityClass));
-        jpqlWords.add(constructJPQLOrderBy(condition, entityClass));
+        jpqlWords.add(constructJPQLFrom(modelClass));
+        jpqlWords.add(constructJPQLWhere(condition, modelClass));
+        jpqlWords.add(constructJPQLOrderBy(condition, modelListSession));
         String jpql = jpqlWords.stream()
                                .filter(s -> !s.isEmpty())
                                .collect(Collectors.joining(" "));
@@ -148,8 +154,8 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
             return nameAndValue;
         };
         
-        final TypedQuery<E> query = em.createQuery(jpql, entityClass);
-        mapEntityFields(condition, entityClass, function)
+        final TypedQuery<E> query = em.createQuery(jpql, modelClass);
+        mapEntityFields(condition, modelClass, function)
                 .stream()
                 .filter(nameAndValue -> nameAndValue._1 != null)
                 .forEach(nameAndValue -> query.setParameter(nameAndValue._1, nameAndValue._2));
@@ -158,9 +164,9 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                     .getResultList();
     }
     
-    private String constructJPQLFrom(Class<E> entityClass)
+    private String constructJPQLFrom(Class<E> modelClass)
     {
-        return "FROM " + entityClass.getName() + " t";
+        return "FROM " + modelClass.getName() + " t";
     }
     
     private static class EntityField
@@ -173,11 +179,11 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         JsfUISearchColumnConverter jsfUISearchColumnConverter;
         JsfUIListColumnOrder jsfUIListColumnOrder;
     }
-    private <R> List<R> mapEntityFields(E entity, Class<E> entityClass, Function<EntityField,R> function)
+    private <R> List<R> mapEntityFields(E entity, Class<E> modelClass, Function<EntityField,R> function)
     {
         List<R> result = new ArrayList<>();
         
-        for(Field field : entityClass.getDeclaredFields()) {
+        for(Field field : modelClass.getDeclaredFields()) {
             //JPAのEntityは、開発者が定義したフィールドとは別に
             //JPA側で自動で名前の先頭に_(アンダーバー)が付くフィールドと
             //serialVersionUIDフィールドが付加する。
@@ -229,7 +235,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         }
         return result;
     }
-    private String constructJPQLWhere(E condition, Class<E> entityClass) 
+    private String constructJPQLWhere(E condition, Class<E> modelClass) 
     {
         Function<EntityField,String> function = entityField -> {
             String conditionExpression = "";
@@ -247,7 +253,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
             return conditionExpression;
         };
         
-        String wherePhrase = mapEntityFields(condition, entityClass, function)
+        String wherePhrase = mapEntityFields(condition, modelClass, function)
                                         .stream()
                                         .filter(conditionExpression -> !conditionExpression.isEmpty())
                                         .collect(Collectors.joining(" and "));
@@ -255,24 +261,28 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                 ? "WHERE " + wherePhrase : "";
     }
     
-    private String constructJPQLOrderBy(E condition, Class<E> entityClass)
+    private String constructJPQLOrderBy(E condition, EntityListSessionBase<E> modelSessionList)
     {
         //JsfUIListColumnOrder
         Function<EntityField,Tuple<String,JsfUIListColumnOrder>> function = entityField -> {
             return new Tuple<>(entityField.fieldName, entityField.jsfUIListColumnOrder);
         };
-        Comparator<Tuple<String, JsfUIListColumnOrder>> comparator =
-                Comparator.comparing(tp -> tp._2.orderSequence());
-        
-        String orderPhase = mapEntityFields(condition, entityClass, function)
-                                        .stream()
-                                        .filter(tp -> tp._2 != null)
-                                        .filter(tp -> !tp._2.orderType().equals(NONE))
-                                        .sorted(comparator)
-                                        .map(tp -> "t." + tp._1 + " " + (tp._2.orderType().equals(DESCENDING) ? "DESC" : "ASC" ))
-                                        .collect(Collectors.joining(", "));
-        return orderPhase.isEmpty() == false
-                ? "ORDER BY " + orderPhase : "";
+        Comparator<JsfUIColumnSetting> comparator =
+                Comparator.comparing(setting -> setting.getJsfUIListColumnOrder().orderSequence());
+
+        String orderPhrase = modelSessionList.getUIColumnSettings()
+                                .filter(setting -> setting != null)
+                                .filter(setting -> setting.getJsfUIListColumnOrder() != null)
+                                .sorted(comparator)
+                                .map(setting -> "t.%fieldName% %orderType%"
+                                                    .replaceAll("%fieldName%", setting.getFieldName())
+                                                    .replaceAll("%orderType%", setting.getJsfUIListColumnOrder().orderType().equals(DESCENDING)
+                                                                                    ? "DESC" : "ASC")
+                                )
+                                .collect(Collectors.joining(", "));
+                            
+        return orderPhrase.isEmpty() == false
+                ? "ORDER BY " + orderPhrase : "";
     }
     
     private String likeEscape(String likeCondition)

@@ -41,6 +41,7 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     private EntityURLQueryHandler<E> urlQueryHandler;
     
     abstract public Class<E> modelClass();
+    abstract public EntityListSessionBase modelListSession();
 
     public PageNavigator getPageNavigator() { return pageNavigator; }
     public EntityListSetting getSetting() { return setting; }
@@ -82,7 +83,8 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
         this.entities = entityCRUD.search(searchCondition, 
                                                getPageNavigator().getOffset(), 
                                                getPageNavigator().getRowCountPerPage(),
-                                               modelClass()); 
+                                               modelClass(),
+                                               modelListSession()); 
         this.entityDataModel = new ListDataModel<>(entities);
     }
     
@@ -153,24 +155,15 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
                             + urlQueryHandler.urlEncode(mode);
     }
     
-    
     public String sortAscending()
     {
-        AnnotationHelper.alterAnnotationOn(
-                            modelClass(),
-                            "employeeCode",
-                            JsfUIListColumnOrder.class, 
-                            new DynJsfUIListColumnOrder(JsfUIOrderType.ASCENDING, 1));
+        modelListSession().sortAscending();
         return search();
     }
     
     public String sortDescending()
     {
-        AnnotationHelper.alterAnnotationOn(
-                            modelClass(),
-                            "employeeCode",
-                            JsfUIListColumnOrder.class, 
-                            new DynJsfUIListColumnOrder(JsfUIOrderType.DESCENDING, 1));
+        modelListSession().sortDescending();
         return search();
     }
 }
