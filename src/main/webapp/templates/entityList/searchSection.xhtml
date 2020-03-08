@@ -12,32 +12,32 @@
         <ui:composition>
             <f:validateBean disabled="true">
                 <h:panelGrid id="search" columns="3">
-                    <c:forEach var="fd" items="#{entityReflectionBean.getEntityFields(entityListBean.searchCondition)}">
-                        <c:if test="#{not empty fd.jsfUISearchColumn}">
-                            <h:outputLabel for="#{fd.jsfUISearchColumn.componentId()}" 
-                                            value="#{fd.jsfUISearchColumn.labelTitle()}"/>
-                            <c:if test="#{fd.jsfUISearchColumn.columnType().eqHtmlInputText()}">
-                                <h:inputText id="#{fd.jsfUISearchColumn.componentId()}"
-                                              value="#{fd.value}" 
+                    <c:forEach var="entityFieldInstance" items="#{entityListBean.searchCondition.entityFieldInstances}">
+                        <c:if test="#{not empty entityFieldInstance.jsfUISearchColumn}">
+                            <h:outputLabel for="#{entityFieldInstance.jsfUISearchColumn.componentId()}" 
+                                            value="#{entityFieldInstance.jsfUISearchColumn.labelTitle()}"/>
+                            <c:if test="#{entityFieldInstance.jsfUISearchColumn.columnType().eqHtmlInputText()}">
+                                <h:inputText id="#{entityFieldInstance.jsfUISearchColumn.componentId()}"
+                                              value="#{entityFieldInstance.value}" 
                                               onkeypress="if(event.keyCode === 13) return false;" />
                             </c:if>
-                            <c:if test="#{fd.jsfUISearchColumn.columnType().eqUISelectOne()}">
-                                <h:selectOneMenu id="#{fd.jsfUISearchColumn.componentId()}"
-                                                  value="#{fd.value}"
-                                                  converter="#{fd.jsfConverter}">
-                                    <c:forEach var="item" items="#{fd.jsfUISearchSelectOne.selectItems()}">
+                            <c:if test="#{entityFieldInstance.jsfUISearchColumn.columnType().eqUISelectOne()}">
+                                <h:selectOneMenu id="#{entityFieldInstance.jsfUISearchColumn.componentId()}"
+                                                  value="#{entityFieldInstance.value}"
+                                                  converter="#{entityFieldInstance.jsfConverter}">
+                                    <c:forEach var="item" items="#{entityFieldInstance.jsfUISearchSelectOne.selectItems()}">
                                         <f:selectItem itemValue="#{item.itemValue()}" itemLabel="#{item.itemLabel()}" />
                                     </c:forEach>
                                 </h:selectOneMenu>
                             </c:if>
-                            <c:if test="#{fd.jsfUISearchColumn.columnType().eqHtmlInputDate()}">
-                                <h:inputText id="#{fd.jsfUISearchColumn.componentId()}"
-                                              value="#{fd.value}" 
+                            <c:if test="#{entityFieldInstance.jsfUISearchColumn.columnType().eqHtmlInputDate()}">
+                                <h:inputText id="#{entityFieldInstance.jsfUISearchColumn.componentId()}"
+                                              value="#{entityFieldInstance.value}" 
                                               onkeypress="if(event.keyCode === 13) return false;">
                                     <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
                                 </h:inputText>
                             </c:if>
-                            <h:message for="#{fd.jsfUISearchColumn.componentId()}" />
+                            <h:message for="#{entityFieldInstance.jsfUISearchColumn.componentId()}" />
                         </c:if>
                     </c:forEach>
                 </h:panelGrid>

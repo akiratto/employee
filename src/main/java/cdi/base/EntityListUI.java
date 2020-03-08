@@ -12,21 +12,18 @@ import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
-import javax.faces.model.ArrayDataModel;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import jsf.type.JsfUIOrderType;
-import jsf.ui.annotation.JsfUIListColumnOrder;
-import jsf.ui.annotation.dynamic.DynJsfUIListColumnOrder;
-import util.AnnotationHelper;
 
 /**
  *
  * @author Owner
  */
-public abstract class EntityListBase<E extends Serializable, PK extends Serializable> implements Serializable {   
+public abstract class EntityListUI<E extends Serializable, PK extends Serializable> 
+        implements Serializable
+{   
     private E searchCondition;
     private List<E> entities;
     private DataModel<E> entityDataModel;
@@ -41,7 +38,7 @@ public abstract class EntityListBase<E extends Serializable, PK extends Serializ
     private EntityURLQueryHandler<E> urlQueryHandler;
     
     abstract public Class<E> modelClass();
-    abstract public EntityListSessionBase modelListSession();
+    abstract public EntityListSession modelListSession();
 
     public PageNavigator getPageNavigator() { return pageNavigator; }
     public EntityListSetting getSetting() { return setting; }

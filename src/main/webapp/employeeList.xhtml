@@ -22,8 +22,10 @@
                     https://docs.oracle.com/javaee/6/javaserverfaces/2.1/docs/vdldocs/facelets/f/viewParam.html
                 -->
                 <f:metadata>
-                    <ui:repeat var="fd" value="#{entityReflectionBean.getEntityFields(employeeList.searchCondition)}">
-                        <f:viewParam name="#{fd.snakeCaseName}" value="#{fd.value}" converter="#{fd.jsfConverter}" />
+                    <ui:repeat var="entityFieldInstance" value="#{employeeList.searchCondition.entityFieldInstances}">
+                        <f:viewParam name      ="#{entityFieldInstance.snakeCaseName}" 
+                                      value     ="#{entityFieldInstance.value}" 
+                                      converter ="#{entityFieldInstance.jsfConverter}" />
                     </ui:repeat>
                     <f:viewParam name="page_no" value="#{employeeList.pageNavigator.currentPageNo}" />
                     <f:viewAction action="#{employeeList.viewAction()}" />

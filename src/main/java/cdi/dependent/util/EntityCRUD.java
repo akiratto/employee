@@ -1,6 +1,6 @@
 package cdi.dependent.util;
 
-import cdi.base.EntityListSessionBase;
+import cdi.base.EntityListSession;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -123,7 +123,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                           int offset, 
                           int rowCountPerPage, 
                           Class<E> modelClass, 
-                          EntityListSessionBase<E> modelListSession) 
+                          EntityListSession<E> modelListSession) 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
@@ -261,7 +261,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                 ? "WHERE " + wherePhrase : "";
     }
     
-    private String constructJPQLOrderBy(E condition, EntityListSessionBase<E> modelSessionList)
+    private String constructJPQLOrderBy(E condition, EntityListSession<E> modelSessionList)
     {
         //JsfUIListColumnOrder
         Function<EntityField,Tuple<String,JsfUIListColumnOrder>> function = entityField -> {

@@ -1,6 +1,6 @@
 package cdi;
 
-import cdi.base.EntityListSessionBase;
+import cdi.base.EntityListSession;
 import entity.TEmployee;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -20,7 +20,7 @@ import misc.JsfUIColumnSetting;
  */
 @Named
 @SessionScoped
-public class EmployeeListSession extends EntityListSessionBase<TEmployee> {
+public class EmployeeListSession extends EntityListSession<TEmployee> {
 
     @Override
     public Class<TEmployee> modelClass() {

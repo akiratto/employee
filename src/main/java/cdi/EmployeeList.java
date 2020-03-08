@@ -1,7 +1,7 @@
 package cdi;
 
-import cdi.base.EntityListBase;
-import cdi.base.EntityListSessionBase;
+import cdi.base.EntityListUI;
+import cdi.base.EntityListSession;
 import entity.TEmployee;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -13,7 +13,7 @@ import javax.inject.Named;
  */
 @Named
 @ViewScoped
-public class EmployeeList extends EntityListBase<TEmployee, Integer> {   
+public class EmployeeList extends EntityListUI<TEmployee, Integer> {   
 
     @Inject
     private EmployeeListSession employeeListSession;
@@ -24,7 +24,7 @@ public class EmployeeList extends EntityListBase<TEmployee, Integer> {
     }
 
     @Override
-    public EntityListSessionBase modelListSession() {
+    public EntityListSession modelListSession() {
         return employeeListSession;
     }
 }

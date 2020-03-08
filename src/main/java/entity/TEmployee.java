@@ -4,6 +4,7 @@
 package entity;
 
 import cdi.EmployeeList;
+import cdi.base.EntityInstance;
 import csv.annotation.CsvColumn;
 import csv.annotation.CsvColumnFormula;
 import csv.annotation.CsvConverter;
@@ -57,7 +58,12 @@ import jsf.ui.annotation.JsfUIListColumnOrder;
 @JsfUIDetailPage      ( detailPageTitle      = "社員詳細",     detailPageName      = "employeeDetail" )
 @JsfUICreateBatchPage ( createBatchPageTitle = "社員一括登録", createBatchPageName = "employeeBatch" )
 @JsfUIListPageButtons ( createButtonTitle = "新規登録", searchButtonTitle = "検索", clearButtonTitle = "クリア", createBatchButtonTitle = "一括登録", deleteAllButtonTitle = "全件削除")
-public class TEmployee implements Serializable {
+public class TEmployee
+        extends EntityInstance<TEmployee>
+        implements Serializable 
+{
+    @Override public Class<TEmployee> modelClass() { return TEmployee.class; }
+    @Override public TEmployee modelInstance()     { return this; }
 
     //--JPA
     @Id

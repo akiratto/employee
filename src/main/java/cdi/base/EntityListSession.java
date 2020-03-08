@@ -15,10 +15,11 @@ import misc.JsfUIColumnSetting;
  *
  * @author Owner
  */
-public abstract class EntityListSessionBase<E extends Serializable> implements Serializable {
+public abstract class EntityListSession<E extends Serializable>
+        extends EntityDefinition<E>
+        implements Serializable 
+{
     Map<String,JsfUIColumnSetting> fieldSetting = new HashMap<>();
-    
-    abstract public Class<E> modelClass();
     
     @PostConstruct
     public void init()
