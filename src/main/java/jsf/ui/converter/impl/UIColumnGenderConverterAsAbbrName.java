@@ -1,6 +1,6 @@
 package jsf.ui.converter.impl;
 
-import entity.type.Gender;
+import entity.database.type.Gender;
 import jsf.ui.converter.UIColumnConverter;
 
 /**

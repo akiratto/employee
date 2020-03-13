@@ -5,7 +5,7 @@ import csv.annotation.CsvColumnFormula;
 import csv.annotation.CsvConverter;
 import csv.converter.builtin.CsvColumnDateConverter;
 import employee.converter.GenderConverter;
-import entity.type.Gender;
+import entity.database.type.Gender;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;

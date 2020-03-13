@@ -1,7 +1,7 @@
 package cdi.dependent;
 
 import cdi.base.dependent.EntityListSetting;
-import entity.TEmployee;
+import entity.database.EmployeeTable;
 import javax.enterprise.context.Dependent;
 
 /**
@@ -14,4 +14,4 @@ import javax.enterprise.context.Dependent;
  * @author Owner
  */
 @Dependent
-public class EmployeeListSetting extends EntityListSetting<TEmployee> { }
+public class EmployeeListSetting extends EntityListSetting<EmployeeTable> { }

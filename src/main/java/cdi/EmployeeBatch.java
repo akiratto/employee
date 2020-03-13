@@ -4,7 +4,7 @@ import cdi.interseptor.TransactionDebugger;
 import csv.CsvReadLineCustomValidationHandler;
 import csv.CsvReader;
 import csv.exception.CsvReadLineException;
-import entity.TEmployee;
+import entity.database.EmployeeTable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,9 +108,9 @@ public class EmployeeBatch implements Serializable {
             
             Integer errorCount = 0;
             Path csvFilePath = csvFile.toPath();
-            TEmployee employee = null;
+            EmployeeTable employee = null;
             try(CsvReader csvFileReader = new CsvReader(csvFilePath, Charset.forName("UTF-8"), customValidationHandler)) {
-                Tuple<TEmployee,Integer> employeeAndErrorCount = null;
+                Tuple<EmployeeTable,Integer> employeeAndErrorCount = null;
                 do {
                         employeeAndErrorCount = this.readLine100AndCommit(csvFileReader, errorCount);
                         System.out.println("--- 100 comitted ---");
@@ -133,12 +133,12 @@ public class EmployeeBatch implements Serializable {
     }
     
     @Transactional
-    private Tuple<TEmployee,Integer> readLine100AndCommit(CsvReader csvFile, Integer errorCount) throws IOException
+    private Tuple<EmployeeTable,Integer> readLine100AndCommit(CsvReader csvFile, Integer errorCount) throws IOException
     {
-        TEmployee employee = null;
+        EmployeeTable employee = null;
         for(int i = 1; i <= 100; i++) {
             try {
-                employee = csvFile.readLine(TEmployee.class);
+                employee = csvFile.readLine(EmployeeTable.class);
                 if(employee==null) break; 
                 em.persist(employee);
             } catch(CsvReadLineException e) {

@@ -1,4 +1,4 @@
-package entity.type;
+package entity.database.type;
 
 import java.util.function.Function;
 import java.util.function.Predicate;

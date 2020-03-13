@@ -1,6 +1,6 @@
 package cdi;
 
-import entity.TEmployee;
+import entity.database.EmployeeTable;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -26,7 +26,7 @@ public class EmployeeDetail implements Serializable {
         Edit
     }
     private Integer employeeId;
-    private TEmployee entity;
+    private EmployeeTable entity;
     private Mode mode = Mode.Undefined;
     
     @PersistenceContext
@@ -51,13 +51,13 @@ public class EmployeeDetail implements Serializable {
         System.out.println(">>> Employee initQueryParameters() BEGIN >>>");
         switch(this.mode) {
             case New:
-                entity = new TEmployee();
+                entity = new EmployeeTable();
                 break;
             case Edit:
             case Read:
                 if(employeeId == null || employeeId.equals("")) break;
                     
-                entity = em.find(TEmployee.class, employeeId);
+                entity = em.find(EmployeeTable.class, employeeId);
                 if(entity == null) break;
                 System.out.println("employee found! [employeeId=" + entity.getEmployee_id() + ", mode=" + mode.name() + "]");
                 break;       
@@ -91,7 +91,7 @@ public class EmployeeDetail implements Serializable {
         return viewId;
     }
 
-    public TEmployee getEntity() {
+    public EmployeeTable getEntity() {
         return entity;
     }
     
@@ -188,7 +188,7 @@ public class EmployeeDetail implements Serializable {
        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
        flash.setKeepMessages(true);        //リダイレクト後もFacesMessageが保持されるよう設定する
        
-       TEmployee employee = em.find(TEmployee.class, this.employeeId);
+       EmployeeTable employee = em.find(EmployeeTable.class, this.employeeId);
        if(employee == null) {
            FacesContext.getCurrentInstance()
                 .addMessage(
