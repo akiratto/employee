@@ -1,11 +1,13 @@
 package cdi.base;
 
+import cdi.reflection.EntityReflectionBean;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import jsf.ui.annotation.JsfUIId;
 
 /**
  *
@@ -21,6 +23,24 @@ public abstract class EntityDefinition<E extends Serializable> {
                 .collect(Collectors.toList());
     }
     
+    public <E extends Serializable> EntityFieldDefinition<E> getJsfUIIdFieldDefinition(E entity)
+    {
+        return getDeclaredFieldsByStream()
+                .map(field -> new EntityFieldDefinition<E>(field))
+                .filter(fieldDefinition -> fieldDefinition.hasJsfUIId())
+                .findFirst()
+                .orElse(null);
+    }
+    
+    public <E extends Serializable> EntityFieldDefinition<E> getJsfUIInternalIdFieldDefinition(E entity)
+    {
+        return getDeclaredFieldsByStream()
+                .map(field -> new EntityFieldDefinition<E>(field))
+                .filter(fieldDefinition -> fieldDefinition.hasJsfUIInternalId())
+                .findFirst()
+                .orElse(null);
+    }
+        
     protected Stream<Field> getDeclaredFieldsByStream()
     {
         return Arrays.asList( modelClass().getDeclaredFields() )

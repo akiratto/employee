@@ -24,4 +24,23 @@ public abstract class EntityInstance<E extends Serializable>
                 .map(field -> new EntityFieldInstance<>(field, modelInstance()))
                 .collect(Collectors.toList());
     }
+    
+    
+    public EntityFieldInstance<E> getJsfUIIdFieldInstance()
+    {
+        return getDeclaredFieldsByStream()
+                .map(field -> new EntityFieldInstance<>(field, modelInstance()))
+                .filter(fieldInstance -> fieldInstance.hasJsfUIId())
+                .findFirst()
+                .orElse(null);
+    }
+    
+    public EntityFieldInstance<E> getJsfUIInternalIdFieldInstance()
+    {
+        return getDeclaredFieldsByStream()
+                .map(field -> new EntityFieldInstance<>(field, modelInstance()))
+                .filter(fieldInstance -> fieldInstance.hasJsfUIInternalId())
+                .findFirst()
+                .orElse(null);
+    }
 }
