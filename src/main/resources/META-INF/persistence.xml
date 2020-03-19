@@ -3,7 +3,7 @@
   <persistence-unit name="EmployeePU" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>jdbc/employee</jta-data-source>
-    <class>entity.database.EmployeeTable</class>
+    <class>database.entity.TableEmployee</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>

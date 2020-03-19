@@ -63,11 +63,6 @@
             <version>7.0</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>3.3.1-SNAPSHOT</artifactId>
-            <version>7</version>
-        </dependency>
     </dependencies>
 
     <build>
