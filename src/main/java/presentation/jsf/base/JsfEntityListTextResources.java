@@ -39,13 +39,13 @@ public abstract class JsfEntityListTextResources<JE extends Serializable> implem
 //        }
 //        modelClass = dummy.getClass().getComponentType();
 //    }
-    abstract public Class<JE> modelClass();
+    abstract public Class<JE> entityClazz();
     
-    private JsfUIModel           getJsfUIModel() { return modelClass().getDeclaredAnnotation(JsfUIModel.class); }
-    private JsfUIListPage        getJsfUIListPage() { return modelClass().getDeclaredAnnotation(JsfUIListPage.class); }
-    private JsfUIDetailPage      getJsfUIDetailPage() { return modelClass().getDeclaredAnnotation(JsfUIDetailPage.class); }
-    private JsfUICreateBatchPage getJsfUICreateBatchPage() { return modelClass().getDeclaredAnnotation(JsfUICreateBatchPage.class); }
-    private JsfUIListPageButtons getJsfUIListPageButtons() { return modelClass().getDeclaredAnnotation(JsfUIListPageButtons.class); }
+    private JsfUIModel           getJsfUIModel() { return entityClazz().getDeclaredAnnotation(JsfUIModel.class); }
+    private JsfUIListPage        getJsfUIListPage() { return entityClazz().getDeclaredAnnotation(JsfUIListPage.class); }
+    private JsfUIDetailPage      getJsfUIDetailPage() { return entityClazz().getDeclaredAnnotation(JsfUIDetailPage.class); }
+    private JsfUICreateBatchPage getJsfUICreateBatchPage() { return entityClazz().getDeclaredAnnotation(JsfUICreateBatchPage.class); }
+    private JsfUIListPageButtons getJsfUIListPageButtons() { return entityClazz().getDeclaredAnnotation(JsfUIListPageButtons.class); }
     
     public String modelTitle()          { return Optional.ofNullable(getJsfUIModel()).map(JsfUIModel::modelTitle).orElse(""); }
     public String listPageName()         { return Optional.ofNullable(getJsfUIListPage()).map(JsfUIListPage::listPageName).orElse(""); }
@@ -64,7 +64,7 @@ public abstract class JsfEntityListTextResources<JE extends Serializable> implem
     public String modelIdName()
     {
         String modelIdName = "";
-        for(Field field : modelClass().getDeclaredFields()) {
+        for(Field field : entityClazz().getDeclaredFields()) {
             JsfUIId jsfUIId = field.getAnnotation(JsfUIId.class);
             if(jsfUIId == null) continue;
             
@@ -79,7 +79,7 @@ public abstract class JsfEntityListTextResources<JE extends Serializable> implem
     public String modelIdTitle()
     {
         String modelIdTitle = "";
-        for(Field field : modelClass().getDeclaredFields()) {
+        for(Field field : entityClazz().getDeclaredFields()) {
             JsfUIId jsfUIId = field.getAnnotation(JsfUIId.class);
             if(jsfUIId == null) continue;
             

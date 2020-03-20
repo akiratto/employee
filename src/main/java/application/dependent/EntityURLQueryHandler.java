@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application.util;
+package application.dependent;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -20,7 +20,6 @@ import javax.enterprise.context.Dependent;
  *
  * @author owner
  */
-@Dependent
 public class EntityURLQueryHandler<E extends Serializable> implements Serializable  {
     
     public Map<String,String> generateQueryStrings(E searchCondition)

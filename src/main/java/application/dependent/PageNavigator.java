@@ -1,4 +1,4 @@
-package application.util;
+package application.dependent;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;

@@ -1,7 +1,7 @@
 package presentation.jsf.annotation.dynamic;
 
 import java.lang.annotation.Annotation;
-import application.type.OrderType;
+import database.type.JPQLOrderType;
 import presentation.jsf.annotation.JsfUIListColumnOrder;
 
 /**
@@ -9,17 +9,17 @@ import presentation.jsf.annotation.JsfUIListColumnOrder;
  * @author Owner
  */
 public class DynJsfUIListColumnOrder implements JsfUIListColumnOrder {
-    private OrderType orderType;
+    private JPQLOrderType orderType;
     private int orderSequence;
     
-    public DynJsfUIListColumnOrder(OrderType orderType, int orderSequence)
+    public DynJsfUIListColumnOrder(JPQLOrderType orderType, int orderSequence)
     {
         this.orderType = orderType;
         this.orderSequence = orderSequence;
     }
     
     @Override
-    public OrderType orderType() {
+    public JPQLOrderType orderType() {
         return orderType;
     }
 

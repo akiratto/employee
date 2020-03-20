@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
-import application.type.OrderType;
+import database.type.JPQLOrderType;
 import presentation.jsf.annotation.JsfUIListColumnOrder;
 import presentation.jsf.annotation.dynamic.DynJsfUIListColumnOrder;
 import presentation.jsf.type.JsfUIColumnSetting;

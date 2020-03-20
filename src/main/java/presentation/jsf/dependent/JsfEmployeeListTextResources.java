@@ -12,7 +12,7 @@ import presentation.jsf.entity.JsfEmployee;
 public class JsfEmployeeListTextResources extends JsfEntityListTextResources<JsfEmployee> {
 
     @Override
-    public Class<JsfEmployee> modelClass() {
+    public Class<JsfEmployee> entityClazz() {
         return JsfEmployee.class;
     }
     

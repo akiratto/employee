@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import presentation.jsf.annotation.JsfConverter;
 import presentation.jsf.type.JsfUIColumnType;
-import application.type.OrderType;
+import database.type.JPQLOrderType;
 import presentation.jsf.type.JsfUISearchMethodType;
 import presentation.jsf.annotation.JsfUICreateBatchPage;
 import presentation.jsf.annotation.JsfUIDetailPage;
@@ -63,7 +63,7 @@ public class JsfEmployee extends EntityInstance<JsfEmployee> implements Serializ
     @JsfUIListColumn(componentId = "search_employee_code",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "社員コード")
-    @JsfUIListColumnOrder(orderSequence = 1, orderType = OrderType.DESCENDING)
+    @JsfUIListColumnOrder(orderSequence = 1, orderType = JPQLOrderType.DESCENDING)
     @JsfUISearchColumn(componentId = "search_employee_code", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員コード")

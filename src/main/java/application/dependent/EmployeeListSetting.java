@@ -1,8 +1,8 @@
-package application.util;
+package application.dependent;
 
 import presentation.jsf.base.JsfEntityListTextResources;
-import database.entity.TableEmployee;
 import javax.enterprise.context.Dependent;
+import presentation.jsf.entity.JsfEmployee;
 
 /**
  * デプロイ時にCDIがEntityListSetting<TEmployee>を注入可能にするため定義
@@ -14,4 +14,11 @@ import javax.enterprise.context.Dependent;
  * @author Owner
  */
 @Dependent
-public class EmployeeListSetting extends JsfEntityListTextResources<TableEmployee> { }
+public class EmployeeListSetting extends JsfEntityListTextResources<JsfEmployee> 
+{ 
+    @Override
+    public Class<JsfEmployee> entityClazz() {
+        return JsfEmployee.class;
+    }
+    
+}
