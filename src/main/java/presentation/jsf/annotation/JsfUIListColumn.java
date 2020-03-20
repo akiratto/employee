@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import presentation.jsf.type.JsfUIColumnType;
-import presentation.jsf.type.JsfUIOrderType;
+import application.type.OrderType;
 import presentation.jsf.converter.UIColumnConverter;
 
 /**

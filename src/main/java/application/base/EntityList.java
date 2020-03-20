@@ -1,6 +1,9 @@
 package application.base;
 
-import application.util.EntityCRUD;
+import application.converter.JsfEntityAndTableEntityConverter;
+import presentation.jsf.base.JsfEntityListTextResources;
+import presentation.jsf.base.JsfEntityListSession;
+import application.util.EntityCRUDService;
 import application.util.EntityURLQueryHandler;
 import application.util.PageNavigator;
 import java.io.Serializable;
@@ -24,32 +27,33 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
         implements Serializable
 {   
     private JE searchCondition;
-    private List<JE> entities;
-    private DataModel<JE> entityDataModel;
-    private Long entityAllCount;
+    private List<JE> jsfEntities;
+    private DataModel<JE> jsfEntityDataModel;
+    private Long jsfEntityAllCount;
     @Inject
-    private EntityCRUD<TE,PK> entityCRUD;
+    private EntityCRUDService<TE,PK> entityCRUDService;
     @Inject
     private PageNavigator pageNavigator;
     @Inject
-    private EntityListSetting<JE> setting;
-    @Inject
     private EntityURLQueryHandler<JE> urlQueryHandler;
     
-    abstract public Class<JE> jsfEntityClass();
-    abstract public EntityListSession<JE> jsfEntityListSession();
+    abstract protected Class<JE> jsfEntityClass();
+    abstract protected JsfEntityListSession<JE> jsfEntityListSession();
+    abstract protected JsfEntityListTextResources<JE> jsfEntityListTextResources();
+    abstract protected JsfEntityAndTableEntityConverter<JE,TE> jsfEntityAndTableEntityConverter();
     
     abstract public Class<TE> tableEntityClass();
 
     public PageNavigator getPageNavigator() { return pageNavigator; }
-    public EntityListSetting getSetting() { return setting; }
+    public JsfEntityListSession<JE> getSession() { return jsfEntityListSession(); }
+    public JsfEntityListTextResources<JE> getTextResources() { return jsfEntityListTextResources(); }
     
     public JE       getSearchCondition() { return searchCondition; }
-    public List<JE> getEntities()   { return entities; }
-    public DataModel<JE> getEntityDataModel() { return entityDataModel; }
+    public List<JE> getJsfEntities()   { return jsfEntities; }
+    public DataModel<JE> getJsfEntityDataModel() { return jsfEntityDataModel; }
    
-    public int     getEntityCount()     { return entities.size(); }
-    public Long    getEntityAllCount()  { return entityAllCount; }
+    public int     getJsfEntityCount()     { return jsfEntities.size(); }
+    public Long    getJsfEntityAllCount()  { return jsfEntityAllCount; }
     
     @PostConstruct
     public void init()
@@ -60,9 +64,9 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
             ex.printStackTrace();
             this.searchCondition = null;
         }
-        this.entities = new ArrayList<>();
-        this.entityDataModel = new ListDataModel<>(entities);
-        this.entityAllCount = 0L;
+        this.jsfEntities = new ArrayList<>();
+        this.jsfEntityDataModel = new ListDataModel<>(jsfEntities);
+        this.jsfEntityAllCount = 0L;
     }
             
     @PreDestroy
@@ -74,16 +78,17 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
     public void viewAction() 
     {
         //検索条件を基に抽出処理を実行する -------------------------------------
-        this.entityAllCount = entityCRUD.countAll(searchCondition, tableEntityClass());
+        TE searchConditionTable = jsfEntityAndTableEntityConverter().toTableEntity(searchCondition);
+        this.jsfEntityAllCount = entityCRUDService.countAll(searchConditionTable, tableEntityClass());
 
-        getPageNavigator().build(entityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
+        getPageNavigator().build(jsfEntityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
         
-        this.entities = entityCRUD.search(searchCondition, 
+        this.jsfEntities = entityCRUDService.search(searchConditionTable, 
                                                getPageNavigator().getOffset(), 
                                                getPageNavigator().getRowCountPerPage(),
-                                               jsfEntityClass(),
+                                               tableEntityClass(),
                                                jsfEntityListSession()); 
-        this.entityDataModel = new ListDataModel<>(entities);
+        this.jsfEntityDataModel = new ListDataModel<>(jsfEntities);
     }
     
     public String create()
@@ -115,7 +120,7 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = entityCRUD.deleteAll(jsfEntityClass());
+        int deleteCount = entityCRUDService.deleteAll(jsfEntityClass());
         
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(deleteCount)));
         String queryString = urlQueryHandler.generateString(searchCondition);
@@ -130,19 +135,19 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
-        E entity = entityCRUD.find(entityId, jsfEntityClass());
+        E entity = entityCRUDService.find(entityId, jsfEntityClass());
         if(entity == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound() ));
             return search();
         }
-        entityCRUD.delete(entityId, jsfEntityClass());
+        entityCRUDService.delete(entityId, jsfEntityClass());
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityId.toString()) ));
         return search();
     }
     
     public String gotoDetail(PK entityId, String mode)
     {
-        E entity = entityCRUD.find(entityId, jsfEntityClass());
+        E entity = entityCRUDService.find(entityId, jsfEntityClass());
         if(entity == null) {
             return "";
         }

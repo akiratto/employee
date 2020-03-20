@@ -1,6 +1,6 @@
-package application;
+package presentation.jsf;
 
-import application.base.EntityListSession;
+import presentation.jsf.base.JsfEntityListSession;
 import database.entity.TableEmployee;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
-import presentation.jsf.type.JsfUIOrderType;
+import application.type.OrderType;
 import presentation.jsf.annotation.JsfUIListColumnOrder;
 import presentation.jsf.annotation.dynamic.DynJsfUIListColumnOrder;
 import presentation.jsf.type.JsfUIColumnSetting;
@@ -20,7 +20,7 @@ import presentation.jsf.type.JsfUIColumnSetting;
  */
 @Named
 @SessionScoped
-public class EmployeeListSession extends EntityListSession<TableEmployee> {
+public class JsfEmployeeListSession extends JsfEntityListSession<TableEmployee> {
 
     @Override
     public Class<TableEmployee> modelClass() {

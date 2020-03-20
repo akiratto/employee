@@ -1,4 +1,4 @@
-package application.base;
+package presentation.jsf.base;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -19,32 +19,33 @@ import presentation.jsf.annotation.JsfUIModelColumn;
  *
  * @author Owner
  */
-public class EntityListSetting<E extends Serializable> implements Serializable {
-    private Class<?> modelClass;
+public abstract class JsfEntityListTextResources<JE extends Serializable> implements Serializable {
+//    private Class<?> modelClass;
+//    
+//    /*
+//        コンストラクタの引数はダミー。
+//        実行時にEntityListSettingの型引数Eに指定された型を
+//        取得するためのもの。
+//        
+//        引数に型Eの可変長配列を指定することで
+//        本コンストラクタ呼び出し時に引数を指定しなくても
+//        dummy変数に型変数Eに指定された型情報が残る。
+//        それをgetComponentType()メソッドで取得している。
+//    */
+//    public JsfEntityListMessages(JE... dummy)
+//    {
+//        if(dummy.length > 0) {
+//            throw new IllegalArgumentException("dummy引数を指定してはいけません。");
+//        }
+//        modelClass = dummy.getClass().getComponentType();
+//    }
+    abstract public Class<JE> modelClass();
     
-    /*
-        コンストラクタの引数はダミー。
-        実行時にEntityListSettingの型引数Eに指定された型を
-        取得するためのもの。
-        
-        引数に型Eの可変長配列を指定することで
-        本コンストラクタ呼び出し時に引数を指定しなくても
-        dummy変数に型変数Eに指定された型情報が残る。
-        それをgetComponentType()メソッドで取得している。
-    */
-    public EntityListSetting(E... dummy)
-    {
-        if(dummy.length > 0) {
-            throw new IllegalArgumentException("dummy引数を指定してはいけません。");
-        }
-        modelClass = dummy.getClass().getComponentType();
-    }
-    
-    private JsfUIModel           getJsfUIModel() { return modelClass.getDeclaredAnnotation(JsfUIModel.class); }
-    private JsfUIListPage        getJsfUIListPage() { return modelClass.getDeclaredAnnotation(JsfUIListPage.class); }
-    private JsfUIDetailPage      getJsfUIDetailPage() { return modelClass.getDeclaredAnnotation(JsfUIDetailPage.class); }
-    private JsfUICreateBatchPage getJsfUICreateBatchPage() { return modelClass.getDeclaredAnnotation(JsfUICreateBatchPage.class); }
-    private JsfUIListPageButtons getJsfUIListPageButtons() { return modelClass.getDeclaredAnnotation(JsfUIListPageButtons.class); }
+    private JsfUIModel           getJsfUIModel() { return modelClass().getDeclaredAnnotation(JsfUIModel.class); }
+    private JsfUIListPage        getJsfUIListPage() { return modelClass().getDeclaredAnnotation(JsfUIListPage.class); }
+    private JsfUIDetailPage      getJsfUIDetailPage() { return modelClass().getDeclaredAnnotation(JsfUIDetailPage.class); }
+    private JsfUICreateBatchPage getJsfUICreateBatchPage() { return modelClass().getDeclaredAnnotation(JsfUICreateBatchPage.class); }
+    private JsfUIListPageButtons getJsfUIListPageButtons() { return modelClass().getDeclaredAnnotation(JsfUIListPageButtons.class); }
     
     public String modelTitle()          { return Optional.ofNullable(getJsfUIModel()).map(JsfUIModel::modelTitle).orElse(""); }
     public String listPageName()         { return Optional.ofNullable(getJsfUIListPage()).map(JsfUIListPage::listPageName).orElse(""); }
@@ -63,7 +64,7 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
     public String modelIdName()
     {
         String modelIdName = "";
-        for(Field field : modelClass.getDeclaredFields()) {
+        for(Field field : modelClass().getDeclaredFields()) {
             JsfUIId jsfUIId = field.getAnnotation(JsfUIId.class);
             if(jsfUIId == null) continue;
             
@@ -78,7 +79,7 @@ public class EntityListSetting<E extends Serializable> implements Serializable {
     public String modelIdTitle()
     {
         String modelIdTitle = "";
-        for(Field field : modelClass.getDeclaredFields()) {
+        for(Field field : modelClass().getDeclaredFields()) {
             JsfUIId jsfUIId = field.getAnnotation(JsfUIId.class);
             if(jsfUIId == null) continue;
             

@@ -1,13 +1,14 @@
 package presentation.jsf.entity;
 
 import database.type.Gender;
+import java.io.Serializable;
 import java.util.Date;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import presentation.jsf.annotation.JsfConverter;
 import presentation.jsf.type.JsfUIColumnType;
-import presentation.jsf.type.JsfUIOrderType;
+import application.type.OrderType;
 import presentation.jsf.type.JsfUISearchMethodType;
 import presentation.jsf.annotation.JsfUICreateBatchPage;
 import presentation.jsf.annotation.JsfUIDetailPage;
@@ -24,6 +25,7 @@ import presentation.jsf.annotation.JsfUISearchColumn;
 import presentation.jsf.annotation.JsfUISearchColumnConverter;
 import presentation.jsf.annotation.JsfUISelectItem;
 import presentation.jsf.annotation.JsfUISelectOne;
+import presentation.jsf.base.EntityInstance;
 import presentation.jsf.converter.impl.UIColumnGenderConverterAsAbbrName;
 import presentation.jsf.converter.impl.UIColumnGenderConverterAsJpName;
 
@@ -36,7 +38,18 @@ import presentation.jsf.converter.impl.UIColumnGenderConverterAsJpName;
 @JsfUIDetailPage      ( detailPageTitle      = "社員詳細",     detailPageName      = "employeeDetail" )
 @JsfUICreateBatchPage ( createBatchPageTitle = "社員一括登録", createBatchPageName = "employeeBatch" )
 @JsfUIListPageButtons ( createButtonTitle = "新規登録", searchButtonTitle = "検索", clearButtonTitle = "クリア", createBatchButtonTitle = "一括登録", deleteAllButtonTitle = "全件削除")
-public class JsfEmployee {
+public class JsfEmployee extends EntityInstance<JsfEmployee> implements Serializable {
+
+    @Override
+    public Class<JsfEmployee> modelClass() {
+        return JsfEmployee.class;
+    }
+    
+    @Override
+    public JsfEmployee modelInstance() {
+        return this;
+    }
+    
     //--Jsf
     @JsfUIInternalId
     private Integer employee_id;
@@ -50,7 +63,7 @@ public class JsfEmployee {
     @JsfUIListColumn(componentId = "search_employee_code",
                      columnType = JsfUIColumnType.HTML_INPUT_TEXT,
                      labelTitle = "社員コード")
-    @JsfUIListColumnOrder(orderSequence = 1, orderType = JsfUIOrderType.DESCENDING)
+    @JsfUIListColumnOrder(orderSequence = 1, orderType = OrderType.DESCENDING)
     @JsfUISearchColumn(componentId = "search_employee_code", 
                  columnType = JsfUIColumnType.HTML_INPUT_TEXT, 
                  labelTitle = "社員コード")

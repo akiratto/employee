@@ -1,4 +1,4 @@
-package application.base;
+package presentation.jsf.base;
 
 import presentation.jsf.base.EntityDefinition;
 import java.io.Serializable;
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
-import presentation.jsf.type.JsfUIOrderType;
+import application.type.OrderType;
 import presentation.jsf.annotation.JsfUIListColumnOrder;
 import presentation.jsf.annotation.dynamic.DynJsfUIListColumnOrder;
 import presentation.jsf.type.JsfUIColumnSetting;
@@ -16,8 +16,8 @@ import presentation.jsf.type.JsfUIColumnSetting;
  *
  * @author Owner
  */
-public abstract class EntityListSession<E extends Serializable>
-        extends EntityDefinition<E>
+public abstract class JsfEntityListSession<JE extends Serializable>
+        extends EntityDefinition<JE>
         implements Serializable 
 {
     Map<String,JsfUIColumnSetting> fieldSetting = new HashMap<>();
@@ -48,7 +48,7 @@ public abstract class EntityListSession<E extends Serializable>
     public void sortAscending()
     {
         String fieldName = "employeeCode";
-        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(JsfUIOrderType.ASCENDING, 1);
+        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(OrderType.ASCENDING, 1);
         JsfUIColumnSetting newEmployeeCodeUIColumnSetting = new JsfUIColumnSetting(fieldName, newOrder);
         
         fieldSetting.put("employeeCode", newEmployeeCodeUIColumnSetting);
@@ -57,7 +57,7 @@ public abstract class EntityListSession<E extends Serializable>
     public void sortDescending()
     {
         String fieldName = "employeeCode";
-        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(JsfUIOrderType.DESCENDING, 1);
+        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(OrderType.DESCENDING, 1);
         JsfUIColumnSetting newEmployeeCodeUIColumnSetting = new JsfUIColumnSetting(fieldName, newOrder);
         
         fieldSetting.put("employeeCode", newEmployeeCodeUIColumnSetting);

@@ -1,6 +1,6 @@
 package application.util;
 
-import application.base.EntityListSession;
+import presentation.jsf.base.JsfEntityListSession;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -15,9 +15,7 @@ import javax.enterprise.context.Dependent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import static presentation.jsf.type.JsfUIOrderType.ASCENDING;
-import static presentation.jsf.type.JsfUIOrderType.DESCENDING;
-import static presentation.jsf.type.JsfUIOrderType.NONE;
+import static application.type.OrderType.DESCENDING;
 import presentation.jsf.type.JsfUISearchMethodType;
 import presentation.jsf.annotation.JsfUIListColumnOrder;
 import presentation.jsf.annotation.JsfUIModel;
@@ -32,7 +30,7 @@ import util.Tuple;
  * @author owner
  */
 @Dependent
-public class EntityCRUD<E extends Serializable, PK extends Serializable> implements Serializable {
+public class EntityCRUDService<E extends Serializable, PK extends Serializable> implements Serializable {
     @PersistenceContext
     private EntityManager em;
     
@@ -90,24 +88,25 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
         jpqlWords.add(constructJPQLWhere(condition, modelClass));
         String jpql = String.join(" ", jpqlWords);
         
-        Function<EntityField, Tuple<String,Object>> function = entityField -> {
-            Tuple<String,Object> nameAndValue = new Tuple<>();
-            if(entityField.fieldValue != null) {
-                
-                switch(entityField.jsfUISearchMethodType) {
-                    case SEARCH_METHOD_EQUAL:
-                        nameAndValue._1 = entityField.fieldName;
-                        nameAndValue._2 = entityField.fieldValue;
-                        break;
-                        
-                    case SEARCH_METHOD_INCLUDE:
-                        nameAndValue._1 = entityField.fieldName;
-                        nameAndValue._2 = "%" + likeEscape(entityField.fieldValueAsStringInUISearchColumn) + "%";
-                        break;
-                }
-            }
-            return nameAndValue;
-        };
+        Function<EntityField, Tuple<String,Object>> function =  
+                entityField -> {
+                    Tuple<String,Object> nameAndValue = new Tuple<>();
+                    if(entityField.fieldValue != null) {
+
+                        switch(entityField.jsfUISearchMethodType) {
+                            case SEARCH_METHOD_EQUAL:
+                                nameAndValue._1 = entityField.fieldName;
+                                nameAndValue._2 = entityField.fieldValue;
+                                break;
+
+                            case SEARCH_METHOD_INCLUDE:
+                                nameAndValue._1 = entityField.fieldName;
+                                nameAndValue._2 = "%" + likeEscape(entityField.fieldValueAsStringInUISearchColumn) + "%";
+                                break;
+                        }
+                    }
+                    return nameAndValue;
+                };
         
         final TypedQuery<Long> query = em.createQuery(jpql, Long.class);
         mapEntityFields(condition, modelClass, function)
@@ -123,7 +122,7 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                           int offset, 
                           int rowCountPerPage, 
                           Class<E> modelClass, 
-                          EntityListSession<E> modelListSession) 
+                          JsfEntityListSession<E> modelListSession) 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
@@ -135,24 +134,25 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                                .filter(s -> !s.isEmpty())
                                .collect(Collectors.joining(" "));
         
-        Function<EntityField, Tuple<String,Object>> function = entityField -> {
-            Tuple<String,Object> nameAndValue = new Tuple<>();
-            if(entityField.fieldValue != null) {
-                
-                switch(entityField.jsfUISearchMethodType) {
-                    case SEARCH_METHOD_EQUAL:
-                        nameAndValue._1 = entityField.fieldName;
-                        nameAndValue._2 = entityField.fieldValue;
-                        break;
-                        
-                    case SEARCH_METHOD_INCLUDE:
-                        nameAndValue._1 = entityField.fieldName;
-                        nameAndValue._2 = "%" + likeEscape(entityField.fieldValueAsStringInUISearchColumn) + "%";
-                        break;
-                }
-            }
-            return nameAndValue;
-        };
+        Function<EntityField, Tuple<String,Object>> function =   
+                entityField -> {
+                    Tuple<String,Object> nameAndValue = new Tuple<>();
+                    if(entityField.fieldValue != null) {
+
+                        switch(entityField.jsfUISearchMethodType) {
+                            case SEARCH_METHOD_EQUAL:
+                                nameAndValue._1 = entityField.fieldName;
+                                nameAndValue._2 = entityField.fieldValue;
+                                break;
+
+                            case SEARCH_METHOD_INCLUDE:
+                                nameAndValue._1 = entityField.fieldName;
+                                nameAndValue._2 = "%" + likeEscape(entityField.fieldValueAsStringInUISearchColumn) + "%";
+                                break;
+                        }
+                    }
+                    return nameAndValue;
+                };
         
         final TypedQuery<E> query = em.createQuery(jpql, modelClass);
         mapEntityFields(condition, modelClass, function)
@@ -203,9 +203,9 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                     uiSearchColumnConverter = (UIColumnConverter)jsfUISearchColumnConverter.converter().newInstance();
                 }
             } catch (InstantiationException ex) {
-                Logger.getLogger(EntityCRUD.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EntityCRUDService.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IllegalAccessException ex) {
-                Logger.getLogger(EntityCRUD.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EntityCRUDService.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             JsfUIListColumnOrder jsfUIListColumnOrder = field.getAnnotation(JsfUIListColumnOrder.class);
@@ -237,21 +237,22 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
     }
     private String constructJPQLWhere(E condition, Class<E> modelClass) 
     {
-        Function<EntityField,String> function = entityField -> {
-            String conditionExpression = "";
-            if(entityField.fieldValue != null) {
-                switch(entityField.jsfUISearchMethodType) {
-                    case SEARCH_METHOD_EQUAL:
-                        conditionExpression = "t." + entityField.fieldName + "= :" + entityField.fieldName; 
-                        break;
+        Function<EntityField,String> function =  
+                entityField -> {
+                    String conditionExpression = "";
+                    if(entityField.fieldValue != null) {
+                        switch(entityField.jsfUISearchMethodType) {
+                            case SEARCH_METHOD_EQUAL:
+                                conditionExpression = "t." + entityField.fieldName + "= :" + entityField.fieldName; 
+                                break;
 
-                    case SEARCH_METHOD_INCLUDE:
-                        conditionExpression = "t." + entityField.fieldName + " like :"  + entityField.fieldName + " ESCAPE '\\'";
-                        break;
-                }
-            }
-            return conditionExpression;
-        };
+                            case SEARCH_METHOD_INCLUDE:
+                                conditionExpression = "t." + entityField.fieldName + " like :"  + entityField.fieldName + " ESCAPE '\\'";
+                                break;
+                        }
+                    }
+                    return conditionExpression;
+                };
         
         String wherePhrase = mapEntityFields(condition, modelClass, function)
                                         .stream()
@@ -261,10 +262,11 @@ public class EntityCRUD<E extends Serializable, PK extends Serializable> impleme
                 ? "WHERE " + wherePhrase : "";
     }
     
-    private String constructJPQLOrderBy(E condition, EntityListSession<E> modelSessionList)
+    private String constructJPQLOrderBy(E condition, JsfEntityListSession<E> modelSessionList)
     {
         //JsfUIListColumnOrder
-        Function<EntityField,Tuple<String,JsfUIListColumnOrder>> function = entityField -> {
+        Function<EntityField,Tuple<String,JsfUIListColumnOrder>> function =  
+                entityField -> {
             return new Tuple<>(entityField.fieldName, entityField.jsfUIListColumnOrder);
         };
         Comparator<JsfUIColumnSetting> comparator =

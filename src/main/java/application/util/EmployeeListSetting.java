@@ -1,6 +1,6 @@
 package application.util;
 
-import application.base.EntityListSetting;
+import presentation.jsf.base.JsfEntityListTextResources;
 import database.entity.TableEmployee;
 import javax.enterprise.context.Dependent;
 
@@ -14,4 +14,4 @@ import javax.enterprise.context.Dependent;
  * @author Owner
  */
 @Dependent
-public class EmployeeListSetting extends EntityListSetting<TableEmployee> { }
+public class EmployeeListSetting extends JsfEntityListTextResources<TableEmployee> { }

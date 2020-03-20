@@ -1,10 +1,10 @@
-package presentation.jsf.type;
+package application.type;
 
 /**
  *
  * @author Owner
  */
-public enum JsfUIOrderType {
+public enum OrderType {
     NONE,
     ASCENDING,
     DESCENDING;

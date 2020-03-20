@@ -1,7 +1,8 @@
 package application;
 
+import presentation.jsf.JsfEmployeeListSession;
 import application.base.EntityList;
-import application.base.EntityListSession;
+import presentation.jsf.base.JsfEntityListSession;
 import database.entity.TableEmployee;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
@@ -16,7 +17,7 @@ import javax.inject.Named;
 public class EmployeeList extends EntityList<TableEmployee, Integer> {   
 
     @Inject
-    private EmployeeListSession employeeListSession;
+    private JsfEmployeeListSession employeeListSession;
     
     @Override
     public Class<TableEmployee> modelClass() {
@@ -24,7 +25,7 @@ public class EmployeeList extends EntityList<TableEmployee, Integer> {
     }
 
     @Override
-    public EntityListSession modelListSession() {
+    public JsfEntityListSession modelListSession() {
         return employeeListSession;
     }
 }
