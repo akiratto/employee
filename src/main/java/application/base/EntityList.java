@@ -1,10 +1,11 @@
 package application.base;
 
+import presentation.jsf.base.JsfEntityListSearcher;
 import application.converter.JsfEntityAndTableEntityConverter;
 import presentation.jsf.base.JsfEntityListTextResources;
 import presentation.jsf.base.JsfEntityListSession;
 import database.dependent.EntityCRUDService;
-import application.dependent.EntityURLQueryHandler;
+import presentation.jsf.entity.JsfEntityURLQueryHandler;
 import application.dependent.PageNavigator;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,9 +34,11 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
     @Inject
     private EntityCRUDService<TE,PK> entityCRUDService;
     @Inject
+    private JsfEntityListSearcher<JE> searcher;
+    @Inject
     private PageNavigator pageNavigator;
     @Inject
-    private EntityURLQueryHandler<JE> urlQueryHandler;
+    private JsfEntityURLQueryHandler<JE> urlQueryHandler;
     
     abstract protected Class<JE> jsfEntityClass();
     abstract protected JsfEntityListSession<JE> jsfEntityListSession();

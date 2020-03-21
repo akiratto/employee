@@ -1,141 +1,57 @@
-package database.dependent;
+package presentation.jsf.base;
 
-import database.type.JPQLOrderBy;
-import presentation.jsf.base.JsfEntityListSession;
+import database.dependent.EntityCRUDService;
+import static database.type.JPQLOrderType.DESCENDING;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.enterprise.context.Dependent;
+import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import static database.type.JPQLOrderType.DESCENDING;
-import javax.persistence.Entity;
-import presentation.jsf.type.JsfUISearchMethodType;
 import presentation.jsf.annotation.JsfUIListColumnOrder;
-import presentation.jsf.annotation.JsfUIModel;
 import presentation.jsf.annotation.JsfUISearchColumn;
 import presentation.jsf.annotation.JsfUISearchColumnConverter;
+import presentation.jsf.base.JsfEntityListSession;
 import presentation.jsf.converter.UIColumnConverter;
 import presentation.jsf.type.JsfUIColumnSetting;
+import presentation.jsf.type.JsfUISearchMethodType;
 import util.Tuple;
 
 /**
  *
- * @author owner
+ * @author Owner
  */
-@Dependent
-public class EntityCRUDService<E extends Serializable, PK extends Serializable> implements Serializable {
+public abstract class JsfEntityListSearcher<JE extends Serializable> implements Serializable
+{
     @PersistenceContext
-    private EntityManager em;
+    EntityManager em;
     
-    public void create(Consumer<E> creater, Class<E> entityClazz) throws InstantiationException, IllegalAccessException {
-        E newEntity = entityClazz.newInstance();
-        creater.accept(newEntity);
-        em.persist(newEntity);
-        em.flush();
-        em.clear();
-    }
-
-    public E find(PK entityId, Class<E> entityClazz) {
-        E foundEntity = em.find(entityClazz, entityId);
-        em.clear();
-        return foundEntity;
-    }
-
-    public int update(PK entityId, Consumer<E> updater, Class<E> entityClazz) {
-        E foundEntity = em.find(entityClazz, entityId);
-        if(foundEntity==null) {
-            em.clear();
-            return 0;
-        }
-        updater.accept(foundEntity);    //管理状態のエンティティをupdater内でsetterによる値設定を行えば, UPDATE文が発行される
-        em.flush();
-        em.clear();
-        return 1;
-    }
-
-    public int delete(PK entityId, Class<E> entityClazz) {
-        E entity = em.find(entityClazz, entityId);
-        if(entity==null) {
-            em.clear();
-            return 0;
-        }
-        em.remove(entity);
-        em.flush();
-        em.clear();
-        return 1;
-    }
-
-    public int deleteAll(Class<E> entityClazz) {
-        int deleteCount = em.createQuery("DELETE FROM " + entityName(entityClazz)).executeUpdate();
-        return deleteCount;
-    }
-
-    public Long countAll(E condition, Class<E> entityClazz) 
-    {
-        List<String> jpqlWords = new ArrayList<>();
-        jpqlWords.add("SELECT");
-        jpqlWords.add("count(t)");
-        jpqlWords.add(constructJPQLFrom(entityClazz));
-        jpqlWords.add(constructJPQLWhere(condition, entityClazz));
-        String jpql = String.join(" ", jpqlWords);
-        
-        Function<EntityField, Tuple<String,Object>> function =  
-                 entityField -> {
-                    Tuple<String,Object> nameAndValue = new Tuple<>();
-                    if(entityField.fieldValue != null) {
-
-                        switch(entityField.jsfUISearchMethodType) {
-                            case SEARCH_METHOD_EQUAL:
-                                nameAndValue._1 = entityField.fieldName;
-                                nameAndValue._2 = entityField.fieldValue;
-                                break;
-
-                            case SEARCH_METHOD_INCLUDE:
-                                nameAndValue._1 = entityField.fieldName;
-                                nameAndValue._2 = "%" + likeEscape(entityField.fieldValueAsStringInUISearchColumn) + "%";
-                                break;
-                        }
-                    }
-                    return nameAndValue;
-                };
-        
-        final TypedQuery<Long> query = em.createQuery(jpql, Long.class);
-        mapEntityFields(condition, entityClazz, function)
-                .stream()
-                .filter(nameAndValue -> nameAndValue._1 != null)
-//                .peek(nameAndValue -> System.out.println(nameAndValue._1 + " " + nameAndValue._2 + " "  + nameAndValue._2.getClass()))
-                .forEach(nameAndValue -> query.setParameter(nameAndValue._1, nameAndValue._2));
-        
-        return query.getSingleResult();    
-    }
-
-    public List<E> search(E condition, 
+    abstract protected Class<JE> entityClazz();
+    
+    public List<JE> search(JE condition, 
                           int offset, 
                           int rowCountPerPage, 
-                          Class<E> entityClazz, 
-                          JsfEntityListSession<E> entityListSession) 
+                          JsfEntityListSession<JE> jsfEntityListSession) 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
         jpqlWords.add("t");
-        jpqlWords.add(constructJPQLFrom(entityClazz));
-        jpqlWords.add(constructJPQLWhere(condition, entityClazz));
-        jpqlWords.add(constructJPQLOrderBy(condition, entityListSession));
+        jpqlWords.add(constructJPQLFrom());
+        jpqlWords.add(constructJPQLWhere(condition));
+        jpqlWords.add(constructJPQLOrderBy(condition, jsfEntityListSession));
         String jpql = jpqlWords.stream()
                                .filter(s -> !s.isEmpty())
                                .collect(Collectors.joining(" "));
         
         Function<EntityField, Tuple<String,Object>> function =   
-                 entityField -> {
+                     entityField -> {
                     Tuple<String,Object> nameAndValue = new Tuple<>();
                     if(entityField.fieldValue != null) {
 
@@ -154,8 +70,8 @@ public class EntityCRUDService<E extends Serializable, PK extends Serializable> 
                     return nameAndValue;
                 };
         
-        final TypedQuery<E> query = em.createQuery(jpql, entityClazz);
-        mapEntityFields(condition, entityClazz, function)
+        final TypedQuery<JE> query = em.createQuery(jpql, entityClazz());
+        mapEntityFields(condition, entityClazz(), function)
                 .stream()
                 .filter(nameAndValue -> nameAndValue._1 != null)
                 .forEach(nameAndValue -> query.setParameter(nameAndValue._1, nameAndValue._2));
@@ -164,9 +80,9 @@ public class EntityCRUDService<E extends Serializable, PK extends Serializable> 
                     .getResultList();
     }
     
-    private String constructJPQLFrom(Class<E> entityClazz)
+    private String constructJPQLFrom()
     {
-        return "FROM " + entityName(entityClazz) + " t";
+        return "FROM " + entityName() + " t";
     }
     
     private static class EntityField
@@ -179,7 +95,7 @@ public class EntityCRUDService<E extends Serializable, PK extends Serializable> 
         JsfUISearchColumnConverter jsfUISearchColumnConverter;
         JsfUIListColumnOrder jsfUIListColumnOrder;
     }
-    private <R> List<R> mapEntityFields(E entity, Class<E> modelClass, Function<EntityField,R> function)
+    private <R> List<R> mapEntityFields(JE entity, Class<JE> modelClass, Function<EntityField,R> function)
     {
         List<R> result = new ArrayList<>();
         
@@ -235,10 +151,10 @@ public class EntityCRUDService<E extends Serializable, PK extends Serializable> 
         }
         return result;
     }
-    private String constructJPQLWhere(E condition, Class<E> entityClazz) 
+    private String constructJPQLWhere(JE condition) 
     {
         Function<EntityField,String> function =  
-                 entityField -> {
+                     -> {
                     String conditionExpression = "";
                     if(entityField.fieldValue != null) {
                         switch(entityField.jsfUISearchMethodType) {
@@ -254,7 +170,7 @@ public class EntityCRUDService<E extends Serializable, PK extends Serializable> 
                     return conditionExpression;
                 };
         
-        String wherePhrase = mapEntityFields(condition, entityClazz, function)
+        String wherePhrase = mapEntityFields(condition, entityClazz(), function)
                                         .stream()
                                         .filter(conditionExpression -> !conditionExpression.isEmpty())
                                         .collect(Collectors.joining(" and "));
@@ -262,17 +178,12 @@ public class EntityCRUDService<E extends Serializable, PK extends Serializable> 
                 ? "WHERE " + wherePhrase : "";
     }
     
-    private String constructJPQLOrderBy(E condition, JsfEntityListSession<E> entityListSession)
+    private String constructJPQLOrderBy(JE condition, JsfEntityListSession<JE> jsfEntityListSession)
     {
-        //JsfUIListColumnOrder
-        Function<EntityField,Tuple<String,JsfUIListColumnOrder>> function =  
-                 entityField -> {
-            return new Tuple<>(entityField.fieldName, entityField.jsfUIListColumnOrder);
-        };
         Comparator<JsfUIColumnSetting> comparator =
                 Comparator.comparing(setting -> setting.getJsfUIListColumnOrder().orderSequence());
 
-        String orderPhrase = entityListSession.getUIColumnSettings()
+        String orderPhrase = jsfEntityListSession.getUIColumnSettings()
                                 .filter(setting -> setting != null)
                                 .filter(setting -> setting.getJsfUIListColumnOrder() != null)
                                 .sorted(comparator)
@@ -287,12 +198,12 @@ public class EntityCRUDService<E extends Serializable, PK extends Serializable> 
                 ? "ORDER BY " + orderPhrase : "";
     }
     
-    private String entityName(Class<E> entityClazz)
+    private String entityName()
     {
-        Entity entity = entityClazz.getDeclaredAnnotation(Entity.class);
+        Entity entity = entityClazz().getDeclaredAnnotation(Entity.class);
         return entity.name().isEmpty() 
                     ? entity.name() 
-                    : entityClazz.getSimpleName();
+                    : entityClazz().getSimpleName();
     }
     
     private String likeEscape(String likeCondition)

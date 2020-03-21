@@ -1,6 +1,11 @@
-package application.base;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package database.dependent;
 
-import database.dependent.EntityCRUDService;
+import database.type.JPQLOrderBy;
 import static database.type.JPQLOrderType.DESCENDING;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -28,30 +33,29 @@ import util.Tuple;
  *
  * @author Owner
  */
-public abstract class EntityListSearcher<E extends Serializable> implements Serializable
-{
+public abstract class TableEntityListSearcher<TE extends Serializable> implements Serializable {
     @PersistenceContext
     EntityManager em;
     
-    abstract protected Class<E> entityClazz();
+    abstract protected Class<TE> entityClazz();
     
-    public List<E> search(E condition, 
+    public List<TE> search(TE condition, 
                           int offset, 
                           int rowCountPerPage, 
-                          JsfEntityListSession<E> jsfEntityListSession) 
+                          JPQLOrderBy jpqlOrderBy) 
     {
         List<String> jpqlWords = new ArrayList<>();
         jpqlWords.add("SELECT");
         jpqlWords.add("t");
         jpqlWords.add(constructJPQLFrom());
         jpqlWords.add(constructJPQLWhere(condition));
-        jpqlWords.add(constructJPQLOrderBy(condition, jsfEntityListSession));
+        jpqlWords.add(jpqlOrderBy.build(true));
         String jpql = jpqlWords.stream()
                                .filter(s -> !s.isEmpty())
                                .collect(Collectors.joining(" "));
         
         Function<EntityField, Tuple<String,Object>> function =   
-                   entityField -> {
+                    entityField -> {
                     Tuple<String,Object> nameAndValue = new Tuple<>();
                     if(entityField.fieldValue != null) {
 
@@ -70,7 +74,7 @@ public abstract class EntityListSearcher<E extends Serializable> implements Seri
                     return nameAndValue;
                 };
         
-        final TypedQuery<E> query = em.createQuery(jpql, entityClazz());
+        final TypedQuery<TE> query = em.createQuery(jpql, entityClazz());
         mapEntityFields(condition, entityClazz(), function)
                 .stream()
                 .filter(nameAndValue -> nameAndValue._1 != null)
@@ -85,76 +89,76 @@ public abstract class EntityListSearcher<E extends Serializable> implements Seri
         return "FROM " + entityName() + " t";
     }
     
-    private static class EntityField
-    {
-        public String fieldName;
-        public Object fieldValue;
-        public String fieldValueAsStringInUISearchColumn;
-        JsfUISearchColumn jsfUISearchColumn;
-        JsfUISearchMethodType jsfUISearchMethodType;
-        JsfUISearchColumnConverter jsfUISearchColumnConverter;
-        JsfUIListColumnOrder jsfUIListColumnOrder;
-    }
-    private <R> List<R> mapEntityFields(E entity, Class<E> modelClass, Function<EntityField,R> function)
-    {
-        List<R> result = new ArrayList<>();
-        
-        for(Field field : modelClass.getDeclaredFields()) {
-            //JPAのEntityは、開発者が定義したフィールドとは別に
-            //JPA側で自動で名前の先頭に_(アンダーバー)が付くフィールドと
-            //serialVersionUIDフィールドが付加する。
-            //これらをフィールドは処理しない。
-            if(field.getName().startsWith("_")) continue;
-            if(field.getName().equals("serialVersionUID")) continue;
-            
-            JsfUISearchColumn jsfUISearchColumn = field.getAnnotation(JsfUISearchColumn.class);
-            if(jsfUISearchColumn==null) continue;
-            
-            JsfUISearchMethodType jsfUISearchMethodType = jsfUISearchColumn.searchMethodType();
-            JsfUISearchColumnConverter jsfUISearchColumnConverter = field.getAnnotation(JsfUISearchColumnConverter.class);
-            
-            UIColumnConverter uiSearchColumnConverter = null;
-            try {
-                if(jsfUISearchColumnConverter != null) {
-                    uiSearchColumnConverter = (UIColumnConverter)jsfUISearchColumnConverter.converter().newInstance();
-                }
-            } catch (InstantiationException ex) {
-                Logger.getLogger(EntityCRUDService.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(EntityCRUDService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            JsfUIListColumnOrder jsfUIListColumnOrder = field.getAnnotation(JsfUIListColumnOrder.class);
-            
-            Object fieldValueAsObject = null;
-            try {
-                boolean tmpAccessible = field.isAccessible();
-                field.setAccessible(true);
-                fieldValueAsObject = field.get(entity);
-                field.setAccessible(tmpAccessible);
-            } catch (IllegalAccessException ex) {
-                
-            } catch (IllegalArgumentException ex) {
-                
-            }
-            EntityField entityField = new EntityField();
-            entityField.fieldName = field.getName();
-            entityField.fieldValue = fieldValueAsObject;
-            entityField.fieldValueAsStringInUISearchColumn = fieldValueAsObject      == null ? "" 
-                                                           : uiSearchColumnConverter == null ? fieldValueAsObject.toString()
-                                                           : uiSearchColumnConverter.convertToUIColumnValue(fieldValueAsObject);
-            entityField.jsfUISearchColumn = jsfUISearchColumn;
-            entityField.jsfUISearchMethodType = jsfUISearchMethodType;
-            entityField.jsfUISearchColumnConverter = jsfUISearchColumnConverter;
-            entityField.jsfUIListColumnOrder = jsfUIListColumnOrder;
-            result.add( function.apply(entityField) );
-        }
-        return result;
-    }
-    private String constructJPQLWhere(E condition) 
+//    private static class EntityField
+//    {
+//        public String fieldName;
+//        public Object fieldValue;
+//        public String fieldValueAsStringInUISearchColumn;
+//        JsfUISearchColumn jsfUISearchColumn;
+//        JsfUISearchMethodType jsfUISearchMethodType;
+//        JsfUISearchColumnConverter jsfUISearchColumnConverter;
+//        JsfUIListColumnOrder jsfUIListColumnOrder;
+//    }
+//    private <R> List<R> mapEntityFields(TE entity, Class<TE> modelClass, Function<EntityField,R> function)
+//    {
+//        List<R> result = new ArrayList<>();
+//        
+//        for(Field field : modelClass.getDeclaredFields()) {
+//            //JPAのEntityは、開発者が定義したフィールドとは別に
+//            //JPA側で自動で名前の先頭に_(アンダーバー)が付くフィールドと
+//            //serialVersionUIDフィールドが付加する。
+//            //これらをフィールドは処理しない。
+//            if(field.getName().startsWith("_")) continue;
+//            if(field.getName().equals("serialVersionUID")) continue;
+//            
+//            JsfUISearchColumn jsfUISearchColumn = field.getAnnotation(JsfUISearchColumn.class);
+//            if(jsfUISearchColumn==null) continue;
+//            
+//            JsfUISearchMethodType jsfUISearchMethodType = jsfUISearchColumn.searchMethodType();
+//            JsfUISearchColumnConverter jsfUISearchColumnConverter = field.getAnnotation(JsfUISearchColumnConverter.class);
+//            
+//            UIColumnConverter uiSearchColumnConverter = null;
+//            try {
+//                if(jsfUISearchColumnConverter != null) {
+//                    uiSearchColumnConverter = (UIColumnConverter)jsfUISearchColumnConverter.converter().newInstance();
+//                }
+//            } catch (InstantiationException ex) {
+//                Logger.getLogger(EntityCRUDService.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (IllegalAccessException ex) {
+//                Logger.getLogger(EntityCRUDService.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            
+//            JsfUIListColumnOrder jsfUIListColumnOrder = field.getAnnotation(JsfUIListColumnOrder.class);
+//            
+//            Object fieldValueAsObject = null;
+//            try {
+//                boolean tmpAccessible = field.isAccessible();
+//                field.setAccessible(true);
+//                fieldValueAsObject = field.get(entity);
+//                field.setAccessible(tmpAccessible);
+//            } catch (IllegalAccessException ex) {
+//                
+//            } catch (IllegalArgumentException ex) {
+//                
+//            }
+//            EntityField entityField = new EntityField();
+//            entityField.fieldName = field.getName();
+//            entityField.fieldValue = fieldValueAsObject;
+//            entityField.fieldValueAsStringInUISearchColumn = fieldValueAsObject      == null ? "" 
+//                                                           : uiSearchColumnConverter == null ? fieldValueAsObject.toString()
+//                                                           : uiSearchColumnConverter.convertToUIColumnValue(fieldValueAsObject);
+//            entityField.jsfUISearchColumn = jsfUISearchColumn;
+//            entityField.jsfUISearchMethodType = jsfUISearchMethodType;
+//            entityField.jsfUISearchColumnConverter = jsfUISearchColumnConverter;
+//            entityField.jsfUIListColumnOrder = jsfUIListColumnOrder;
+//            result.add( function.apply(entityField) );
+//        }
+//        return result;
+//    }
+    private String constructJPQLWhere(TE condition) 
     {
         Function<EntityField,String> function =  
-                  entityField  -> {
+                    entityField -> {
                     String conditionExpression = "";
                     if(entityField.fieldValue != null) {
                         switch(entityField.jsfUISearchMethodType) {
@@ -178,12 +182,8 @@ public abstract class EntityListSearcher<E extends Serializable> implements Seri
                 ? "WHERE " + wherePhrase : "";
     }
     
-    private String constructJPQLOrderBy(E condition, JsfEntityListSession<E> jsfEntityListSession)
+    private String constructJPQLOrderBy(TE condition, JPQLOrderBy jpqlOrderBy)
     {
-        //JsfUIListColumnOrder
-        Function<EntityField,Tuple<String,JsfUIListColumnOrder>> function = entityField  -> {
-            return new Tuple<>(entityField.fieldName, entityField.jsfUIListColumnOrder);
-        };
         Comparator<JsfUIColumnSetting> comparator =
                 Comparator.comparing(setting -> setting.getJsfUIListColumnOrder().orderSequence());
 
