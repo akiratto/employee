@@ -1,15 +1,16 @@
 package application.base;
 
-import presentation.jsf.base.JsfEntityListSearcher;
 import application.converter.JsfEntityAndTableEntityConverter;
 import presentation.jsf.base.JsfEntityListTextResources;
 import presentation.jsf.base.JsfEntityListSession;
 import database.dependent.EntityCRUDService;
 import presentation.jsf.entity.JsfEntityURLQueryHandler;
 import application.dependent.PageNavigator;
+import database.base.EntityListSearcher;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
@@ -32,31 +33,36 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
     private DataModel<JE> jsfEntityDataModel;
     private Long jsfEntityAllCount;
     @Inject
-    private EntityCRUDService<TE,PK> entityCRUDService;
-    @Inject
-    private JsfEntityListSearcher<JE> searcher;
-    @Inject
     private PageNavigator pageNavigator;
     @Inject
     private JsfEntityURLQueryHandler<JE> urlQueryHandler;
+    @Inject
+    private JsfEntityListTextResources<JE> jsfEntityListTextResources;
+    @Inject
+    private JsfEntityListSession<JE> jsfEntityListSession;
+    
+    @Inject
+    private JsfEntityAndTableEntityConverter<JE,TE> jsfEntityAndTableEntityConverter;
+    
+    @Inject
+    private EntityCRUDService<TE,PK> entityCRUDService;
+    @Inject
+    private EntityListSearcher<TE> searcher;
     
     abstract protected Class<JE> jsfEntityClass();
-    abstract protected JsfEntityListSession<JE> jsfEntityListSession();
-    abstract protected JsfEntityListTextResources<JE> jsfEntityListTextResources();
-    abstract protected JsfEntityAndTableEntityConverter<JE,TE> jsfEntityAndTableEntityConverter();
     
-    abstract public Class<TE> tableEntityClass();
-
+    public JE            getSearchCondition() { return searchCondition; }
     public PageNavigator getPageNavigator() { return pageNavigator; }
-    public JsfEntityListSession<JE> getSession() { return jsfEntityListSession(); }
-    public JsfEntityListTextResources<JE> getTextResources() { return jsfEntityListTextResources(); }
+    public JsfEntityListSession<JE>       getSession() { return jsfEntityListSession; }
+    public JsfEntityListTextResources<JE> getTextResources() { return jsfEntityListTextResources; }
     
-    public JE       getSearchCondition() { return searchCondition; }
-    public List<JE> getJsfEntities()   { return jsfEntities; }
+    public List<JE>      getJsfEntities()   { return jsfEntities; }
     public DataModel<JE> getJsfEntityDataModel() { return jsfEntityDataModel; }
    
     public int     getJsfEntityCount()     { return jsfEntities.size(); }
     public Long    getJsfEntityAllCount()  { return jsfEntityAllCount; }
+    
+    abstract public Class<TE> tableEntityClass();
     
     @PostConstruct
     public void init()
@@ -81,41 +87,40 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
     public void viewAction() 
     {
         //検索条件を基に抽出処理を実行する -------------------------------------
-        TE searchConditionTable = jsfEntityAndTableEntityConverter().toTableEntity(searchCondition);
-        this.jsfEntityAllCount = entityCRUDService.countAll(searchConditionTable, tableEntityClass());
-
-        getPageNavigator().build(jsfEntityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
+        TE searchConditionTable = jsfEntityAndTableEntityConverter.toTableEntity(searchCondition);
         
-        this.jsfEntities = entityCRUDService.search(searchConditionTable, 
-                                               getPageNavigator().getOffset(), 
-                                               getPageNavigator().getRowCountPerPage(),
-                                               tableEntityClass(),
-                                               jsfEntityListSession()); 
+        this.jsfEntityAllCount = searcher.count(searchConditionTable);
+
+        pageNavigator.build(jsfEntityAllCount, urlQueryHandler.generateQueryStrings(searchCondition));
+        
+        this.jsfEntities = searcher.search(searchConditionTable, pageNavigator)
+                              .stream()
+                              .map(te -> jsfEntityAndTableEntityConverter.toJsfEntity(te))
+                              .collect(Collectors.toList());
         this.jsfEntityDataModel = new ListDataModel<>(jsfEntities);
     }
     
     public String create()
     { 
-        return setting.detailPageName() 
-                        + "?faces-redirect=true&mode=New";
+        return jsfEntityListTextResources.detailPageName() + "?faces-redirect=true&mode=New";
     }
     
     public String search()
     {
         String queryString = urlQueryHandler.generateString(searchCondition);        
-        return setting.listPageName() 
+        return jsfEntityListTextResources.listPageName() 
                 + "?faces-redirect=true" 
                 + (queryString.isEmpty() ? "" : "&" + queryString);
     }
     
     public String clear()
     {
-        return setting.listPageName() + "?faces-redirect=true";
+        return jsfEntityListTextResources.listPageName() + "?faces-redirect=true";
     }
     
     public String createBatch()
     {
-        return setting.createBatchPageName() + "?faces-redirect=true";
+        return jsfEntityListTextResources.createBatchPageName() + "?faces-redirect=true";
     }
     
     @Transactional
@@ -123,11 +128,11 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = entityCRUDService.deleteAll(jsfEntityClass());
+        int deleteCount = entityCRUDService.deleteAll(tableEntityClass());
         
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(setting.messageDeleteAllEntityCompleted(deleteCount)));
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(jsfEntityListTextResources.messageDeleteAllEntityCompleted(deleteCount)));
         String queryString = urlQueryHandler.generateString(searchCondition);
-        return setting.listPageName() 
+        return jsfEntityListTextResources.listPageName() 
                         + "?faces-redirect=true" 
                         + (queryString.isEmpty() ? "" : "&" + queryString);
     }
@@ -138,23 +143,23 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
-        E entity = entityCRUDService.find(entityId, jsfEntityClass());
+        TE entity = entityCRUDService.find(entityId, tableEntityClass());
         if(entity == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityNotFound() ));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( jsfEntityListTextResources.messageDeleteEntityNotFound() ));
             return search();
         }
-        entityCRUDService.delete(entityId, jsfEntityClass());
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( setting.messageDeleteEntityCompleted(entityId.toString()) ));
+        entityCRUDService.delete(entityId, tableEntityClass());
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage( jsfEntityListTextResources.messageDeleteEntityCompleted(entityId.toString()) ));
         return search();
     }
     
     public String gotoDetail(PK entityId, String mode)
     {
-        E entity = entityCRUDService.find(entityId, jsfEntityClass());
+        TE entity = entityCRUDService.find(entityId, tableEntityClass());
         if(entity == null) {
             return "";
         }
-        return setting.detailPageName() 
+        return jsfEntityListTextResources.detailPageName() 
                             + "?faces-redirect=true&employee_id=" 
                             + urlQueryHandler.urlEncode(entityId.toString()) 
                             + "&mode=" 
@@ -163,13 +168,13 @@ public abstract class EntityList<JE extends Serializable, TE extends Serializabl
     
     public String sortAscending()
     {
-        jsfEntityListSession().sortAscending();
+        jsfEntityListSession.sortAscending();
         return search();
     }
     
     public String sortDescending()
     {
-        jsfEntityListSession().sortDescending();
+        jsfEntityListSession.sortDescending();
         return search();
     }
 }

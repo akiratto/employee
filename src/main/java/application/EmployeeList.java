@@ -1,12 +1,11 @@
 package application;
 
-import presentation.jsf.JsfEmployeeListSession;
 import application.base.EntityList;
 import presentation.jsf.base.JsfEntityListSession;
 import database.entity.TableEmployee;
 import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
+import presentation.jsf.entity.JsfEmployee;
 
 /**
  *
@@ -14,18 +13,16 @@ import javax.inject.Named;
  */
 @Named
 @ViewScoped
-public class EmployeeList extends EntityList<TableEmployee, Integer> {   
+public class EmployeeList extends EntityList<JsfEmployee, TableEmployee, Integer> {   
 
-    @Inject
-    private JsfEmployeeListSession employeeListSession;
-    
     @Override
-    public Class<TableEmployee> modelClass() {
+    protected Class<JsfEmployee> jsfEntityClass() {
+        return JsfEmployee.class;
+    }
+
+    @Override
+    public Class<TableEmployee> tableEntityClass() {
         return TableEmployee.class;
     }
 
-    @Override
-    public JsfEntityListSession modelListSession() {
-        return employeeListSession;
-    }
 }

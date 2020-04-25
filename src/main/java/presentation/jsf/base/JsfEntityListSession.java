@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
-import database.type.JPQLOrderType;
+import database.type.SearchOrderType;
 import presentation.jsf.annotation.JsfUIListColumnOrder;
 import presentation.jsf.annotation.dynamic.DynJsfUIListColumnOrder;
 import presentation.jsf.type.JsfUIColumnSetting;
@@ -48,7 +48,7 @@ public abstract class JsfEntityListSession<JE extends Serializable>
     public void sortAscending()
     {
         String fieldName = "employeeCode";
-        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(JPQLOrderType.ASCENDING, 1);
+        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(SearchOrderType.ASCENDING, 1);
         JsfUIColumnSetting newEmployeeCodeUIColumnSetting = new JsfUIColumnSetting(fieldName, newOrder);
         
         fieldSetting.put("employeeCode", newEmployeeCodeUIColumnSetting);
@@ -57,7 +57,7 @@ public abstract class JsfEntityListSession<JE extends Serializable>
     public void sortDescending()
     {
         String fieldName = "employeeCode";
-        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(JPQLOrderType.DESCENDING, 1);
+        JsfUIListColumnOrder newOrder = new DynJsfUIListColumnOrder(SearchOrderType.DESCENDING, 1);
         JsfUIColumnSetting newEmployeeCodeUIColumnSetting = new JsfUIColumnSetting(fieldName, newOrder);
         
         fieldSetting.put("employeeCode", newEmployeeCodeUIColumnSetting);

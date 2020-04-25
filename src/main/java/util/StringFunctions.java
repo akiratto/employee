@@ -24,4 +24,11 @@ public class StringFunctions {
         }
         return sb.toString();
     }
+    
+    public static String likeEscape(String likeCondition)
+    {
+        return likeCondition
+                .replaceAll("_", "\\\\_")
+                .replaceAll("%", "\\\\%");
+    } 
 }

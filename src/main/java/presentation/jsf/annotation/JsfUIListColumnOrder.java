@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import database.type.JPQLOrderType;
+import database.type.SearchOrderType;
 
 /**
  *
@@ -13,6 +13,6 @@ import database.type.JPQLOrderType;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsfUIListColumnOrder {
-    JPQLOrderType orderType() default JPQLOrderType.NONE;
+    SearchOrderType orderType() default SearchOrderType.NONE;
     int orderSequence() default 99;
 }

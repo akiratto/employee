@@ -4,7 +4,7 @@ package database.type;
  *
  * @author Owner
  */
-public enum JPQLOrderType {
+public enum SearchOrderType {
     NONE,
     ASCENDING,
     DESCENDING;
