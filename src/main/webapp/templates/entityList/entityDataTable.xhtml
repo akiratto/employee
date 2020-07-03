@@ -59,7 +59,7 @@
                     <!-- 一覧表の表示範囲、最大件数 を表示 -->
                     <div id="countInfo">
                         <h:outputText value="#{entityListBean.textResources.messageDisplayRangeInDataTable(
-                                                                            entityListBean.entityAllCount,
+                                                                            entityListBean.jsfEntityAllCount,
                                                                             entityListBean.pageNavigator.beginRowIndex, 
                                                                             entityListBean.pageNavigator.endRowIndex)}" />
                     </div>
@@ -72,7 +72,7 @@
                 <!-- データが1件以上存在する場合、一覧表を表示 -->
                 <h:dataTable id="employee_list"
                               styleClass="employee_list" 
-                              value="#{entityListBean.entityDataModel}" 
+                              value="#{entityListBean.jsfEntityDataModel}" 
                               var="emp"  
                               rendered="#{not empty entityListBean.jsfEntities}">
 
@@ -85,7 +85,7 @@
                                           value="削除" 
                                           onclick="return confirm(F3(this,'delete_confirm_message'))"
                                           action="#{entityListBean.delete( entityReflectionBean.getJsfUIInternalIdField(emp).value )}" />
-                        <div id="delete_confirm_message_#{entityListBean.entityDataModel.rowIndex}" style="display:none">#{entityListBean.textResources.messageDeleteConfirmInDataTable( entityReflectionBean.getJsfUIIdField(emp).value )}</div>
+                        <div id="delete_confirm_message_#{entityListBean.jsfEntityDataModel.rowIndex}" style="display:none">#{entityListBean.textResources.messageDeleteConfirmInDataTable( entityReflectionBean.getJsfUIIdField(emp).value )}</div>
                     </h:column>
 
                     <!-- エンティティのIDカラム -->
