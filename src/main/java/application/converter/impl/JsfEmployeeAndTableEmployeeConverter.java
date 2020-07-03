@@ -2,6 +2,7 @@ package application.converter.impl;
 
 import application.converter.JsfEntityAndTableEntityConverter;
 import database.entity.TableEmployee;
+import java.io.Serializable;
 import javax.enterprise.context.Dependent;
 import presentation.jsf.entity.JsfEmployee;
 
@@ -11,7 +12,7 @@ import presentation.jsf.entity.JsfEmployee;
  */
 @Dependent
 public class JsfEmployeeAndTableEmployeeConverter
-        implements JsfEntityAndTableEntityConverter<JsfEmployee, TableEmployee>
+        implements JsfEntityAndTableEntityConverter<JsfEmployee, TableEmployee>, Serializable
 {
 
     @Override

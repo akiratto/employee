@@ -34,7 +34,7 @@ public class TableEmployee
     private String name;
 
     @Basic
-    @Convert(converter = presentation.csv.converter.impl.GenderConverter.class)
+    @Convert(converter = database.converter.GenderConverter.class)
     private Gender gender;
     
     @Temporal(TemporalType.DATE)

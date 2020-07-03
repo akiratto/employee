@@ -4,7 +4,7 @@ import application.converter.JsfEntityAndTableEntityConverter;
 import presentation.jsf.base.JsfEntityListTextResources;
 import presentation.jsf.base.JsfEntityListSession;
 import database.dependent.EntityCRUDService;
-import presentation.jsf.entity.JsfEntityURLQueryHandler;
+import presentation.jsf.dependent.JsfEntityURLQueryHandler;
 import application.dependent.PageNavigator;
 import database.base.EntityListSearcher;
 import java.io.Serializable;

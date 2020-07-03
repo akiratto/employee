@@ -9,12 +9,12 @@
     <h:body>
         <ui:composition>
             <h:panelGrid id="pnl" columns="4">
-                <h:commandButton action="#{entityListBean.create()}" value="#{entityListBean.setting.createButtonTitle()}"/>
-                <h:commandButton action="#{entityListBean.search()}" value="#{entityListBean.setting.searchButtonTitle()}" />
-                <h:commandButton action="#{entityListBean.clear()}" value="#{entityListBean.setting.clearButtonTitle()}"/>
-                <h:commandButton action="#{entityListBean.createBatch()}" value="#{entityListBean.setting.createBatchButtonTitle()}" />
+                <h:commandButton action="#{entityListBean.create()}" value="#{entityListBean.textResources.createButtonTitle()}"/>
+                <h:commandButton action="#{entityListBean.search()}" value="#{entityListBean.textResources.searchButtonTitle()}" />
+                <h:commandButton action="#{entityListBean.clear()}" value="#{entityListBean.textResources.clearButtonTitle()}"/>
+                <h:commandButton action="#{entityListBean.createBatch()}" value="#{entityListBean.textResources.createBatchButtonTitle()}" />
                 <h:commandButton action="#{entityListBean.deleteAll()}" 
-                                  value="#{entityListBean.setting.deleteAllButtonTitle()}" 
+                                  value="#{entityListBean.textResources.deleteAllButtonTitle()}" 
                                   onclick="return confirm(F('messageDeleteAllEntityConfirm'))" />
             </h:panelGrid>
         </ui:composition>

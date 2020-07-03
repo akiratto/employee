@@ -4,6 +4,7 @@ import application.dependent.PageNavigator;
 import database.base.EntityListSearcher;
 import database.entity.TableEmployee;
 import database.entity.TableEmployee_;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import javax.enterprise.context.Dependent;
@@ -20,7 +21,7 @@ import static util.StringFunctions.likeEscape;
  * @author owner
  */
 @Dependent
-public class EmployeeListSearcher implements EntityListSearcher<TableEmployee> {
+public class EmployeeListSearcher implements EntityListSearcher<TableEmployee>, Serializable {
 
     @PersistenceContext
     protected EntityManager em;

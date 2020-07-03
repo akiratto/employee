@@ -7,7 +7,7 @@
       xmlns:jsf="http://xmlns.jcp.org/jsf"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title>#{entityListBean.setting.listPageTitle()}</title>
+        <title>#{entityListBean.textResources.listPageTitle()}</title>
     </h:head>
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:outputScript library="js" name="common.js" target="head" />
@@ -16,7 +16,7 @@
             <ui:insert name="metadata" />
             mojarra version:<h:outputText value="#{jsfVersionInfo.version}" /><br />
             <h:form id="f" enctype="multipart/form-data">
-                <h1>#{entityListBean.setting.listPageTitle()}</h1>
+                <h1>#{entityListBean.textResources.listPageTitle()}</h1>
                 <h:messages globalOnly="true" />
                 <ui:insert name="buttonsInList" />
                 <ui:insert name="searchSection" />
@@ -33,7 +33,7 @@
                      inputタグのvalue属性にEL式で値を指定して
                      このvalue属性の値をJavascriptから参照することで値を取得する。
                 -->
-                <input id="messageDeleteAllEntityConfirm" type="hidden" value="#{entityListBean.setting.messageDeleteAllEntityConfirm()}" />
+                <input id="messageDeleteAllEntityConfirm" type="hidden" value="#{entityListBean.textResources.messageDeleteAllEntityConfirm()}" />
             </h:form>
         </f:view>
     </h:body>
