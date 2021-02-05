@@ -10,20 +10,26 @@
     </h:head>
     <h:outputStylesheet library="css" name="employee_list.css" />
     <h:body>
-        <f:metadata>
-            <f:viewParam name="employee_code" value="#{employeeList.searchCondition.employeeCode}" />
-            <f:viewParam name="name" value="#{employeeList.searchCondition.name}" />
-            <f:viewParam name="gender" value="#{employeeList.searchCondition.gender}">
-                <f:converter converterId="genderConverter" />
-            </f:viewParam>
-            <f:viewParam name="phone" value="#{employeeList.searchCondition.phone}" />
-            <f:viewParam name="mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" />
-            <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
-            <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
-            <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
-            <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
-            <f:viewAction action="#{employeeList.viewAction()}" />
-        </f:metadata>
+        <ui:composition template="templates/employeeTemplate.xhtml">
+            <ui:define name="title">社員一覧</ui:define>
+            <ui:define name="css">
+                <h:outputStylesheet library="css" name="employee_list.css" />
+            </ui:define>
+            <ui:define name="content">
+                <f:metadata>
+                    <f:viewParam name="employee_code" value="#{employeeList.searchCondition.employeeCode}" />
+                    <f:viewParam name="name" value="#{employeeList.searchCondition.name}" />
+                    <f:viewParam name="gender" value="#{employeeList.searchCondition.gender}">
+                        <f:converter converterId="genderConverter" />
+                    </f:viewParam>
+                    <f:viewParam name="phone" value="#{employeeList.searchCondition.phone}" />
+                    <f:viewParam name="mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" />
+                    <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
+                    <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
+                    <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
+                    <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
+                    <f:viewAction action="#{employeeList.viewAction()}" />
+                </f:metadata>
                 <h:form id="f" enctype="multipart/form-data">
                     <h1>社員一覧</h1>
                     <h:messages globalOnly="true" />
@@ -140,6 +146,8 @@
                         <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
                     </p>
                 </h:form>
+            </ui:define>
+        </ui:composition>
     </h:body>
 </html>
 

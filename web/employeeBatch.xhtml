@@ -1,31 +1,37 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>社員一括登録</title>
     </h:head>
     <h:body>
-        <h1>社員一括登録</h1>
-        <h:form id="f" enctype="multipart/form-data">
-            <h:messages globalOnly="true" />
-            <h:panelGrid columns="2">
-                <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true"/>
-                <h:commandButton value="一括登録" onclick="return confirm('一括登録を実行します。よろしいですか？')" action="#{employeeBatch.uploadFile()}"/>
-            </h:panelGrid>
-            <h:panelGrid columns="3">
-                <h:outputLabel value="CSVファイル:" for="csv_fileupload" />
-                <h:inputFile id="csv_fileupload" value="#{employeeBatch.csvFile}" />
-                <h:message for="csv_fileupload" />
-                <h:outputLabel value="ログメッセージ:" for="log_message" />        
-                <h:inputTextarea id="log_message" 
-                                   value="#{employeeBatch.logMessage}" 
-                                   cols="40" 
-                                   rows="20" 
-                                   readonly="true" />
-                <h:outputText value="" />
-            </h:panelGrid>
-        </h:form>
+        <ui:composition template="templates/employeeTemplate.xhtml">
+            <ui:define name="title">社員一括登録</ui:define>
+            <ui:define name="content">
+                <h1>社員一括登録</h1>
+                <h:form id="f" enctype="multipart/form-data">
+                    <h:messages globalOnly="true" />
+                    <h:panelGrid columns="2">
+                        <h:commandButton value="戻る" action="employeeList?faces-redirect=true" immediate="true"/>
+                        <h:commandButton value="一括登録" onclick="return confirm('一括登録を実行します。よろしいですか？')" action="#{employeeBatch.uploadFile()}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="CSVファイル:" for="csv_fileupload" />
+                        <h:inputFile id="csv_fileupload" value="#{employeeBatch.csvFile}" />
+                        <h:message for="csv_fileupload" />
+                        <h:outputLabel value="ログメッセージ:" for="log_message" />        
+                        <h:inputTextarea id="log_message" 
+                                           value="#{employeeBatch.logMessage}" 
+                                           cols="40" 
+                                           rows="20" 
+                                           readonly="true" />
+                        <h:outputText value="" />
+                    </h:panelGrid>
+                </h:form>
+            </ui:define>
+        </ui:composition>>
     </h:body>
 </html>
 

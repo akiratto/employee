@@ -32,6 +32,9 @@ public class CustomExceptionHandler extends ExceptionHandlerWrapper {
             Throwable t = context.getException();
             FacesContext fc = FacesContext.getCurrentInstance();
             
+            System.err.println("jsf.exception.CustomExceptionHandler occured.");
+            t.printStackTrace();
+            
             try {
                 NavigationHandler navHandler = fc.getApplication().getNavigationHandler();
                 navHandler.handleNavigation(fc, null, "error/errorException.xhtml?faces-redirect=true");

@@ -64,6 +64,6 @@ public class User {
         } catch(ServletException ex) {
             ex.printStackTrace();
         }
-        return "index.xhtml?faces-redirect=true";
+        return "login.xhtml?faces-redirect=true";
     }
 }
