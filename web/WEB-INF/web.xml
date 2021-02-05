@@ -19,6 +19,34 @@
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>faces/employeeList.xhtml</welcome-file>
+        <welcome-file>faces/login.xhtml</welcome-file>
     </welcome-file-list>
+    <security-constraint>
+        <display-name>employee</display-name>
+        <web-resource-collection>
+            <web-resource-name>employee</web-resource-name>
+            <description>社員管理プログラムのリソース</description>
+            <url-pattern>/faces/employeeList.xhtml</url-pattern>
+            <url-pattern>/faces/employeeDetail.xhtml</url-pattern>
+            <url-pattern>/faces/employeeBatch.xhtml</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>ログイン認証後にリソースを利用できるロール</description>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>employee-realm</realm-name>
+        <form-login-config>
+            <form-login-page>/faces/login.xhtml</form-login-page>
+            <form-error-page>/faces/error/errorException.xhtml</form-error-page>
+        </form-login-config>
+    </login-config>
+    <security-role>
+        <description>管理者</description>
+        <role-name>admin</role-name>
+    </security-role>
 </web-app>

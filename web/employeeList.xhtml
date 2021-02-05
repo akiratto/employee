@@ -24,122 +24,122 @@
             <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
             <f:viewAction action="#{employeeList.viewAction()}" />
         </f:metadata>
-        <h:form id="f" enctype="multipart/form-data">
-            <h1>社員一覧</h1>
-            <h:messages globalOnly="true" />
-            <h:panelGrid columns="4">
-                <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
-                <h:commandButton action="#{employeeList.search()}" value="検索" />
-                <h:commandButton action="#{employeeList.clear()}" value="クリア"/>
-                <h:commandButton action="#{employeeList.batchEmployee()}" value="一括登録" />
-                <h:commandButton action="#{employeeList.deleteAllEmployee()}" 
-                                  value="全件削除" 
-                                  onclick="return confirm('社員情報をすべて削除します。\n本当によろしいです？')" />
-            </h:panelGrid>
-            <f:validateBean disabled="true">
-                <h:panelGrid columns="3">
-                    <h:outputLabel for="search_employee_code" value="社員コード"/>
-                    <h:inputText id="search_employee_code" value="#{employeeList.searchCondition.employeeCode}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_code" />
+                <h:form id="f" enctype="multipart/form-data">
+                    <h1>社員一覧</h1>
+                    <h:messages globalOnly="true" />
+                    <h:panelGrid columns="4">
+                        <h:commandButton action="#{employeeList.createEmployee()}" value="新規登録"/>
+                        <h:commandButton action="#{employeeList.search()}" value="検索" />
+                        <h:commandButton action="#{employeeList.clear()}" value="クリア"/>
+                        <h:commandButton action="#{employeeList.batchEmployee()}" value="一括登録" />
+                        <h:commandButton action="#{employeeList.deleteAllEmployee()}" 
+                                          value="全件削除" 
+                                          onclick="return confirm('社員情報をすべて削除します。\n本当によろしいです？')" />
+                    </h:panelGrid>
+                    <f:validateBean disabled="true">
+                        <h:panelGrid columns="3">
+                            <h:outputLabel for="search_employee_code" value="社員コード"/>
+                            <h:inputText id="search_employee_code" value="#{employeeList.searchCondition.employeeCode}" onkeypress="if(event.keyCode == 13) return false;"/>
+                            <h:message for="search_employee_code" />
 
-                    <h:outputLabel for="search_employee_name" value="社員名"/>
-                    <h:inputText id="search_employee_name" value="#{employeeList.searchCondition.name}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_name" />
+                            <h:outputLabel for="search_employee_name" value="社員名"/>
+                            <h:inputText id="search_employee_name" value="#{employeeList.searchCondition.name}" onkeypress="if(event.keyCode == 13) return false;"/>
+                            <h:message for="search_employee_name" />
 
-                    <h:outputLabel for="search_employee_gender" value="性別"/>
-                    <h:selectOneMenu id="search_employee_gender"
-                                     value="#{employeeList.searchCondition.gender}"
-                                     converter="genderConverter">
-                        <f:selectItem itemValue="" itemLabel="" />
-                        <f:selectItems value="#{employeeList.genders}"/>
-                    </h:selectOneMenu>
-                    <h:message for="search_employee_gender" />
-                    
-                    <h:outputLabel for="search_employee_birthday" value="誕生日" />
-                    <h:inputText id="search_employee_birthday" 
-                                  value="#{employeeList.searchCondition.birthday}" 
-                                  onkeypress="if(event.keyCode == 13) return false;">
-                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
-                    </h:inputText>
-                    <h:message for="search_employee_birthday" />
+                            <h:outputLabel for="search_employee_gender" value="性別"/>
+                            <h:selectOneMenu id="search_employee_gender"
+                                             value="#{employeeList.searchCondition.gender}"
+                                             converter="genderConverter">
+                                <f:selectItem itemValue="" itemLabel="" />
+                                <f:selectItems value="#{employeeList.genders}"/>
+                            </h:selectOneMenu>
+                            <h:message for="search_employee_gender" />
 
-                    <h:outputLabel for="search_employee_phone" value="電話番号"/>
-                    <h:inputText id="search_employee_phone" value="#{employeeList.searchCondition.phone}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_phone" />
+                            <h:outputLabel for="search_employee_birthday" value="誕生日" />
+                            <h:inputText id="search_employee_birthday" 
+                                          value="#{employeeList.searchCondition.birthday}" 
+                                          onkeypress="if(event.keyCode == 13) return false;">
+                                <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
+                            </h:inputText>
+                            <h:message for="search_employee_birthday" />
 
-                    <h:outputLabel for="search_employee_mobile_phone" value="携帯電話番号"/>
-                    <h:inputText id="search_employee_mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_mobile_phone" />
+                            <h:outputLabel for="search_employee_phone" value="電話番号"/>
+                            <h:inputText id="search_employee_phone" value="#{employeeList.searchCondition.phone}" onkeypress="if(event.keyCode == 13) return false;"/>
+                            <h:message for="search_employee_phone" />
 
-                    <h:outputLabel for="search_employee_zip_code" value="郵便番号"/>
-                    <h:inputText id="search_employee_zip_code" value="#{employeeList.searchCondition.zipCode}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_zip_code" />
+                            <h:outputLabel for="search_employee_mobile_phone" value="携帯電話番号"/>
+                            <h:inputText id="search_employee_mobile_phone" value="#{employeeList.searchCondition.mobilePhone}" onkeypress="if(event.keyCode == 13) return false;"/>
+                            <h:message for="search_employee_mobile_phone" />
 
-                    <h:outputLabel for="search_employee_address" value="住所"/>
-                    <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" onkeypress="if(event.keyCode == 13) return false;"/>
-                    <h:message for="search_employee_address" />
-                </h:panelGrid>
-            </f:validateBean>
-            <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.employeeList}" style="display: block;margin-top:16px;"/>
-            <div style="position: relative;width:1000px;height:30px;" jsf:rendered="#{not empty employeeList.employeeList}">
-                <div id="topPageNavigator">
-                    <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
-                    <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
-                        <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
-                        <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
-                    </ui:repeat>
-                    <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
-                </div>
-                <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" /></div>
-            </div>
-            <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp"  rendered="#{not empty employeeList.employeeList}">
-                <h:column>
-                    <f:facet name="header">
-                        <h:outputText value="ボタン" />
-                    </f:facet>
-                    <h:commandButton value="削除" 
-                                     onclick="return confirm('社員コード:#{emp.employeeCode}を削除してもよろしいですか？')"
-                                      action="#{employeeList.deleteEmployee(emp.employee_id)}" />
-                </h:column>
-                <h:column>
-                    <f:facet name="header">
-                        <h:outputText value="社員コード" />
-                    </f:facet>
-                    <h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}">
-                        <h:outputText value="#{emp.employeeCode}" />
-                    </h:commandLink>
-                </h:column>
-                <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
-                <h:column>
-                    <f:facet name="header"><h:outputText value="性別" /></f:facet>
-                    <h:outputText value="#{emp.gender.jpName()}" />
-                </h:column>
-                <h:column>
-                    <f:facet name="header"><h:outputText value="生年月日" /></f:facet>
-                    <h:outputText value="#{emp.birthday}">
-                        <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
-                    </h:outputText>
-                </h:column>
-                <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>
-                <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
-                <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>
-                <h:column><f:facet name="header"><h:outputText value="住所" /></f:facet>#{emp.address}</h:column>
-                <h:column>
-                    <f:facet name="header">
-                        <h:outputText value="備考" />
-                    </f:facet>
-                    <h:outputText class="preformatted" value="#{emp.remarks}"/>
-                </h:column>
-            </h:dataTable>
-            <p style="width:1000px; text-align:center;">
-                <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
-                <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
-                    <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
-                    <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
-                </ui:repeat>
-                <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
-            </p>
-        </h:form>
+                            <h:outputLabel for="search_employee_zip_code" value="郵便番号"/>
+                            <h:inputText id="search_employee_zip_code" value="#{employeeList.searchCondition.zipCode}" onkeypress="if(event.keyCode == 13) return false;"/>
+                            <h:message for="search_employee_zip_code" />
+
+                            <h:outputLabel for="search_employee_address" value="住所"/>
+                            <h:inputText id="search_employee_address" value="#{employeeList.searchCondition.address}" onkeypress="if(event.keyCode == 13) return false;"/>
+                            <h:message for="search_employee_address" />
+                        </h:panelGrid>
+                    </f:validateBean>
+                    <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.employeeList}" style="display: block;margin-top:16px;"/>
+                    <div style="position: relative;width:1000px;height:30px;" jsf:rendered="#{not empty employeeList.employeeList}">
+                        <div id="topPageNavigator">
+                            <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
+                            <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                                <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
+                                <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
+                            </ui:repeat>
+                            <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
+                        </div>
+                        <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" /></div>
+                    </div>
+                    <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp"  rendered="#{not empty employeeList.employeeList}">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="ボタン" />
+                            </f:facet>
+                            <h:commandButton value="削除" 
+                                             onclick="return confirm('社員コード:#{emp.employeeCode}を削除してもよろしいですか？')"
+                                              action="#{employeeList.deleteEmployee(emp.employee_id)}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="社員コード" />
+                            </f:facet>
+                            <h:commandLink action="#{employeeList.gotoDetail(emp.employee_id, 'Read')}">
+                                <h:outputText value="#{emp.employeeCode}" />
+                            </h:commandLink>
+                        </h:column>
+                        <h:column><f:facet name="header"><h:outputText value="名前" /></f:facet>#{emp.name}</h:column>
+                        <h:column>
+                            <f:facet name="header"><h:outputText value="性別" /></f:facet>
+                            <h:outputText value="#{emp.gender.jpName()}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header"><h:outputText value="生年月日" /></f:facet>
+                            <h:outputText value="#{emp.birthday}">
+                                <f:convertDateTime type="date" dateStyle="medium" timeZone="JST" />
+                            </h:outputText>
+                        </h:column>
+                        <h:column><f:facet name="header"><h:outputText value="電話番号" /></f:facet>#{emp.phone}</h:column>
+                        <h:column><f:facet name="header"><h:outputText value="携帯電話番号" /></f:facet>#{emp.mobilePhone}</h:column>    
+                        <h:column><f:facet name="header"><h:outputText value="郵便番号" /></f:facet>#{emp.zipCode}</h:column>
+                        <h:column><f:facet name="header"><h:outputText value="住所" /></f:facet>#{emp.address}</h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="備考" />
+                            </f:facet>
+                            <h:outputText class="preformatted" value="#{emp.remarks}"/>
+                        </h:column>
+                    </h:dataTable>
+                    <p style="width:1000px; text-align:center;">
+                        <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
+                        <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                            <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
+                            <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
+                        </ui:repeat>
+                        <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
+                    </p>
+                </h:form>
     </h:body>
 </html>
 

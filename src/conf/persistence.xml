@@ -4,6 +4,10 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>jdbc/employee</jta-data-source>
     <class>entity.TEmployee</class>
+    <class>employee.entity.TUser</class>
+    <class>employee.entity.TGroup</class>
+    <class>entity.TUser</class>
+    <class>entity.TGroup</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>
