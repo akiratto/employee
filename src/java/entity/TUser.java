@@ -18,6 +18,9 @@ public class TUser implements Serializable {
     private String userid;
 
     @Basic
+    private String salt;
+
+    @Basic
     private String password;
 
     public String getUserid() {
@@ -26,6 +29,14 @@ public class TUser implements Serializable {
 
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    public String getSalt() {
+        return this.salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public String getPassword() {
@@ -54,7 +65,7 @@ public class TUser implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 89 * hash + (this.getUserid() != null ? this.getUserid().hashCode() : 0);
+        hash = 59 * hash + (this.getUserid() != null ? this.getUserid().hashCode() : 0);
         return hash;
     }
 

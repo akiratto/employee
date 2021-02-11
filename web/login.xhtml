@@ -9,11 +9,11 @@
         <h:form id="f">
             <h:panelGrid columns="2">
                 <h:outputText value="ユーザ名" />
-                <h:inputText value="#{user.userName}" />
+                <h:inputText value="#{login.userName}" />
                 <h:outputText value="パスワード" />
-                <h:inputSecret value="#{user.password}" />
+                <h:inputSecret value="#{login.password}" />
             </h:panelGrid>
-            <h:commandButton value="ログイン" action="#{user.login()}" />
+            <h:commandButton value="ログイン" action="#{login.login()}" />
         </h:form>
     </h:body>
 </html>

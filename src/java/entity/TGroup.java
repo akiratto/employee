@@ -8,11 +8,17 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 /**
  * @author Owner
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "TGroup.findByUserid", query = "Select e from TGroup e WHERE e.tUser.userid = :userid")
+    ,@NamedQuery(name = "TGroup.deleteByUserid", query = "Delete FROM TGroup e WHERE e.tUser.userid = :userid")
+})
 public class TGroup implements Serializable {
 
     @EmbeddedId
@@ -56,7 +62,7 @@ public class TGroup implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 67 * hash + (this.getGroupPK() != null ? this.getGroupPK().hashCode() : 0);
+        hash = 53 * hash + (this.getGroupPK() != null ? this.getGroupPK().hashCode() : 0);
         return hash;
     }
 

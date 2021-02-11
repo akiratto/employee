@@ -8,7 +8,10 @@
     <h:body>
         <h:form>
             <div style="text-align: right;">
-                <h:commandLink value="ログアウト" action="#{user.logout()}" />
+                <h:panelGrid columns="2">
+                    <h:commandLink value="管理" action="admin.xhtml?faces-redirect=true" />
+                    <h:commandLink value="ログアウト" action="#{login.logout()}" />
+                </h:panelGrid>
             </div>
         </h:form>
     </h:body>

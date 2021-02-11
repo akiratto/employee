@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Named
 @RequestScoped
-public class User {
+public class Login {
     private String userName;
     private String password;
 

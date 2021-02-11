@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:head>
+        <title>ユーザ管理</title>
+    </h:head>
+    <h:body>
+        <h1>ユーザ管理</h1>
+        <h:form id="f">
+            <h:messages globalOnly="true" />
+            <h:panelGrid columns="3">
+                <h:outputLabel for="add_username" value="登録ユーザ名" />
+                <h:inputText id="add_username" value="#{admin.addUserName}" required="true" requiredMessage="登録ユーザ名の入力は必須です。"/>
+                <h:message for="add_username" />
+                
+                <h:outputLabel for="add_password" value="登録パスワード" />
+                <h:inputSecret id="add_password" value="#{admin.addPassword}" required="true" requiredMessage="登録パスワードの入力は必須です。" />
+                <h:message for="add_password" />
+                
+                <h:outputLabel for="add_group" value="登録グループ" />
+                <h:inputText id="add_group" value="#{admin.addGroupNames}" required="true" requiredMessage="登録グループの入力は必須です。"/>
+                <h:message for="add_group" />
+            </h:panelGrid>
+            <h:commandButton value="登録" action="#{admin.addUser()}" />
+            
+        </h:form>
+    </h:body>
+</html>
+

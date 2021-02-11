@@ -13,6 +13,10 @@
         <jpa:inf e="true" n="java.io.Serializable"/>
         <jpa:ath>Owner</jpa:ath>
         <jpa:attributes>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="salt" id="_16125876153574">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
             <jpa:basic attribute-type="String" v="true" xvt="" name="password" id="_16102177498005">
                 <jpa:xwm nil="false" req="false"/>
                 <jpa:xm nil="false" req="false"/>
@@ -31,6 +35,9 @@
         </jpa:nq>
         <jpa:nq e="false" name="TUser.findByPassword">
             <jpa:query>Select t from TUser t where t.password=:password</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TUser.findBySalt">
+            <jpa:query>Select t from TUser t where t.salt=:salt</jpa:query>
         </jpa:nq>
     </jpa:entity>
     <jpa:entity compositePrimaryKeyType="EMBEDDEDID" compositePrimaryKeyClass="TGroupPK" abs="false" class="TGroup" v="true" jbn="false" xre="false" m="false" rootElement="_15490577311041" id="_1610284399947">
@@ -68,6 +75,12 @@
         </jpa:attributes>
         <jpa:nq e="false" name="TGroup.findAll">
             <jpa:query>Select e from TGroup e</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="true" name="TGroup.findByUserid">
+            <jpa:query>Select e from TGroup e WHERE e.tUser.userid = :userid</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="true" name="TGroup.deleteByUserid">
+            <jpa:query>Delete FROM TGroup e WHERE e.tUser.userid = :userid</jpa:query>
         </jpa:nq>
     </jpa:entity>
     <jpa:snp loc="BEFORE_PACKAGE" e="true">/**
