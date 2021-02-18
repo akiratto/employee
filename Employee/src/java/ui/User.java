@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cdi.common;
+package ui;
 
-import cdi.dependent.UserService;
+import model.UserService;
 import exception.cdi.dependent.UserLoginException;
 import exception.cdi.dependent.UserLogoutException;
 import java.util.logging.Level;

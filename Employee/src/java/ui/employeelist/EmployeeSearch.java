@@ -1,4 +1,4 @@
-package cdi.dependent.employeelist;
+package ui.employeelist;
 
 import entity.TEmployee;
 import java.io.Serializable;

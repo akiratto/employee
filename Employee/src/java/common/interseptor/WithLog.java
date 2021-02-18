@@ -1,4 +1,4 @@
-package cdi.interseptor;
+package common.interseptor;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;

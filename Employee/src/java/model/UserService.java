@@ -1,4 +1,4 @@
-package cdi.dependent;
+package model;
 
 import exception.cdi.dependent.UserLoginException;
 import exception.cdi.dependent.UserLogoutException;

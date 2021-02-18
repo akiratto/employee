@@ -27,7 +27,7 @@
                     <f:viewParam name="zipcode" value="#{employeeList.searchCondition.zipCode}" />
                     <f:viewParam name="address" value="#{employeeList.searchCondition.address}" />
                     <f:viewParam name="remarks" value="#{employeeList.searchCondition.remarks}" />
-                    <f:viewParam name="page_no" value="#{pageNavigator.currentPageNo}" />
+                    <f:viewParam name="page_no" value="#{employeeList.pageNavigator.currentPageNo}" />
                     <f:viewAction action="#{employeeList.viewAction()}" />
                 </f:metadata>
                 <h:form id="f" enctype="multipart/form-data">
@@ -89,14 +89,14 @@
                     <h:outputText value="社員情報は見つかりません。" rendered="#{empty employeeList.employeeList}" style="display: block;margin-top:16px;"/>
                     <div style="position: relative;width:1000px;height:30px;" jsf:rendered="#{not empty employeeList.employeeList}">
                         <div id="topPageNavigator">
-                            <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
-                            <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                            <h:commandLink action="#{employeeList.pageNavigator.prevPage()}" value="前へ" rendered="#{employeeList.pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
+                            <ui:repeat value="#{employeeList.pageNavigator.pageLinks}" var="p">
                                 <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
                                 <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
                             </ui:repeat>
-                            <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
+                            <h:commandLink action="#{employeeList.pageNavigator.nextPage()}" value="次へ" rendered="#{employeeList.pageNavigator.nextPageEnabled()}" />
                         </div>
-                        <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{pageNavigator.beginRowIndex}～#{pageNavigator.endRowIndex}件 表示]" /></div>
+                        <div id="countInfo"><h:outputText value="[社員情報を #{employeeList.employeeAllCount}件中#{employeeList.pageNavigator.beginRowIndex}～#{employeeList.pageNavigator.endRowIndex}件 表示]" /></div>
                     </div>
                     <h:dataTable styleClass="employee_list" value="#{employeeList.employeeList}" var="emp"  rendered="#{not empty employeeList.employeeList}">
                         <h:column>
@@ -138,12 +138,12 @@
                         </h:column>
                     </h:dataTable>
                     <p style="width:1000px; text-align:center;">
-                        <h:commandLink action="#{pageNavigator.prevPage()}" value="前へ" rendered="#{pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
-                        <ui:repeat value="#{pageNavigator.pageLinks}" var="p">
+                        <h:commandLink action="#{employeeList.pageNavigator.prevPage()}" value="前へ" rendered="#{employeeList.pageNavigator.prevPageEnabled()}" style="margin-right:0.6em;"/>
+                        <ui:repeat value="#{employeeList.pageNavigator.pageLinks}" var="p">
                             <h:commandLink action="#{p.moveToPage()}" value="#{p.pageNo}" rendered="#{not p.isCurrentPage()}" style="margin-right:0.6em;" />
                             <h:outputText value="#{p.pageNo}" rendered="#{p.isCurrentPage()}" style="font-weight: bold;margin-right:0.6em;" />
                         </ui:repeat>
-                        <h:commandLink action="#{pageNavigator.nextPage()}" value="次へ" rendered="#{pageNavigator.nextPageEnabled()}" />
+                        <h:commandLink action="#{employeeList.pageNavigator.nextPage()}" value="次へ" rendered="#{employeeList.pageNavigator.nextPageEnabled()}" />
                     </p>
                 </h:form>
             </ui:define>

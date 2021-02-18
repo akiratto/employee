@@ -1,4 +1,4 @@
-package cdi;
+package model;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -22,8 +23,7 @@ import javax.persistence.PersistenceContext;
  *
  * @author owner
  */
-@Named
-@ViewScoped
+@Dependent
 public class PageNavigator implements Serializable {
     public static class PageLink {
         PageNavigator pageNavigator;

@@ -1,4 +1,4 @@
-package cdi.dependent.employeelist;
+package model;
 
 import entity.TEmployee;
 import java.io.Serializable;
@@ -16,7 +16,7 @@ import javax.persistence.TypedQuery;
  * @author owner
  */
 @Dependent
-public class EmployeeQuery implements Serializable {
+public class EmployeeListService implements Serializable {
     
     @PersistenceContext
     private EntityManager em;

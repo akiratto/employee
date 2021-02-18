@@ -1,4 +1,4 @@
-package cdi.interseptor;
+package common.interseptor;
 
 import java.io.Serializable;
 import javax.interceptor.AroundInvoke;

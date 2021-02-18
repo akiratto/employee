@@ -1,4 +1,4 @@
-package cdi;
+package ui;
 
 import entity.TEmployee;
 import java.io.Serializable;

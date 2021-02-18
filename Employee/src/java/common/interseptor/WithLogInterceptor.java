@@ -1,4 +1,4 @@
-package cdi.interseptor;
+package common.interseptor;
 
 import java.util.logging.Logger;
 import javax.annotation.Priority;

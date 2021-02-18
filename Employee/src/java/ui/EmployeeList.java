@@ -1,7 +1,8 @@
-package cdi;
+package ui;
 
-import cdi.dependent.employeelist.EmployeeQuery;
-import cdi.dependent.employeelist.EmployeeSearch;
+import model.PageNavigator;
+import model.EmployeeListService;
+import ui.employeelist.EmployeeSearch;
 import entity.TEmployee;
 import entity.type.Gender;
 import java.io.Serializable;
@@ -39,7 +40,7 @@ public class EmployeeList implements Serializable {
     private PageNavigator pageNavigator;
     
     @Inject
-    private EmployeeQuery employeeListQuery;
+    private EmployeeListService employeeListService;
     
     @Inject
     private EmployeeSearch employeeSearch;
@@ -66,11 +67,11 @@ public class EmployeeList implements Serializable {
     {
         System.out.println(">>> EmployeeList viewAction() BEGIN >>>");
 
-        Long               employeeAllCount   = employeeListQuery.countEmployeeAllCount(searchCondition);
+        Long               employeeAllCount   = employeeListService.countEmployeeAllCount(searchCondition);
         Map<String,String> searchParameterMap = employeeSearch.generateSearchParameterMap(searchCondition);
         pageNavigator.build(employeeAllCount, searchParameterMap);
         
-        List<TEmployee> employeeList = employeeListQuery.extractEmployees(searchCondition, 
+        List<TEmployee> employeeList = employeeListService.extractEmployees(searchCondition, 
                                                                           employeeAllCount, 
                                                                           pageNavigator.getOffset(), 
                                                                           pageNavigator.getRowCountPerPage());
@@ -95,6 +96,10 @@ public class EmployeeList implements Serializable {
 
     public Long getEmployeeAllCount() {
         return employeeAllCount;
+    }
+
+    public PageNavigator getPageNavigator() {
+        return pageNavigator;
     }
 
     public String createEmployee()

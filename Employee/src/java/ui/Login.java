@@ -1,4 +1,4 @@
-package cdi;
+package ui;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;

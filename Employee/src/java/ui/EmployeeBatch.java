@@ -1,6 +1,6 @@
-package cdi;
+package ui;
 
-import cdi.interseptor.TransactionDebugger;
+import common.interseptor.TransactionDebugger;
 import csv.CsvReadLineCustomValidationHandler;
 import csv.CsvReader;
 import csv.exception.CsvReadLineException;
