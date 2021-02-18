@@ -13,7 +13,7 @@
                 <h:outputText value="パスワード" />
                 <h:inputSecret value="#{login.password}" />
             </h:panelGrid>
-            <h:commandButton value="ログイン" action="#{login.login()}" />
+            <h:commandButton value="ログイン" action="#{user.login(login.userName, login.password)}" />
         </h:form>
     </h:body>
 </html>

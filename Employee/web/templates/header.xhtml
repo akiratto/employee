@@ -7,10 +7,10 @@
     </h:head>
     <h:body>
         <h:form>
-            <div style="text-align: right;">
+            <div style="width:100%; text-align: right;">
                 <h:panelGrid columns="2">
-                    <h:commandLink value="管理" action="admin.xhtml?faces-redirect=true" />
-                    <h:commandLink value="ログアウト" action="#{login.logout()}" />
+                    <h:commandLink value="管理" action="admin.xhtml?faces-redirect=true" rendered="#{user.hasAdminRole()}" />
+                    <h:commandLink value="ログアウト" action="#{user.logout()}" />
                 </h:panelGrid>
             </div>
         </h:form>

@@ -2,8 +2,6 @@ package employee.converter;
 
 import csv.converter.CsvColumnConverter;
 import entity.type.Gender;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -73,7 +71,7 @@ public class GenderConverter implements CsvColumnConverter, Converter, Attribute
     //AttributeConverter -------------------------------------------------------
     @Override
     public String convertToDatabaseColumn(Gender attribute) {
-        return attribute.name();
+        return attribute == null ? null : attribute.name();
     }
 
     @Override
