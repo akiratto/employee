@@ -6,8 +6,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.transaction.Transactional;
-import model.AdminService;
-import model.AdminService.UpsertUserResult;
+import service.AdminService;
+import service.AdminService.UpsertUserResult;
 
 /**
  *

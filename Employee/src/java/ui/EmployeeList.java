@@ -1,10 +1,10 @@
 package ui;
 
-import model.PageNavigator;
-import model.EmployeeListService;
+import service.PageNavigator;
+import service.EmployeeListService;
 import ui.employeelist.EmployeeSearch;
-import entity.TEmployee;
-import entity.type.Gender;
+import type.TEmployee;
+import type.Gender;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

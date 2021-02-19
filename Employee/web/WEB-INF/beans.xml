@@ -5,6 +5,6 @@
        bean-discovery-mode="annotated">
     
     <interceptors>
-        <class>common.interseptor.TransactionInterceptor</class>
+        <class>util.log.TransactionInterceptor</class>
     </interceptors>
 </beans>

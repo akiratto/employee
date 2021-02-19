@@ -1,6 +1,7 @@
 package entity;
 
-import entity.type.Gender;
+import type.TEmployee;
+import type.Gender;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Set;

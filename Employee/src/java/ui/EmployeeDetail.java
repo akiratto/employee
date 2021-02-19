@@ -1,6 +1,6 @@
 package ui;
 
-import entity.TEmployee;
+import type.TEmployee;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

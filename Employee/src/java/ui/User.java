@@ -5,9 +5,9 @@
  */
 package ui;
 
-import model.UserService;
-import exception.cdi.dependent.UserLoginException;
-import exception.cdi.dependent.UserLogoutException;
+import service.UserService;
+import service.exception.UserLoginException;
+import service.exception.UserLogoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.RequestScoped;
