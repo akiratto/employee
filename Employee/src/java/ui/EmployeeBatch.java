@@ -13,7 +13,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +26,10 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.servlet.http.Part;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import type.CsvEmployee;
 import type.Tuple;
 
 /**
@@ -108,14 +107,14 @@ public class EmployeeBatch implements Serializable {
             
             Integer errorCount = 0;
             Path csvFilePath = csvFile.toPath();
-            TEmployee employee = null;
+            CsvEmployee employeeCsv = null;
             try(CsvReader csvFileReader = new CsvReader(csvFilePath, Charset.forName("UTF-8"), customValidationHandler)) {
-                Tuple<TEmployee,Integer> employeeAndErrorCount = null;
+                Tuple<CsvEmployee,Integer> employeeAndErrorCount = null;
                 do {
                         employeeAndErrorCount = this.readLine100AndCommit(csvFileReader, errorCount);
                         System.out.println("--- 100 comitted ---");
-                        employee = employeeAndErrorCount._1;
-                } while(employee != null);
+                        employeeCsv = employeeAndErrorCount._1;
+                } while(employeeCsv != null);
                 
             } finally {
                 Files.deleteIfExists(csvFilePath);
@@ -133,13 +132,25 @@ public class EmployeeBatch implements Serializable {
     }
     
     @Transactional
-    private Tuple<TEmployee,Integer> readLine100AndCommit(CsvReader csvFile, Integer errorCount) throws IOException
+    private Tuple<CsvEmployee,Integer> readLine100AndCommit(CsvReader csvFile, Integer errorCount) throws IOException
     {
-        TEmployee employee = null;
+        CsvEmployee employeeCsv = null;
         for(int i = 1; i <= 100; i++) {
             try {
-                employee = csvFile.readLine(TEmployee.class);
-                if(employee==null) break; 
+                employeeCsv = csvFile.readLine(CsvEmployee.class);
+                if(employeeCsv==null) break; 
+                
+                TEmployee employee = new TEmployee();
+                employee.setEmployeeCode(employeeCsv.getEmployeeCode());
+                employee.setDepartmentCode(employeeCsv.getDepartmentCode());
+                employee.setName(employeeCsv.getName());
+                employee.setGender(employeeCsv.getGender());
+                employee.setBirthday(employeeCsv.getBirthday());
+                employee.setPhone(employeeCsv.getPhone());
+                employee.setMobilePhone(employeeCsv.getMobilePhone());
+                employee.setZipCode(employeeCsv.getZipCode());
+                employee.setAddress(employeeCsv.getAddress());
+                employee.setRemarks("");
                 em.persist(employee);
             } catch(CsvReadLineException e) {
                 this.logMessage += e.getErrorOccurrenceLine() + "行目に以下のエラーが発生しました。\n";
@@ -156,6 +167,6 @@ public class EmployeeBatch implements Serializable {
                 }
             }
         }
-        return new Tuple<>(employee, errorCount);
+        return new Tuple<>(employeeCsv, errorCount);
     }
 }

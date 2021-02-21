@@ -3,12 +3,7 @@
  */
 package type;
 
-import util.csv.annotation.CsvColumn;
-import util.csv.annotation.CsvColumnFormula;
-import util.csv.annotation.CsvConverter;
-import util.csv.converter.builtin.CsvColumnDateConverter;
 import util.converter.GenderConverter;
-import type.Gender;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -35,49 +30,31 @@ public class TEmployee implements Serializable {
     private Integer employee_id;
     
     @Basic
-    @CsvColumn(field="社員コード")
     private String employeeCode;
     
     @Transient
     private String departmentCode;
     
     @Basic
-    //--CSV パーサ
-    @CsvColumn(field="氏名")
     private String name;
 
     @Basic
-//    @Enumerated(EnumType.STRING)
     @Convert(converter = GenderConverter.class)
-    //--CSV パーサ
-    @CsvColumn(field="性別")
-    @CsvConverter(converter = GenderConverter.class)
     private Gender gender;
     
     @Temporal(TemporalType.DATE)
-    //--CSV パーサ
-    @CsvColumn(field="生年月日")
-    @CsvConverter(converter = CsvColumnDateConverter.class)
     private Date birthday;
 
     @Basic
-    //--CSV パーサ
-    @CsvColumn(field="電話番号")
     private String phone;
 
     @Basic
-    //--CSV パーサ
-    @CsvColumn(field="携帯電話")
     private String mobilePhone;
 
     @Basic
-    //--CSV パーサ
-    @CsvColumn(field="郵便番号")
     private String zipCode;
 
     @Basic
-    //--CSV パーサ
-    @CsvColumnFormula(formula="住所1 += 住所2 += 住所3 += 住所4 += 住所5")
     private String address;
 
     @Basic

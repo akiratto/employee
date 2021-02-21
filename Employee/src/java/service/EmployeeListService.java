@@ -38,6 +38,7 @@ public class EmployeeListService implements Serializable {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT t FROM TEmployee t \n");
         appendWherePhrase(sql);
+        sql.append("ORDER BY t.employeeCode ASC \n");
 
         TypedQuery<TEmployee> query = em.createQuery(sql.toString(), TEmployee.class);
         setQueryParameters(query, searchCondition);
