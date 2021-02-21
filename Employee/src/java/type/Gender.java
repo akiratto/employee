@@ -1,8 +1,5 @@
 package type;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 /**
  *
  * @author Owner
