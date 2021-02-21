@@ -3,8 +3,6 @@
  */
 package type;
 
-import util.converter.GenderConverter;
-import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Convert;
@@ -17,31 +15,31 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import util.converter.GenderConverter;
 
 /**
  * @author owner
  */
-@Entity(name = "TEmployee")
-@Table(uniqueConstraints=@UniqueConstraint(name = "t_employee_unique_employee_code", columnNames="employeeCode"))
-public class TEmployee implements Serializable {
+@Entity
+@Table(uniqueConstraints = {
+    @UniqueConstraint(name = "t_employee_unique_employee_code", columnNames = {"EMPLOYEECODE"})})
+public class TEmployee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer employee_id;
-    
+    private Long employee_id;
+
     @Basic
     private String employeeCode;
-    
-    @Transient
-    private String departmentCode;
-    
+
     @Basic
     private String name;
 
-    @Basic
     @Convert(converter = GenderConverter.class)
+    @Basic
     private Gender gender;
-    
+
+    @Basic
     @Temporal(TemporalType.DATE)
     private Date birthday;
 
@@ -60,28 +58,23 @@ public class TEmployee implements Serializable {
     @Basic
     private String remarks;
 
-    public Integer getEmployee_id() {
+    @Transient
+    private String departmentCode;
+
+    public Long getEmployee_id() {
         return this.employee_id;
     }
 
-    public void setEmployee_id(Integer employee_id) {
+    public void setEmployee_id(Long employee_id) {
         this.employee_id = employee_id;
     }
 
     public String getEmployeeCode() {
-        return employeeCode;
+        return this.employeeCode;
     }
 
     public void setEmployeeCode(String employeeCode) {
         this.employeeCode = employeeCode;
-    }
-
-    public String getDepartmentCode() {
-        return departmentCode;
-    }
-
-    public void setDepartmentCode(String departmentCode) {
-        this.departmentCode = departmentCode;
     }
 
     public String getName() {
@@ -101,7 +94,7 @@ public class TEmployee implements Serializable {
     }
 
     public Date getBirthday() {
-        return birthday;
+        return this.birthday;
     }
 
     public void setBirthday(Date birthday) {
@@ -146,6 +139,14 @@ public class TEmployee implements Serializable {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public String getDepartmentCode() {
+        return this.departmentCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
     }
 
 }

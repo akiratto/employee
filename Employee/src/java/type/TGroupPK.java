@@ -57,9 +57,9 @@ public class TGroupPK implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 71 * hash + (this.getUserid() != null ? this.getUserid().hashCode() : 0);
-        hash = 71 * hash + (this.getGroupid() != null ? this.getGroupid().hashCode() : 0);
+        int hash = 3;
+        hash = 89 * hash + (this.getUserid() != null ? this.getUserid().hashCode() : 0);
+        hash = 89 * hash + (this.getGroupid() != null ? this.getGroupid().hashCode() : 0);
         return hash;
     }
 

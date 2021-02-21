@@ -113,7 +113,7 @@ public class EmployeeList implements Serializable {
     }
     
     @Transactional
-    public String deleteEmployee(Integer employeeId) throws UnsupportedEncodingException
+    public String deleteEmployee(Long employeeId) throws UnsupportedEncodingException
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
@@ -141,7 +141,7 @@ public class EmployeeList implements Serializable {
     }
             
     
-    public String gotoDetail(Integer employeeId, String mode) throws UnsupportedEncodingException
+    public String gotoDetail(Long employeeId, String mode) throws UnsupportedEncodingException
     {
         System.out.println(String.format(">>> EmployeeList gotoDetail(%s,%s) BEGIN >>>", employeeId, mode));
         

@@ -14,7 +14,6 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -36,11 +35,11 @@ public class EmployeeDetail implements Serializable {
     }
     
     public static class QueryParameter {
-        private Integer employeeId;
+        private Long employeeId;
         private Mode mode = Mode.Undefined;
         
-        public Integer getEmployeeId() { return employeeId; }
-        public void setEmployeeId(Integer employeeId) { this.employeeId = employeeId; }
+        public Long getEmployeeId() { return employeeId; }
+        public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
         public Mode getMode() { return mode; }
         public void setMode(Mode mode) { this.mode = mode; }
     }
@@ -48,7 +47,7 @@ public class EmployeeDetail implements Serializable {
     //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="JSFページで画面項目をバインドするプロパティ">
-    private Integer employee_id;
+    private Long employee_id;
     
     //--Bean バリデーション
     @NotNull(message="社員コードの入力は必須です。")
@@ -103,11 +102,11 @@ public class EmployeeDetail implements Serializable {
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="JSFページで画面項目をバインドするプロパティのgetter・setter">
-    public Integer getEmployee_id() {
+    public Long getEmployee_id() {
         return employee_id;
     }
     
-    public void setEmployee_id(Integer employee_id) {
+    public void setEmployee_id(Long employee_id) {
         this.employee_id = employee_id;
     }
     

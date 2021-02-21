@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<jpa:entity-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" pkg="entity" v="4.4" rws="_15490577311042" Pws="_15490577311042" cws="_15490577311042" persistenceUnitName="EmployeePU" sm="false" xs="false" id="_15490577311041" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd">
+<jpa:entity-mappings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" pkg="type" v="4.4" rws="_15490577311042" Pws="_15490577311042" cws="_15490577311042" persistenceUnitName="EmployeePU" sm="false" xs="false" id="_15490577311041" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd">
     <jpa:entity compositePrimaryKeyClass="TUserPK" abs="false" class="TUser" v="true" jbn="false" xre="false" m="false" rootElement="_15490577311041" id="_1610217641208">
         <jpa:ts e="true">
             <jpa:a>_16102176412232</jpa:a>
@@ -83,6 +83,97 @@
             <jpa:query>Delete FROM TGroup e WHERE e.tUser.userid = :userid</jpa:query>
         </jpa:nq>
     </jpa:entity>
+    <jpa:entity compositePrimaryKeyClass="TEmployeePK" abs="false" class="TEmployee" v="true" jbn="false" xre="false" m="false" rootElement="_15490577311041" id="_1613933688897">
+        <jpa:ath>owner</jpa:ath>
+        <jpa:attributes>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="employeeCode" id="_16139337361016">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="name" id="_16139342989259">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
+            <jpa:basic attribute-type="type.Gender" v="true" xvt="" name="gender" id="_161393430382110">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+                <jpa:convert c="util.converter.GenderConverter" d="false"/>
+            </jpa:basic>
+            <jpa:basic attribute-type="java.util.Date" v="true" xvt="" name="birthday" id="_161393440500511">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+                <jpa:temporal>DATE</jpa:temporal>
+            </jpa:basic>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="phone" id="_161393455830212">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="mobilePhone" id="_161393456330113">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="zipCode" id="_161393456982914">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="address" id="_161393457546115">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
+            <jpa:basic attribute-type="String" v="true" xvt="" name="remarks" id="_161393458181416">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:basic>
+            <jpa:transient attribute-type="String" v="true" xvt="" name="departmentCode" id="_16139342590938">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+            </jpa:transient>
+            <jpa:id attribute-type="Long" v="true" xvt="" name="employee_id" id="_16139336889074">
+                <jpa:xwm nil="false" req="false"/>
+                <jpa:xm nil="false" req="false"/>
+                <jpa:generated-value strategy="IDENTITY"/>
+            </jpa:id>
+        </jpa:attributes>
+        <jpa:nq e="false" name="TEmployee.findAll">
+            <jpa:query>Select e from TEmployee e</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByEmployeeCode">
+            <jpa:query>Select t from TEmployee t where t.employeeCode=:employeeCode</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByDepartmentCode">
+            <jpa:query>Select t from TEmployee t where t.departmentCode=:departmentCode</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByName">
+            <jpa:query>Select t from TEmployee t where t.name=:name</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByGender">
+            <jpa:query>Select t from TEmployee t where t.gender=:gender</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByBirthday">
+            <jpa:query>Select t from TEmployee t where t.birthday=:birthday</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByPhone">
+            <jpa:query>Select t from TEmployee t where t.phone=:phone</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByMobilePhone">
+            <jpa:query>Select t from TEmployee t where t.mobilePhone=:mobilePhone</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByZipCode">
+            <jpa:query>Select t from TEmployee t where t.zipCode=:zipCode</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByAddress">
+            <jpa:query>Select t from TEmployee t where t.address=:address</jpa:query>
+        </jpa:nq>
+        <jpa:nq e="false" name="TEmployee.findByRemarks">
+            <jpa:query>Select t from TEmployee t where t.remarks=:remarks</jpa:query>
+        </jpa:nq>
+        <jpa:table>
+            <jpa:unique-constraint name="t_employee_unique_employee_code">
+                <jpa:column-name>EMPLOYEECODE</jpa:column-name>
+            </jpa:unique-constraint>
+        </jpa:table>
+    </jpa:entity>
+    <jpa:converter c="util.converter.GenderConverter" a="type.Gender" f="java.lang.String"/>
     <jpa:snp loc="BEFORE_PACKAGE" e="true">/**
  * This file was generated by the Jeddict
  */</jpa:snp>
@@ -101,6 +192,7 @@
         <jpa:ws n="Main" id="_15490577311042">
             <i ref="_1610217641208" x="628" y="234"/>
             <i ref="_1610284399947" x="307" y="61"/>
+            <i ref="_1613933688897" x="131" y="197"/>
         </jpa:ws>
     </jpa:wsl>
 </jpa:entity-mappings>
