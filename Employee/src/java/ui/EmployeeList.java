@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import service.EmployeeListService.DeleteResult;
 
 /**
  *
@@ -33,14 +33,12 @@ import javax.transaction.Transactional;
 @Named
 @ViewScoped
 public class EmployeeList implements Serializable {
-    @PersistenceContext
-    private EntityManager em;
-    
+
     @Inject
     private PageNavigator pageNavigator;
     
     @Inject
-    private EmployeeListService employeeListService;
+    private EmployeeListService service;
     
     @Inject
     private EmployeeSearch employeeSearch;
@@ -67,11 +65,11 @@ public class EmployeeList implements Serializable {
     {
         System.out.println(">>> EmployeeList viewAction() BEGIN >>>");
 
-        Long               employeeAllCount   = employeeListService.countEmployeeAllCount(searchCondition);
+        Long               employeeAllCount   = service.countEmployeeAllCount(searchCondition);
         Map<String,String> searchParameterMap = employeeSearch.generateSearchParameterMap(searchCondition);
         pageNavigator.build(employeeAllCount, searchParameterMap);
         
-        List<TEmployee> employeeList = employeeListService.extractEmployees(searchCondition, 
+        List<TEmployee> employeeList = service.extractEmployees(searchCondition, 
                                                                           employeeAllCount, 
                                                                           pageNavigator.getOffset(), 
                                                                           pageNavigator.getRowCountPerPage());
@@ -112,28 +110,37 @@ public class EmployeeList implements Serializable {
         return "employeeBatch?faces-redirect=true";
     }
     
-    @Transactional
     public String deleteEmployee(Long employeeId) throws UnsupportedEncodingException
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
         
-        TEmployee employee = em.find(TEmployee.class, employeeId);
-        if(employee == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("削除する社員情報が見つかりません。"));
-            return search();
+        DeleteResult result = service.delete(employeeId);
+        String destination;
+        switch(result.getType()) {
+            case SUCCESS:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員コード:" + result.getEmployeeCode() + "を削除しました。"));
+                destination = search();
+                break;
+                
+            case FAILURE_EMPLOYEE_NOT_FOUND:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("削除する社員情報が見つかりません。"));
+                destination = search();
+                break;
+                
+            default:
+                destination = null;
+                break;
         }
-        em.remove(employee);
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員コード:" + employee.getEmployeeCode() + "を削除しました。"));
-        return search();
+        return destination;
     }
     
-    @Transactional
     public String deleteAllEmployee()
     {
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
         flash.setKeepMessages(true);    //リダイレクト後もFacesMessageが保持されるよう設定する
-        int deleteCount = em.createQuery("DELETE FROM TEmployee").executeUpdate();
+        
+        int deleteCount = service.deleteAll();
         
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(deleteCount + "件の社員情報を削除しました。"));
         String queryString = employeeSearch.generateSearchURLQueryString(searchCondition);
@@ -143,14 +150,6 @@ public class EmployeeList implements Serializable {
     
     public String gotoDetail(Long employeeId, String mode) throws UnsupportedEncodingException
     {
-        System.out.println(String.format(">>> EmployeeList gotoDetail(%s,%s) BEGIN >>>", employeeId, mode));
-        
-        TEmployee tEmployee = em.find(TEmployee.class, employeeId);
-        if(tEmployee == null) {
-            return "";
-        }
-        
-        System.out.println(String.format("<<< EmployeeList gotoDetail(%s,%s) END <<<", employeeId, mode));
         return "employeeDetail?faces-redirect=true&employee_id=" + employeeId + "&mode=" + URLEncoder.encode(mode, "UTF-8");
     }
        

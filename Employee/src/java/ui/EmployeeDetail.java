@@ -11,20 +11,25 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import service.EmployeeDetailService;
+import service.EmployeeDetailService.DeleteResult;
+import service.EmployeeDetailService.FindResult;
+import service.EmployeeDetailService.RegistResult;
+import service.EmployeeDetailService.UpdateResult;
 import type.Gender;
 
 @Named
 @ViewScoped
 public class EmployeeDetail implements Serializable {
-    @PersistenceContext
-    protected EntityManager em;
+    
+    @Inject
+    private EmployeeDetailService service;
     
     //<editor-fold defaultstate="collapsed" desc="JSFページでURLのクエリパラメータをバインドするプロパティ">
     public enum Mode {
@@ -209,9 +214,10 @@ public class EmployeeDetail implements Serializable {
         System.out.println("<<< Employee terminate() END <<<");
     }
     
-    public void initQueryParameters()
+    public String initQueryParameters()
     {
         System.out.println(">>> Employee initQueryParameters() BEGIN >>>");
+        String destination = null;
         switch(this.queryParameter.mode) {
             case New:
                 break;
@@ -219,13 +225,17 @@ public class EmployeeDetail implements Serializable {
             case Read:
                 if(this.queryParameter.employeeId == null || this.queryParameter.employeeId.equals("")) break;
                     
-                TEmployee entity = em.find(TEmployee.class, this.queryParameter.employeeId);
-                if(entity == null) break;
-                
+                FindResult result = service.find(this.queryParameter.employeeId);
+                if(result.getType() == FindResult.Type.FAILURE_EMPLOYEE_NOT_FOUND) {
+                    destination = "employeeList.xhtml?faces-redirect=true";
+                    break;
+                }
+                TEmployee entity = result.getEmployee();
+
                 //エンティティの値をプロパティに設定
                 this.employee_id = entity.getEmployee_id();
                 this.employeeCode = entity.getEmployeeCode();
-                this.departmentCode = entity.getDepartmentCode();
+                this.departmentCode = entity.getDepartment().getDepartmentCode();
                 this.name = entity.getName();
                 this.gender = entity.getGender();
                 this.birthday = entity.getBirthday();
@@ -234,13 +244,13 @@ public class EmployeeDetail implements Serializable {
                 this.zipCode = entity.getZipCode();
                 this.address = entity.getAddress();
                 this.remarks = entity.getRemarks();
-                
                 System.out.println("employee found! [employeeId=" + entity.getEmployee_id() + ", mode=" + this.queryParameter.mode.name() + "]");
                 break;       
             default:
                 break;
         }
         System.out.println("<<< Employee initQueryParameters() END <<<");
+        return destination;
     }
     
     public String beginEdit()
@@ -276,78 +286,17 @@ public class EmployeeDetail implements Serializable {
     public String save() throws UnsupportedEncodingException
     {
         System.out.println(">>> Employee save() BEGIN >>>");
+
+        //リダイレクト後もFacesMessageが保持されるよう設定する
         Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-        flash.setKeepMessages(true);        //リダイレクト後もFacesMessageが保持されるよう設定する
+        flash.setKeepMessages(true);        
 
         String destination;
         if(isNew()) {
-            Long employeeCount = em.createQuery("SELECT COUNT(t) FROM TEmployee t WHERE t.employeeCode = :employeeCode", Long.class)
-                                            .setParameter("employeeCode", employeeCode)
-                                            .getSingleResult();
-            if(employeeCount > 0) {
-                //同じ社員情報がデータベースに既に存在する場合
-                FacesContext.getCurrentInstance().addMessage(
-                                null,
-                                new FacesMessage("社員コード:" + employeeCode + "は既に使用されています。")
-                );
-                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
-                destination = null;
-                
-            } else {
-                TEmployee entity = new TEmployee();
-                entity.setEmployeeCode(this.employeeCode);
-                entity.setDepartmentCode(this.departmentCode);
-                entity.setName(this.name);
-                entity.setGender(this.gender);
-                entity.setBirthday(this.birthday);
-                entity.setPhone(this.phone);
-                entity.setMobilePhone(this.mobilePhone);
-                entity.setZipCode(this.zipCode);
-                entity.setAddress(this.address);
-                entity.setRemarks(this.remarks);
-                em.persist(entity);
-                em.flush(); //SQLを発行してIDを自動附番させ、entityに反映させる
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員情報を新規登録しました。"));
-                
-                //処理後は読み取りモードで画面を開きなおす
-                StringBuilder builder = new StringBuilder();
-                builder.append("employeeDetail.xhtml?faces-redirect=true");
-                builder.append("&employee_id=");
-                builder.append(entity.getEmployee_id().toString());
-                builder.append("&mode=");
-                builder.append(URLEncoder.encode(this.queryParameter.mode.Read.name(),"UTF-8"));
-                destination = builder.toString();
-            }
+            destination = regist();
 
         } else {
-            TEmployee entity = em.find(TEmployee.class, this.employee_id);
-            if(entity==null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員情報の更新に失敗しました。既に削除されている可能性があります。"));
-                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
-                destination = null;
-            } else {
-                entity.setEmployeeCode(this.employeeCode);
-                entity.setDepartmentCode(this.departmentCode);
-                entity.setName(this.name);
-                entity.setGender(this.gender);
-                entity.setBirthday(this.birthday);
-                entity.setPhone(this.phone);
-                entity.setMobilePhone(this.mobilePhone);
-                entity.setZipCode(this.zipCode);
-                entity.setAddress(this.address);
-                entity.setRemarks(this.remarks);
-                em.merge(entity);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("社員情報を保存しました。"));
-
-                //処理後は読み取りモードで画面を開きなおす
-                StringBuilder builder = new StringBuilder();
-                builder.append("employeeDetail.xhtml?faces-redirect=true");
-                builder.append("&employee_id=");
-                builder.append(entity.getEmployee_id().toString());
-                builder.append("&mode=");
-                builder.append(URLEncoder.encode(this.queryParameter.mode.Read.name(),"UTF-8"));
-                destination = builder.toString();
-            }
+            destination = update();
         }
         
         System.out.println("<<< Employee save() END <<<");
@@ -357,23 +306,34 @@ public class EmployeeDetail implements Serializable {
    @Transactional
    public String delete()
    {
-       Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-       flash.setKeepMessages(true);        //リダイレクト後もFacesMessageが保持されるよう設定する
-       
-       TEmployee employee = em.find(TEmployee.class, this.employee_id);
-       if(employee == null) {
-           FacesContext.getCurrentInstance()
-                .addMessage(
-                   null, 
-                   new FacesMessage("社員コード:" + this.employeeCode + " が見つかりません。既に削除された可能性があります。")
-                );
-           return "employeeList.xhtml?faces-redirect=true";
-       }
-       em.remove(employee);
-       
-       FacesContext.getCurrentInstance()
-               .addMessage(null, new FacesMessage("社員コード:" + this.employeeCode + " を削除しました。"));
-       return "employeeList.xhtml?faces-redirect=true";
+        //メッセージ定数準備
+        final String MESSAGE_DELETE_FAILURE_EMPLOYEE_NOT_FOUND      = "社員コード:" + this.employeeCode + " が見つかりません。既に削除された可能性があります。";
+        final String MESSAGE_DELETE_SUCCESS                         = "社員コード:" + this.employeeCode + " を削除しました。";
+        
+        Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+        flash.setKeepMessages(true);        //リダイレクト後もFacesMessageが保持されるよう設定する
+
+        String destination;
+
+        DeleteResult result = service.delete(this.employeeCode);
+        switch(result) {
+            case SUCCESS:
+                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(MESSAGE_DELETE_SUCCESS));
+                 destination = "employeeList.xhtml?faces-redirect=true";
+                 break;
+
+            case FAILURE_EMPLOYEE_NOT_FOUND:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(MESSAGE_DELETE_FAILURE_EMPLOYEE_NOT_FOUND));
+                
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+                break;
+
+            default:
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+        }
+        return destination;
    }
    
 //<editor-fold defaultstate="collapsed" desc="プライベート">
@@ -391,6 +351,119 @@ public class EmployeeDetail implements Serializable {
            e.printStackTrace();
        }
        return viewId;
+   }
+   
+   private String regist() throws UnsupportedEncodingException
+   {
+        //メッセージ定数準備
+        final String MESSAGE_REGIST_FAILURE_EMPLOYEE_ALREADY_EXISTS = "社員コード:" + employeeCode + "は既に使用されています。";
+        final String MESSAGE_REGIST_FAILURE_DEPARTMENT_NOT_FOUND    = "社員情報に設定された部署情報が見つかりません。";
+        final String MESSAGE_REGIST_SUCCESS                         = "社員情報を新規登録しました。";
+        
+        RegistResult result = service.regist(
+                                                this.employeeCode, 
+                                                this.departmentCode, 
+                                                this.name, 
+                                                this.gender, 
+                                                this.birthday, 
+                                                this.phone, 
+                                                this.mobilePhone, 
+                                                this.zipCode, 
+                                                this.address, 
+                                                this.remarks);
+        
+        String destination;
+        switch(result.getType()) {
+            case SUCCESS:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(MESSAGE_REGIST_SUCCESS));
+
+                //処理後は読み取りモードで画面を開きなおす
+                StringBuilder builder = new StringBuilder();
+                builder.append("employeeDetail.xhtml?faces-redirect=true");
+                builder.append("&employee_id=");
+                builder.append(result.getEmployeeId().toString());
+                builder.append("&mode=");
+                builder.append(URLEncoder.encode(Mode.Read.name(),"UTF-8"));
+                destination = builder.toString();
+                break;
+            
+            case FAILURE_EMPLOYEE_ALREADY_EXISTS:
+                FacesContext.getCurrentInstance().addMessage(null,new FacesMessage(MESSAGE_REGIST_FAILURE_EMPLOYEE_ALREADY_EXISTS));
+
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+
+                break;
+
+            case FAILURE_DEPARTMENT_NOT_FOUND:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(MESSAGE_REGIST_FAILURE_DEPARTMENT_NOT_FOUND));
+
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+
+                break;
+
+            default:
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+        }
+        return destination;
+   }
+   
+   private String update() throws UnsupportedEncodingException
+   {
+        //メッセージ定数準備
+        final String MESSAGE_UPDATE_FAILURE_EMPLOYEE_NOT_FOUND      = "社員情報の更新に失敗しました。既に削除されている可能性があります。";
+        final String MESSAGE_UPDATE_FAILURE_DEPARTMENT_NOT_FOUND    = "社員情報に設定された部署情報が見つかりません。";
+        final String MESSAGE_UPDATE_SUCCESS                         = "社員情報を保存しました。";
+       
+       UpdateResult result = service.update(
+                                        this.employee_id, 
+                                        this.employeeCode, 
+                                        this.departmentCode, 
+                                        this.name, 
+                                        this.gender, 
+                                        this.birthday, 
+                                        this.phone, 
+                                        this.mobilePhone, 
+                                        this.zipCode, 
+                                        this.address, 
+                                        this.remarks);
+       
+        String destination;
+        switch(result) {
+            case SUCCESS:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(MESSAGE_UPDATE_SUCCESS));
+
+                //処理後は読み取りモードで画面を開きなおす
+                StringBuilder builder = new StringBuilder();
+                builder.append("employeeDetail.xhtml?faces-redirect=true");
+                builder.append("&employee_id=");
+                builder.append(employee_id.toString());
+                builder.append("&mode=");
+                builder.append(URLEncoder.encode(this.queryParameter.mode.Read.name(),"UTF-8"));
+                destination = builder.toString();
+                break;
+
+            case FAILURE_EMPLOYEE_NOT_FOUND:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(MESSAGE_UPDATE_FAILURE_EMPLOYEE_NOT_FOUND));
+                
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+                break;
+
+            case FAILURE_DEPARTMENT_NOT_FOUND:
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(MESSAGE_UPDATE_FAILURE_DEPARTMENT_NOT_FOUND));
+                
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+                break;
+
+            default:
+                //登録処理を中止。現在の画面にとどまり、@ViewScopedのCDIビーンの内容を破棄しない。
+                destination = null;
+        }
+        return destination;
    }
 //</editor-fold>
    

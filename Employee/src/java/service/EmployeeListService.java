@@ -10,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 
 /**
  *
@@ -48,6 +49,58 @@ public class EmployeeListService implements Serializable {
                     .getResultList();
     }
     
+    public static class DeleteResult {
+        public static enum Type {
+            SUCCESS,
+            FAILURE_EMPLOYEE_NOT_FOUND,
+        }
+        private static DeleteResult success(String employeeCode)
+        {
+            return new DeleteResult(Type.SUCCESS, employeeCode);
+        }
+        
+        private static DeleteResult failureEmployeeNotFound()
+        {
+            return new DeleteResult(Type.FAILURE_EMPLOYEE_NOT_FOUND, null);
+        }
+        
+        private Type type;
+        private String employeeCode;
+
+        private DeleteResult(Type type, String employeeCode) {
+            this.type = type;
+            this.employeeCode = employeeCode;
+        }
+        
+        public Type getType() {
+            return type;
+        }
+
+        public String getEmployeeCode() {
+            return employeeCode;
+        }
+    }
+    
+    @Transactional
+    public DeleteResult delete(Long employeeId)
+    {
+        TEmployee employee = em.find(TEmployee.class, employeeId);
+        if(employee==null) {
+            return DeleteResult.failureEmployeeNotFound();
+        } else {
+            em.remove(employee);
+
+            return DeleteResult.success(employee.getEmployeeCode());
+        }
+    }
+
+    @Transactional
+    public int deleteAll()
+    {
+        return em.createQuery("DELETE FROM TEmployee").executeUpdate();
+    }
+    
+//<editor-fold defaultstate="collapsed" desc="プライベート">
     private void appendWherePhrase(StringBuilder sql)
     {
         sql.append("WHERE (:employeeCodeIsEmpty = TRUE OR t.employeeCode = :employeeCode)   \n");
@@ -81,7 +134,7 @@ public class EmployeeListService implements Serializable {
         query.setParameter("mobilePhoneIsEmpty" , mobilePhoneIsEmpty );
         query.setParameter("zipCodeIsEmpty"     , zipCodeIsEmpty     );
         query.setParameter("addressIsEmpty"     , addressIsEmpty     );
-        query.setParameter("remarksIsEmpty"     , remarksIsEmpty     );  
+        query.setParameter("remarksIsEmpty"     , remarksIsEmpty     );
         
         String employeeCode = searchCondition.getEmployeeCode() == null ? "" : searchCondition.getEmployeeCode();
         String name         = searchCondition.getName()         == null ? "" : "%" + likeEscape(searchCondition.getName()) + "%";
@@ -109,4 +162,5 @@ public class EmployeeListService implements Serializable {
                 .replaceAll("_", "\\\\_")
                 .replaceAll("%", "\\\\%");
     }
+//</editor-fold>
 }

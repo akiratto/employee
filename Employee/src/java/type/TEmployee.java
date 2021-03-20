@@ -10,10 +10,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import util.converter.GenderConverter;
 
@@ -23,6 +24,7 @@ import util.converter.GenderConverter;
 @Entity
 @Table(uniqueConstraints = {
     @UniqueConstraint(name = "t_employee_unique_employee_code", columnNames = {"EMPLOYEECODE"})})
+@NamedQuery(name = "TEmployee.findByEmployeeCode", query = "Select t from TEmployee t where t.employeeCode=:employeeCode")
 public class TEmployee {
 
     @Id
@@ -58,8 +60,8 @@ public class TEmployee {
     @Basic
     private String remarks;
 
-    @Transient
-    private String departmentCode;
+    @OneToOne(targetEntity = TDepartment.class)
+    private TDepartment department;
 
     public Long getEmployee_id() {
         return this.employee_id;
@@ -141,12 +143,39 @@ public class TEmployee {
         this.remarks = remarks;
     }
 
-    public String getDepartmentCode() {
-        return this.departmentCode;
+    public TDepartment getDepartment() {
+        return this.department;
     }
 
-    public void setDepartmentCode(String departmentCode) {
-        this.departmentCode = departmentCode;
+    public void setDepartment(TDepartment department) {
+        this.department = department;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!java.util.Objects.equals(getClass(), obj.getClass())) {
+            return false;
+        }
+        final TEmployee other = (TEmployee) obj;
+        if (!java.util.Objects.equals(this.getEmployee_id(), other.getEmployee_id())) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + (this.getEmployee_id() != null ? this.getEmployee_id().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return "TEmployee{" + " employeeCode=" + employeeCode + '}';
     }
 
 }
