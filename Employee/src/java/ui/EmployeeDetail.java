@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
@@ -23,6 +24,8 @@ import service.EmployeeDetailService.FindResult;
 import service.EmployeeDetailService.RegistResult;
 import service.EmployeeDetailService.UpdateResult;
 import type.Gender;
+import type.TDepartment;
+import ui.common.DepartmentSelector;
 
 @Named
 @ViewScoped
@@ -30,6 +33,9 @@ public class EmployeeDetail implements Serializable {
     
     @Inject
     private EmployeeDetailService service;
+    
+    @Inject
+    private DepartmentSelector departmentSelector;
     
     //<editor-fold defaultstate="collapsed" desc="JSFページでURLのクエリパラメータをバインドするプロパティ">
     public enum Mode {
@@ -199,7 +205,7 @@ public class EmployeeDetail implements Serializable {
     public boolean isNew() { return queryParameter.mode == Mode.New; }
     public boolean isRead() { return queryParameter.mode == Mode.Read; }
     public boolean isEdit() { return queryParameter.mode == Mode.Edit; }
-    
+
     @PostConstruct
     public void init()
     {
@@ -235,7 +241,10 @@ public class EmployeeDetail implements Serializable {
                 //エンティティの値をプロパティに設定
                 this.employee_id = entity.getEmployee_id();
                 this.employeeCode = entity.getEmployeeCode();
-                this.departmentCode = entity.getDepartment().getDepartmentCode();
+                this.departmentCode = Optional.ofNullable(entity)
+                                              .map(TEmployee::getDepartment)
+                                              .map(TDepartment::getDepartmentCode)
+                                              .orElse("");
                 this.name = entity.getName();
                 this.gender = entity.getGender();
                 this.birthday = entity.getBirthday();

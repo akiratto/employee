@@ -9,13 +9,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 /**
  * @author owner
  */
 @Entity
-@NamedQuery(name = "TDepartment.findByDepartmentCode", query = "Select t from TDepartment t where t.departmentCode=:departmentCode")
+@NamedQueries({
+    @NamedQuery(name = "TDepartment.findAll", query = "Select e from TDepartment e")
+    ,@NamedQuery(name = "TDepartment.findByDepartmentCode", query = "Select t from TDepartment t where t.departmentCode=:departmentCode")
+})
 public class TDepartment {
 
     @Id
@@ -71,7 +75,7 @@ public class TDepartment {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 17 * hash + (this.getDepartmentCode() != null ? this.getDepartmentCode().hashCode() : 0);
+        hash = 31 * hash + (this.getDepartmentCode() != null ? this.getDepartmentCode().hashCode() : 0);
         return hash;
     }
 

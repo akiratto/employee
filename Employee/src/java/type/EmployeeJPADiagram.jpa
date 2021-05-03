@@ -211,7 +211,7 @@
                 <jpa:generated-value strategy="IDENTITY"/>
             </jpa:id>
         </jpa:attributes>
-        <jpa:nq e="false" name="TDepartment.findAll">
+        <jpa:nq e="true" name="TDepartment.findAll">
             <jpa:query>Select e from TDepartment e</jpa:query>
         </jpa:nq>
         <jpa:nq e="true" name="TDepartment.findByDepartmentCode">

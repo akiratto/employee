@@ -65,7 +65,7 @@ public class TUser implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 47 * hash + (this.getUserid() != null ? this.getUserid().hashCode() : 0);
+        hash = 53 * hash + (this.getUserid() != null ? this.getUserid().hashCode() : 0);
         return hash;
     }
 

@@ -169,7 +169,7 @@ public class TEmployee {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 47 * hash + (this.getEmployee_id() != null ? this.getEmployee_id().hashCode() : 0);
+        hash = 19 * hash + (this.getEmployee_id() != null ? this.getEmployee_id().hashCode() : 0);
         return hash;
     }
 

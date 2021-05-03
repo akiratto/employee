@@ -31,18 +31,24 @@
                         <h:commandButton value="取消" action="#{employeeDetail.cancelEdit()}" rendered="#{employeeDetail.isEdit()}" immediate="true" />
                     </h:panelGrid>
                     <h:panelGrid columns="3">
-                        <h:outputLabel value="部署：" />
-                        <h:outputText value="#{employeeDetail.departmentCode}" />
-                        <p:commandButton value="検索" onclick="PF('searchDepartmentDialog').show()"/>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="部署" />
+                            <h:commandButton value="検索" action="#{departmentSelector.call()}">
+                                <f:ajax execute="@this" render="departmentList" />
+                            </h:commandButton>
+                        </h:panelGrid>
+                        <h:outputText value="#{employeeDetail.departmentCode}" rendered="#{not empty employeeDetail.departmentCode}"/>
+                        <h:outputText value="(なし)" rendered="#{empty employeeDetail.departmentCode}" />
+                        <h:outputText value="" />
                         
-                        <h:outputLabel value="社員コード：" />
+                        <h:outputLabel value="社員コード" />
                         <h:inputText id="employee_code" 
                                       value="#{employeeDetail.employeeCode}"
                                       disabled="#{not employeeDetail.isNew()}"
                                       onkeypress="if(event.keyCode == 13) return false;" />
                         <h:outputText value="" />
 
-                        <h:outputLabel value="社員名：" for="employee_name" />
+                        <h:outputLabel value="社員名" for="employee_name" />
                         <h:inputText id="employee_name" 
                                        value="#{employeeDetail.name}" 
                                        disabled="#{employeeDetail.isRead()}" 
@@ -51,7 +57,7 @@
                         </h:inputText>
                         <h:message for="employee_name" />
 
-                        <h:outputLabel value="性別：" for="employee_gender" />
+                        <h:outputLabel value="性別" for="employee_gender" />
                         <h:selectOneMenu id="employee_gender" value="#{employeeDetail.gender}" disabled="#{employeeDetail.isRead()}">
                             <f:selectItem itemLabel="男" itemValue="M" />
                             <f:selectItem itemLabel="女" itemValue="F" />
@@ -102,9 +108,25 @@
                                            rows="20"/>
                         <h:message for="employee_remarks" />
                     </h:panelGrid>
-                    <p:dialog widgetVar="searchDepartmentDialog">
-                        <p>Test</p>
-                    </p:dialog>
+                    
+  
+                    <h:dataTable id="departmentList" value="#{departmentSelector.departments}" var="dep">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="部署コード" />
+                            </f:facet>
+                            <h:commandButton action="employeeDetail?faces-redirect=true">
+                                <h:outputText value="#{dep.departmentCode}" />
+                                <f:setPropertyActionListener value="#{dep.departmentCode}" target="#{employeeDetail.departmentCode}" />
+                            </h:commandButton>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="部署名" />
+                            </f:facet>
+                            <h:outputText value="#{dep.departmentName}" />
+                        </h:column>
+                    </h:dataTable>
                 </h:form>
             </ui:define>
         </ui:composition>
