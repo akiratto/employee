@@ -254,7 +254,7 @@ public class EmployeeDetail implements Serializable {
                 this.address = entity.getAddress();
                 this.remarks = entity.getRemarks();
                 System.out.println("employee found! [employeeId=" + entity.getEmployee_id() + ", mode=" + this.queryParameter.mode.name() + "]");
-                break;       
+                break;
             default:
                 break;
         }

@@ -3,7 +3,7 @@ package ui.common;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.enterprise.context.RequestScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -14,7 +14,7 @@ import type.TDepartment;
  * @author owner
  */
 @Named
-@RequestScoped
+@ViewScoped
 public class DepartmentSelector implements Serializable {
     @PersistenceContext
     private EntityManager em;

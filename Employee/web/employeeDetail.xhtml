@@ -37,8 +37,7 @@
                                 <f:ajax execute="@this" render="departmentList" />
                             </h:commandButton>
                         </h:panelGrid>
-                        <h:outputText value="#{employeeDetail.departmentCode}" rendered="#{not empty employeeDetail.departmentCode}"/>
-                        <h:outputText value="(なし)" rendered="#{empty employeeDetail.departmentCode}" />
+                        <h:outputText id="department_code" value="#{empty employeeDetail.departmentCode ? '(なし)' : employeeDetail.departmentCode}"/>
                         <h:outputText value="" />
                         
                         <h:outputLabel value="社員コード" />
@@ -115,8 +114,8 @@
                             <f:facet name="header">
                                 <h:outputText value="部署コード" />
                             </f:facet>
-                            <h:commandButton action="employeeDetail?faces-redirect=true">
-                                <h:outputText value="#{dep.departmentCode}" />
+                            <h:commandButton value="#{dep.departmentCode}">
+                                <f:ajax event="click" render="frm:department_code" />
                                 <f:setPropertyActionListener value="#{dep.departmentCode}" target="#{employeeDetail.departmentCode}" />
                             </h:commandButton>
                         </h:column>
