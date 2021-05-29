@@ -1,0 +1,22 @@
+/* 
+    Created on : 2021/05/22, 12:29:40
+    Author     : owner
+*/
+.dialog_frame {
+    position: absolute;
+    top:100px;
+    left:360px;
+    
+    padding-left:8px;
+    padding-right:8px;
+    padding-top:8px;
+    
+   /* border:5px solid #E0E0E0; */
+    
+    width:320px;
+    height:320px;
+    background-color: #FFFFFF;
+    z-index:2;
+    
+    box-shadow: 0 0 30px gray;
+}
