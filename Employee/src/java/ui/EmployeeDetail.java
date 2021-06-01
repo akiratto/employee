@@ -66,6 +66,7 @@ public class EmployeeDetail implements Serializable {
     private String employeeCode;
     
     private String departmentCode;
+    private String departmentName;
     
     //--Bean バリデーション
     @NotNull(message="社員名の入力は必須です。")
@@ -135,6 +136,14 @@ public class EmployeeDetail implements Serializable {
     
     public void setDepartmentCode(String departmentCode) {
         this.departmentCode = departmentCode;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
     
     public String getName() {
@@ -244,6 +253,10 @@ public class EmployeeDetail implements Serializable {
                 this.departmentCode = Optional.ofNullable(entity)
                                               .map(TEmployee::getDepartment)
                                               .map(TDepartment::getDepartmentCode)
+                                              .orElse("");
+                this.departmentName = Optional.ofNullable(entity)
+                                              .map(TEmployee::getDepartment)
+                                              .map(TDepartment::getDepartmentName)
                                               .orElse("");
                 this.name = entity.getName();
                 this.gender = entity.getGender();

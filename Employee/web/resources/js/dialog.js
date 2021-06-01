@@ -7,9 +7,14 @@ function dialog_show_success(data) {
     }
 }
 
+function dialog_close()
+{
+    dialog_frame.style.display = 'none';
+}
+
 function dialog_close_success(data) {
     if(data.status === 'success') {
-        dialog_frame.style.display = 'none';
+        dialog_close();
     }
 }
 

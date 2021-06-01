@@ -38,11 +38,11 @@
                     <h:panelGrid columns="3">
                         <h:panelGrid columns="2">
                             <h:outputLabel value="部署" />
-                            <h:commandButton value="検索" action="#{departmentSelector.call()}">
-                                <f:ajax event="click" render="dlg" onevent="dialog_show_success"/>
+                            <h:commandButton value="検索" action="#{departmentSelector.call()}" disabled="#{employeeDetail.isRead()}">
+                                <f:ajax event="click" render="departmentList" onevent="dialog_show_success"/>
                             </h:commandButton>
                         </h:panelGrid>
-                        <h:outputText id="department_code" value="#{empty employeeDetail.departmentCode ? '(なし)' : employeeDetail.departmentCode}"/>
+                        <h:outputText id="department_code" value="#{empty employeeDetail.departmentCode ? '(なし)' : employeeDetail.departmentCode += ' ' += employeeDetail.departmentName}"/>
                         <h:outputText value="" />
                         
                         <h:outputLabel value="社員コード" />
@@ -114,7 +114,7 @@
                     </h:panelGrid>
                     
                     
-                    <div jsf:id="dlg" class="dialog_frame" style="display: none">
+                    <div class="dialog_frame" style="display: none">
                         <div class="dialog_title" style="float: left; width: 92%">部署選択</div>
                         <div class="dialog_close" style="float: none;" onclick="dialog_close();">×</div>
                         <h:dataTable id="departmentList" value="#{departmentSelector.departments}" var="dep">
@@ -125,6 +125,7 @@
                                 <h:commandButton value="#{dep.departmentCode}">
                                     <f:ajax event="click" render="frm:department_code" onevent="dialog_close_success"/>
                                     <f:setPropertyActionListener value="#{dep.departmentCode}" target="#{employeeDetail.departmentCode}" />
+                                    <f:setPropertyActionListener value="#{dep.departmentName}" target="#{employeeDetail.departmentName}" />
                                 </h:commandButton>
                             </h:column>
                             <h:column>
